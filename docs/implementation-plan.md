@@ -243,8 +243,9 @@ npm run build         # Build the production application
 - [x] Configure ESLint, Prettier, EditorConfig, and local quality scripts.
 - [x] Configure React Router, application layout, route placeholders, NotFoundPage, RouteErrorPage, and AppErrorBoundary.
 - [x] Create reset rules, design tokens, global styles, a responsive application layout, and the reusable Button primitive.
+- [x] Configure Vitest, Testing Library, JSDOM, coverage reporting, and baseline tests for NotFoundPage, RouteErrorPage, and AppErrorBoundary.
 - [ ] Add the remaining folder structure with active files.
-- [ ] Configure testing and CI.
+- [ ] Configure CI.
 - [ ] Update the README with local setup instructions.
 
 The following items are required before product functionality is implemented:
