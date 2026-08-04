@@ -116,13 +116,13 @@ The application is a responsive task management web application for desktop and 
 
 All routes are served by the same responsive web application. There are no desktop-only, mobile-only, iOS, Android, multi-assignee, or task-detail routes in the initial scope.
 
-| Path | Page | Behavior |
-| --- | --- | --- |
-| `/` | Redirect | Redirects to `/dashboard`. |
-| `/dashboard` | `DashboardPage` | Shows all available tasks grouped by status. Each task has zero or one assignee. |
-| `/my-tasks` | `MyTasksPage` | Shows only tasks whose `assigneeId` matches `profile.id`. |
-| `/settings` | `SettingsPage` | Shows authenticated user information from `profile`; `type` is presented as Position. |
-| `*` | `NotFoundPage` | Handles unknown URLs. |
+| Path         | Page            | Behavior                                                                              |
+| ------------ | --------------- | ------------------------------------------------------------------------------------- |
+| `/`          | Redirect        | Redirects to `/dashboard`.                                                            |
+| `/dashboard` | `DashboardPage` | Shows all available tasks grouped by status. Each task has zero or one assignee.      |
+| `/my-tasks`  | `MyTasksPage`   | Shows only tasks whose `assigneeId` matches `profile.id`.                             |
+| `/settings`  | `SettingsPage`  | Shows authenticated user information from `profile`; `type` is presented as Position. |
+| `*`          | `NotFoundPage`  | Handles unknown URLs.                                                                 |
 
 - `AppLayout` provides the shared sidebar, header, and route outlet.
 - `RouteErrorPage` is the router-level error fallback and does not require its own public URL.
@@ -164,6 +164,7 @@ AppErrorBoundary
 ## Confirmed Quality Architecture
 
 - TypeScript uses strict compiler settings, including `strict`, `noUnusedLocals`, `noUnusedParameters`, and `noFallthroughCasesInSwitch`.
+- TypeScript uses the compatible 6.0 release line required by the selected ESLint TypeScript integration.
 - ESLint is the only code-quality linter and is configured for TypeScript, React Hooks, React Refresh, and JSX accessibility.
 - Prettier is the only formatting tool and is integrated with ESLint through `eslint-config-prettier` to avoid overlapping formatting rules.
 - Vitest and React Testing Library cover component behavior and integration flows.
@@ -187,15 +188,15 @@ npm run build         # Build the production application
 
 ## Confirmed Error Handling Policy
 
-| Error source | User-facing behavior | Initial Setup scope |
-| --- | --- | --- |
-| Unknown URL | `NotFoundPage` with a return-to-dashboard action. | Implemented. |
-| Route failure | `RouteErrorPage` with retry and return-to-dashboard actions. | Implemented. |
-| Unexpected React rendering failure | `AppErrorBoundary` fallback with retry and return-to-dashboard actions. | Implemented. |
-| GraphQL query failure | Inline page-level error state with a retry action that refetches data. | Implemented with GraphQL features. |
-| Mutation failure | Preserve form values or current confirmation state and show an error notification. | Implemented with each mutation feature. |
-| Form validation failure | Field-level accessible validation messages; do not send an invalid mutation. | Implemented with task forms. |
-| Drag and drop failure | Restore or refetch the previous board state and show an error notification. | Implemented with the drag-and-drop bonus. |
+| Error source                       | User-facing behavior                                                               | Initial Setup scope                       |
+| ---------------------------------- | ---------------------------------------------------------------------------------- | ----------------------------------------- |
+| Unknown URL                        | `NotFoundPage` with a return-to-dashboard action.                                  | Implemented.                              |
+| Route failure                      | `RouteErrorPage` with retry and return-to-dashboard actions.                       | Implemented.                              |
+| Unexpected React rendering failure | `AppErrorBoundary` fallback with retry and return-to-dashboard actions.            | Implemented.                              |
+| GraphQL query failure              | Inline page-level error state with a retry action that refetches data.             | Implemented with GraphQL features.        |
+| Mutation failure                   | Preserve form values or current confirmation state and show an error notification. | Implemented with each mutation feature.   |
+| Form validation failure            | Field-level accessible validation messages; do not send an invalid mutation.       | Implemented with task forms.              |
+| Drag and drop failure              | Restore or refetch the previous board state and show an error notification.        | Implemented with the drag-and-drop bonus. |
 
 - Technical error details are logged with `console.error` in development and are not exposed to end users.
 - The challenge does not include external error-monitoring services.
@@ -237,8 +238,9 @@ npm run build         # Build the production application
 - [x] Configure the application entry point, `App`, Vite React plugin, and the `@` source alias.
 - [x] Configure strict TypeScript project references and Node types for Vite configuration.
 - [x] Verify the production build.
+- [x] Configure ESLint, Prettier, EditorConfig, and local quality scripts.
 - [ ] Add the remaining folder structure with active files.
-- [ ] Configure formatting, linting, testing, routing, error handling, and CI.
+- [ ] Configure testing, routing, error handling, and CI.
 - [ ] Update the README with local setup instructions.
 
 The following items are required before product functionality is implemented:
@@ -256,21 +258,21 @@ The following items are required before product functionality is implemented:
 
 ### Current Decisions
 
-| Area | Decision | Rationale |
-| --- | --- | --- |
-| Repository | The repository is public and owned by `fabianespinoza-ravn`. | Required by the challenge. |
-| Workflow | Scoped work uses issues, dedicated branches, Conventional Commits, pull requests, and automated checks. | Provides a clear, incremental project history. |
-| Documentation | Repository materials and application text are written in English. | Keeps the submission consistent and evaluator-friendly. |
-| Platforms | The deliverable is a responsive web application for desktop and mobile browsers on iOS and Android, not native mobile software. | Matches the React, CSS, Figma, and browser-based GraphQL scope. |
-| Task ownership | A task has zero or one assignee; task cards show only the optional assignee avatar. | The API supports one optional assignee, not multiple participants. |
-| My Tasks | My Tasks filters by authenticated user `assigneeId`. | Matches the API and gives the route a clear meaning. |
-| Settings | The required "Position" value is represented by `profile.type`. | The API exposes `type` with `ADMIN` and `CANDIDATE` values, but no separate `position` field. |
-| User avatar | Profile avatars may be `null`; use an accessible fallback rather than a broken image. | Confirmed by the profile API response. |
-| Routing | Use `/dashboard`, `/my-tasks`, and `/settings`; `/` redirects to Dashboard. | Matches visible navigation and avoids duplicate or unsupported routes. |
-| Error handling | Use NotFoundPage for unmatched URLs, RouteErrorPage for route failures, AppErrorBoundary for rendering failures, and localized recovery states for API and form errors. | Separates recovery behavior by error source. |
-| Structure | Use a simplified feature-sliced structure with `app`, `pages`, `widgets`, `features`, `entities`, `shared`, and `test`. | Separates Figma sections, domain components, interactions, and reusable primitives without overengineering. |
-| Styling | Use CSS Modules, global design tokens, mobile-first responsive CSS, and camelCase CSS Module class names. | Keeps Figma implementation consistent, scoped, and adaptable. |
-| Quality | Use strict TypeScript, ESLint, Prettier, Vitest, React Testing Library, and CI quality checks. | Provides useful correctness, accessibility, formatting, and regression checks without unnecessary tooling. |
-| Configuration | Use npm, local environment variables, shared source aliases, minimal Vite configuration, and editor consistency files. | Keeps setup secure and consistent without unnecessary infrastructure. |
-| Code conventions | Use PascalCase components, `useCamelCase` hooks, camelCase utilities, kebab-case folders, named exports, and deliberate public APIs. | Keeps the codebase predictable and avoids unnecessary export indirection. |
-| Dependency scope | Add only foundation dependencies during Initial Setup; defer feature-specific dependencies to their matching phases. | Avoids unused packages and keeps each phase focused. |
+| Area             | Decision                                                                                                                                                                | Rationale                                                                                                   |
+| ---------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------- |
+| Repository       | The repository is public and owned by `fabianespinoza-ravn`.                                                                                                            | Required by the challenge.                                                                                  |
+| Workflow         | Scoped work uses issues, dedicated branches, Conventional Commits, pull requests, and automated checks.                                                                 | Provides a clear, incremental project history.                                                              |
+| Documentation    | Repository materials and application text are written in English.                                                                                                       | Keeps the submission consistent and evaluator-friendly.                                                     |
+| Platforms        | The deliverable is a responsive web application for desktop and mobile browsers on iOS and Android, not native mobile software.                                         | Matches the React, CSS, Figma, and browser-based GraphQL scope.                                             |
+| Task ownership   | A task has zero or one assignee; task cards show only the optional assignee avatar.                                                                                     | The API supports one optional assignee, not multiple participants.                                          |
+| My Tasks         | My Tasks filters by authenticated user `assigneeId`.                                                                                                                    | Matches the API and gives the route a clear meaning.                                                        |
+| Settings         | The required "Position" value is represented by `profile.type`.                                                                                                         | The API exposes `type` with `ADMIN` and `CANDIDATE` values, but no separate `position` field.               |
+| User avatar      | Profile avatars may be `null`; use an accessible fallback rather than a broken image.                                                                                   | Confirmed by the profile API response.                                                                      |
+| Routing          | Use `/dashboard`, `/my-tasks`, and `/settings`; `/` redirects to Dashboard.                                                                                             | Matches visible navigation and avoids duplicate or unsupported routes.                                      |
+| Error handling   | Use NotFoundPage for unmatched URLs, RouteErrorPage for route failures, AppErrorBoundary for rendering failures, and localized recovery states for API and form errors. | Separates recovery behavior by error source.                                                                |
+| Structure        | Use a simplified feature-sliced structure with `app`, `pages`, `widgets`, `features`, `entities`, `shared`, and `test`.                                                 | Separates Figma sections, domain components, interactions, and reusable primitives without overengineering. |
+| Styling          | Use CSS Modules, global design tokens, mobile-first responsive CSS, and camelCase CSS Module class names.                                                               | Keeps Figma implementation consistent, scoped, and adaptable.                                               |
+| Quality          | Use strict TypeScript, ESLint, Prettier, Vitest, React Testing Library, and CI quality checks.                                                                          | Provides useful correctness, accessibility, formatting, and regression checks without unnecessary tooling.  |
+| Configuration    | Use npm, local environment variables, shared source aliases, minimal Vite configuration, and editor consistency files.                                                  | Keeps setup secure and consistent without unnecessary infrastructure.                                       |
+| Code conventions | Use PascalCase components, `useCamelCase` hooks, camelCase utilities, kebab-case folders, named exports, and deliberate public APIs.                                    | Keeps the codebase predictable and avoids unnecessary export indirection.                                   |
+| Dependency scope | Add only foundation dependencies during Initial Setup; defer feature-specific dependencies to their matching phases.                                                    | Avoids unused packages and keeps each phase focused.                                                        |

@@ -1,9 +1,9 @@
 ---
 name: Feature or phase
 about: Plan a feature or implementation phase
-title: "[Feature] "
-labels: ["feature"]
-assignees: ""
+title: '[Feature] '
+labels: ['feature']
+assignees: ''
 ---
 
 ## Goal
