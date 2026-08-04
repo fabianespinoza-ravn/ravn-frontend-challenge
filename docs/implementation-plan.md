@@ -2,6 +2,7 @@
 
 > **Status:** In progress — Initial Setup implementation.  
 > **Last updated:** 2026-08-04
+> **Review status:** Initial Setup is in review through [PR #3](https://github.com/fabianespinoza-ravn/ravn-frontend-challenge/pull/3).
 
 ## Documentation Rule
 
@@ -18,7 +19,7 @@ This file is the repository's source of truth for confirmed product decisions, i
 - Development workflow: issue → dedicated branch → Conventional Commits → pull request → automated checks and self-review → merge.
 - GitHub Project: [Task Management Challenge](https://github.com/users/fabianespinoza-ravn/projects/1)
 - Project workflow: `Backlog` → `Ready` → `In progress` → `In review` → `Done`.
-- Issue [#1 Initial Setup](https://github.com/fabianespinoza-ravn/ravn-frontend-challenge/issues/1) is in `Ready` and must not move to `In progress` until the architecture discussion is complete.
+- Issue [#1 Initial Setup](https://github.com/fabianespinoza-ravn/ravn-frontend-challenge/issues/1) is in `In review` in the GitHub Project and is linked to [PR #3](https://github.com/fabianespinoza-ravn/ravn-frontend-challenge/pull/3).
 
 ## Confirmed Folder Structure
 
@@ -232,7 +233,7 @@ npm run build         # Build the production application
 
 ## Initial Setup: Current Scope
 
-**Implementation status:** In progress.
+**Implementation status:** In review.
 
 ### Implementation Progress
 
@@ -247,6 +248,8 @@ npm run build         # Build the production application
 - [x] Configure GitHub Actions to run installation, formatting, typecheck, lint, tests, and build on pull requests and pushes to `main`.
 - [x] Confirm the folder structure through active source folders; defer `widgets`, `features`, `entities`, and other empty folders until their corresponding phase gives them an active responsibility.
 - [x] Update the README with local setup instructions, environment guidance, architecture rationale, quality commands, CI behavior, and visual-evidence follow-up.
+- [x] Run final local validation: `format:check`, `typecheck`, `lint`, `test`, and `build`.
+- [x] Open [PR #3](https://github.com/fabianespinoza-ravn/ravn-frontend-challenge/pull/3) linked to Issue #1; its GitHub Actions quality checks passed.
 
 The following items are required before product functionality is implemented:
 
