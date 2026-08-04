@@ -1,4 +1,5 @@
 import { NavLink, Outlet } from 'react-router-dom'
+import styles from './AppLayout.module.css'
 
 const navigationItems = [
   { label: 'Dashboard', to: '/dashboard' },
@@ -8,17 +9,23 @@ const navigationItems = [
 
 export function AppLayout() {
   return (
-    <div>
-      <header>
-        <nav aria-label="Primary navigation">
+    <div className={styles.root}>
+      <header className={styles.header}>
+        <nav className={styles.navigation} aria-label="Primary navigation">
           {navigationItems.map((item) => (
-            <NavLink key={item.to} to={item.to}>
+            <NavLink
+              className={({ isActive }) =>
+                isActive ? `${styles.navigationLink} ${styles.isActive}` : styles.navigationLink
+              }
+              key={item.to}
+              to={item.to}
+            >
               {item.label}
             </NavLink>
           ))}
         </nav>
       </header>
-      <main>
+      <main className={styles.content}>
         <Outlet />
       </main>
     </div>

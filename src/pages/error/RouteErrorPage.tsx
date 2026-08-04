@@ -1,4 +1,5 @@
 import { isRouteErrorResponse, useRouteError } from 'react-router-dom'
+import { Button } from '@/shared/ui/button/Button'
 
 export function RouteErrorPage() {
   const error = useRouteError()
@@ -16,12 +17,12 @@ export function RouteErrorPage() {
     <main>
       <h1>Something went wrong while loading this page</h1>
       <p>{errorMessage}</p>
-      <button type="button" onClick={handleRetry}>
+      <Button type="button" onClick={handleRetry}>
         Try again
-      </button>
-      <button type="button" onClick={handleReturnToDashboard}>
+      </Button>
+      <Button type="button" variant="secondary" onClick={handleReturnToDashboard}>
         Back to dashboard
-      </button>
+      </Button>
     </main>
   )
 }

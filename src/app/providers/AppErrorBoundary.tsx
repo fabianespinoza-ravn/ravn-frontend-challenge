@@ -1,4 +1,5 @@
 import { Component, type ErrorInfo, type ReactNode } from 'react'
+import { Button } from '@/shared/ui/button/Button'
 
 type AppErrorBoundaryProps = {
   children: ReactNode
@@ -35,12 +36,12 @@ export class AppErrorBoundary extends Component<AppErrorBoundaryProps, AppErrorB
         <main>
           <h1>Something went wrong</h1>
           <p>Please try again or return to the dashboard.</p>
-          <button type="button" onClick={this.handleRetry}>
+          <Button type="button" onClick={this.handleRetry}>
             Try again
-          </button>
-          <button type="button" onClick={this.handleReturnToDashboard}>
+          </Button>
+          <Button type="button" variant="secondary" onClick={this.handleReturnToDashboard}>
             Back to dashboard
-          </button>
+          </Button>
         </main>
       )
     }

@@ -242,6 +242,7 @@ npm run build         # Build the production application
 - [x] Verify the production build.
 - [x] Configure ESLint, Prettier, EditorConfig, and local quality scripts.
 - [x] Configure React Router, application layout, route placeholders, NotFoundPage, RouteErrorPage, and AppErrorBoundary.
+- [x] Create reset rules, design tokens, global styles, a responsive application layout, and the reusable Button primitive.
 - [ ] Add the remaining folder structure with active files.
 - [ ] Configure testing and CI.
 - [ ] Update the README with local setup instructions.
