@@ -1,6 +1,6 @@
 # Implementation Plan and Decision Log
 
-> **Status:** Planning — Initial Setup is ready to begin after architecture decisions are confirmed.  
+> **Status:** In progress — Initial Setup implementation.  
 > **Last updated:** 2026-08-04
 
 ## Documentation Rule
@@ -228,6 +228,18 @@ npm run build         # Build the production application
 - Apollo Client, GraphQL operations, task modals, and drag-and-drop dependencies are introduced only in their respective feature phases.
 
 ## Initial Setup: Current Scope
+
+**Implementation status:** In progress.
+
+### Implementation Progress
+
+- [x] Create the React, TypeScript, and Vite scaffold.
+- [x] Configure the application entry point, `App`, Vite React plugin, and the `@` source alias.
+- [x] Configure strict TypeScript project references and Node types for Vite configuration.
+- [x] Verify the production build.
+- [ ] Add the remaining folder structure with active files.
+- [ ] Configure formatting, linting, testing, routing, error handling, and CI.
+- [ ] Update the README with local setup instructions.
 
 The following items are required before product functionality is implemented:
 
