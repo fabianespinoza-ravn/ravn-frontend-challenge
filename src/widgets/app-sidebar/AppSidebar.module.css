@@ -1,0 +1,126 @@
+.root {
+  position: sticky;
+  bottom: 0;
+  z-index: 1;
+  display: flex;
+  order: 2;
+  min-height: 4.5rem;
+  align-items: center;
+  justify-content: center;
+  border-top: 1px solid var(--color-border);
+  background: var(--color-surface);
+}
+
+.brand {
+  display: none;
+}
+
+.navigation {
+  display: flex;
+  width: min(100%, 30rem);
+  justify-content: space-around;
+  gap: var(--space-1);
+  padding: var(--space-2) max(var(--space-3), env(safe-area-inset-right))
+    max(var(--space-2), env(safe-area-inset-bottom)) max(var(--space-3), env(safe-area-inset-left));
+}
+
+.navigationLink {
+  display: inline-flex;
+  min-width: 2.75rem;
+  min-height: 2.75rem;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-md);
+  color: var(--color-text-secondary);
+  text-decoration: none;
+}
+
+.navigationLink:hover {
+  background: var(--color-surface-raised);
+  color: var(--color-text-primary);
+}
+
+.navigationLink:focus-visible {
+  outline: var(--focus-ring);
+  outline-offset: var(--focus-offset);
+}
+
+.label {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+.isActive {
+  color: var(--color-accent);
+}
+
+@media (min-width: 768px) {
+  .root {
+    position: sticky;
+    top: 0;
+    bottom: auto;
+    display: block;
+    order: 0;
+    width: 12rem;
+    min-height: calc(100dvh - (var(--space-6) * 2));
+    padding: var(--space-6) var(--space-2);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-xl);
+    background: var(--color-surface-muted);
+  }
+
+  .brand {
+    display: grid;
+    width: 3rem;
+    height: 2.75rem;
+    place-items: center;
+    margin-inline: auto;
+    color: var(--color-text-primary);
+  }
+
+  .navigation {
+    display: grid;
+    width: auto;
+    margin-top: var(--space-6);
+    padding: 0;
+  }
+
+  .navigationLink {
+    width: 100%;
+    justify-content: flex-start;
+    gap: var(--space-3);
+    padding-inline: var(--space-4);
+    font-size: var(--font-size-md);
+    font-weight: var(--font-weight-medium);
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+  }
+
+  .label {
+    position: static;
+    width: auto;
+    height: auto;
+    overflow: visible;
+    clip: auto;
+    white-space: normal;
+  }
+
+  .isActive {
+    position: relative;
+    background: var(--color-surface-raised);
+  }
+
+  .isActive::after {
+    position: absolute;
+    right: calc(var(--space-2) * -1);
+    width: 0.1875rem;
+    height: 1.5rem;
+    border-radius: var(--radius-sm) 0 0 var(--radius-sm);
+    background: var(--color-accent);
+    content: '';
+  }
+}

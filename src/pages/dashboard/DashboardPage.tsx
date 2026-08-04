@@ -1,8 +1,11 @@
+import { TaskToolbar } from '@/widgets/task-toolbar/TaskToolbar'
+import styles from './DashboardPage.module.css'
+
 export function DashboardPage() {
   return (
-    <section>
-      <h1>Dashboard</h1>
-      <p>All tasks will be displayed here.</p>
+    <section className={styles.root}>
+      <h1 className={styles.heading}>Dashboard</h1>
+      <TaskToolbar />
     </section>
   )
 }

@@ -22,7 +22,7 @@ This file is the repository's source of truth for confirmed product decisions, i
 - GitHub Project: [Task Management Challenge](https://github.com/users/fabianespinoza-ravn/projects/1)
 - Project workflow: `Backlog` → `Ready` → `In progress` → `In review` → `Done`.
 - Issue [#1 Initial Setup](https://github.com/fabianespinoza-ravn/ravn-frontend-challenge/issues/1) is closed, was merged through [PR #3](https://github.com/fabianespinoza-ravn/ravn-frontend-challenge/pull/3), and is in `Done` in the GitHub Project.
-- Issue [#4 Dashboard UI](https://github.com/fabianespinoza-ravn/ravn-frontend-challenge/issues/4) is in `Ready` in the GitHub Project. Its implementation branch is `feat/dashboard-static-ui`.
+- Issue [#4 Dashboard UI](https://github.com/fabianespinoza-ravn/ravn-frontend-challenge/issues/4) is in `In progress` in the GitHub Project. Its implementation branch is `feat/dashboard-static-ui`.
 
 ## Confirmed Folder Structure
 
@@ -264,6 +264,21 @@ The following items are required before product functionality is implemented:
 - Global Error Boundary.
 - GitHub Actions for type checking, linting, tests, and production builds.
 - README setup and running instructions.
+
+## Dashboard UI: Current Scope
+
+**Implementation status:** In progress.
+
+### Implementation Progress
+
+- [x] Install `lucide-react` and build the dashboard shell with AppSidebar, AppHeader, TaskToolbar, IconButton, and Avatar primitives.
+- [x] Add focused shell coverage for active navigation, header controls, profile fallback, view controls, and the add-task action.
+- [ ] Build the static task board, mock task data, columns, and task cards.
+- [ ] Refine the dashboard against Figma across mobile, tablet, and desktop layouts; add focused coverage and visual evidence.
+
+- Dashboard shell controls are visual only in this phase. Navigation remains functional through the existing routes and NavLink active states.
+- The shared Avatar supports an accessible initials fallback for a missing or failed image source.
+- The dashboard shell uses the provided visual reference for its contained desktop canvas, compact sidebar and toolbar controls, search field, and official Ravn SVG mark. The planned five-column task-status model remains unchanged.
 
 ## Decision Log
 
