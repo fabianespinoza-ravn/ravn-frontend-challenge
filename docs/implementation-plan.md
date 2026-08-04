@@ -211,6 +211,8 @@ npm run build         # Build the production application
 - A `shared/config/env.ts` module centralizes access to `import.meta.env` and validates GraphQL configuration when API integration begins.
 - No token, secret, or sensitive value is committed, documented, or injected into GitHub Actions.
 - Vite configuration is limited to the official React plugin, the `@` source alias, and Vitest configuration.
+- React Router uses version `7.18.2`, the latest stable version available during setup.
+- npm audit currently reports React Router advisories for RSC or server-side modes; this application is a client-side Vite application and does not configure RSC, SSR, server actions, or server endpoints. No compatible unflagged router release is currently published.
 - TypeScript, Vite, and Vitest share aliases for `@/app`, `@/pages`, `@/widgets`, `@/features`, `@/entities`, `@/shared`, and `@/test`.
 - TypeScript uses separate project, application, and Node configuration files.
 - `.editorconfig`, `.prettierrc.json`, `.prettierignore`, and `eslint.config.js` establish local formatting and linting consistency.
@@ -239,8 +241,9 @@ npm run build         # Build the production application
 - [x] Configure strict TypeScript project references and Node types for Vite configuration.
 - [x] Verify the production build.
 - [x] Configure ESLint, Prettier, EditorConfig, and local quality scripts.
+- [x] Configure React Router, application layout, route placeholders, NotFoundPage, RouteErrorPage, and AppErrorBoundary.
 - [ ] Add the remaining folder structure with active files.
-- [ ] Configure testing, routing, error handling, and CI.
+- [ ] Configure testing and CI.
 - [ ] Update the README with local setup instructions.
 
 The following items are required before product functionality is implemented:
@@ -258,21 +261,39 @@ The following items are required before product functionality is implemented:
 
 ### Current Decisions
 
-| Area             | Decision                                                                                                                                                                | Rationale                                                                                                   |
-| ---------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------- |
-| Repository       | The repository is public and owned by `fabianespinoza-ravn`.                                                                                                            | Required by the challenge.                                                                                  |
-| Workflow         | Scoped work uses issues, dedicated branches, Conventional Commits, pull requests, and automated checks.                                                                 | Provides a clear, incremental project history.                                                              |
-| Documentation    | Repository materials and application text are written in English.                                                                                                       | Keeps the submission consistent and evaluator-friendly.                                                     |
-| Platforms        | The deliverable is a responsive web application for desktop and mobile browsers on iOS and Android, not native mobile software.                                         | Matches the React, CSS, Figma, and browser-based GraphQL scope.                                             |
-| Task ownership   | A task has zero or one assignee; task cards show only the optional assignee avatar.                                                                                     | The API supports one optional assignee, not multiple participants.                                          |
-| My Tasks         | My Tasks filters by authenticated user `assigneeId`.                                                                                                                    | Matches the API and gives the route a clear meaning.                                                        |
-| Settings         | The required "Position" value is represented by `profile.type`.                                                                                                         | The API exposes `type` with `ADMIN` and `CANDIDATE` values, but no separate `position` field.               |
-| User avatar      | Profile avatars may be `null`; use an accessible fallback rather than a broken image.                                                                                   | Confirmed by the profile API response.                                                                      |
-| Routing          | Use `/dashboard`, `/my-tasks`, and `/settings`; `/` redirects to Dashboard.                                                                                             | Matches visible navigation and avoids duplicate or unsupported routes.                                      |
-| Error handling   | Use NotFoundPage for unmatched URLs, RouteErrorPage for route failures, AppErrorBoundary for rendering failures, and localized recovery states for API and form errors. | Separates recovery behavior by error source.                                                                |
-| Structure        | Use a simplified feature-sliced structure with `app`, `pages`, `widgets`, `features`, `entities`, `shared`, and `test`.                                                 | Separates Figma sections, domain components, interactions, and reusable primitives without overengineering. |
-| Styling          | Use CSS Modules, global design tokens, mobile-first responsive CSS, and camelCase CSS Module class names.                                                               | Keeps Figma implementation consistent, scoped, and adaptable.                                               |
-| Quality          | Use strict TypeScript, ESLint, Prettier, Vitest, React Testing Library, and CI quality checks.                                                                          | Provides useful correctness, accessibility, formatting, and regression checks without unnecessary tooling.  |
-| Configuration    | Use npm, local environment variables, shared source aliases, minimal Vite configuration, and editor consistency files.                                                  | Keeps setup secure and consistent without unnecessary infrastructure.                                       |
-| Code conventions | Use PascalCase components, `useCamelCase` hooks, camelCase utilities, kebab-case folders, named exports, and deliberate public APIs.                                    | Keeps the codebase predictable and avoids unnecessary export indirection.                                   |
-| Dependency scope | Add only foundation dependencies during Initial Setup; defer feature-specific dependencies to their matching phases.                                                    | Avoids unused packages and keeps each phase focused.                                                        |
+### 1. Pre-Initial Setup: Repository and Workflow
+
+| ID  | Decision                                                                                                | Rationale                                               |
+| --- | ------------------------------------------------------------------------------------------------------- | ------------------------------------------------------- |
+| 1.1 | The repository is public and owned by `fabianespinoza-ravn`.                                            | Required by the challenge.                              |
+| 1.2 | Scoped work uses issues, dedicated branches, Conventional Commits, pull requests, and automated checks. | Provides a clear, incremental project history.          |
+| 1.3 | Repository materials and application text are written in English.                                       | Keeps the submission consistent and evaluator-friendly. |
+
+### 2. Product and API Behavior
+
+| ID  | Decision                                                                                                                        | Rationale                                                                                     |
+| --- | ------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------- |
+| 2.1 | The deliverable is a responsive web application for desktop and mobile browsers on iOS and Android, not native mobile software. | Matches the React, CSS, Figma, and browser-based GraphQL scope.                               |
+| 2.2 | A task has zero or one assignee; task cards show only the optional assignee avatar.                                             | The API supports one optional assignee, not multiple participants.                            |
+| 2.3 | My Tasks filters by authenticated user `assigneeId`.                                                                            | Matches the API and gives the route a clear meaning.                                          |
+| 2.4 | The required "Position" value is represented by `profile.type`.                                                                 | The API exposes `type` with `ADMIN` and `CANDIDATE` values, but no separate `position` field. |
+| 2.5 | Profile avatars may be `null`; shared avatar UI uses an accessible fallback rather than a broken image.                         | Confirmed by the profile API response.                                                        |
+
+### 3. Initial Setup: Architecture and Experience
+
+| ID  | Decision                                                                                                                                                                | Rationale                                                                                                   |
+| --- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------- |
+| 3.1 | Use a simplified feature-sliced structure with `app`, `pages`, `widgets`, `features`, `entities`, `shared`, and `test`.                                                 | Separates Figma sections, domain components, interactions, and reusable primitives without overengineering. |
+| 3.2 | Use `/dashboard`, `/my-tasks`, and `/settings`; `/` redirects to Dashboard.                                                                                             | Matches visible navigation and avoids duplicate or unsupported routes.                                      |
+| 3.3 | Use NotFoundPage for unmatched URLs, RouteErrorPage for route failures, AppErrorBoundary for rendering failures, and localized recovery states for API and form errors. | Separates recovery behavior by error source.                                                                |
+| 3.4 | Use CSS Modules, global design tokens, mobile-first responsive CSS, and camelCase CSS Module class names.                                                               | Keeps Figma implementation consistent, scoped, and adaptable.                                               |
+| 3.5 | Use PascalCase components, `useCamelCase` hooks, camelCase utilities, kebab-case folders, named exports, and deliberate public APIs.                                    | Keeps the codebase predictable and avoids unnecessary export indirection.                                   |
+
+### 4. Initial Setup: Quality and Configuration
+
+| ID  | Decision                                                                                                                                                     | Rationale                                                                                                  |
+| --- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------- |
+| 4.1 | Use strict TypeScript, ESLint, Prettier, Vitest, React Testing Library, and CI quality checks.                                                               | Provides useful correctness, accessibility, formatting, and regression checks without unnecessary tooling. |
+| 4.2 | Use npm, local environment variables, shared source aliases, minimal Vite configuration, and editor consistency files.                                       | Keeps setup secure and consistent without unnecessary infrastructure.                                      |
+| 4.3 | Add only foundation dependencies during Initial Setup; defer feature-specific dependencies to their matching phases.                                         | Avoids unused packages and keeps each phase focused.                                                       |
+| 4.4 | Use React Router `7.18.2`; monitor its audit advisories because the current application is client-side only and does not use the affected server-side modes. | Uses the latest stable release available while documenting the residual audit signal.                      |

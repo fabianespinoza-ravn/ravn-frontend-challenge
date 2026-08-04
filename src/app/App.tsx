@@ -1,3 +1,11 @@
+import { RouterProvider } from 'react-router-dom'
+import { AppErrorBoundary } from '@/app/providers/AppErrorBoundary'
+import { router } from '@/app/router/router'
+
 export function App() {
-  return <main>Task Management</main>
+  return (
+    <AppErrorBoundary>
+      <RouterProvider router={router} />
+    </AppErrorBoundary>
+  )
 }
