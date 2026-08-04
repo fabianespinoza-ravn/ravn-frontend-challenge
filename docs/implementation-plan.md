@@ -244,8 +244,8 @@ npm run build         # Build the production application
 - [x] Configure React Router, application layout, route placeholders, NotFoundPage, RouteErrorPage, and AppErrorBoundary.
 - [x] Create reset rules, design tokens, global styles, a responsive application layout, and the reusable Button primitive.
 - [x] Configure Vitest, Testing Library, JSDOM, coverage reporting, and baseline tests for NotFoundPage, RouteErrorPage, and AppErrorBoundary.
+- [x] Configure GitHub Actions to run installation, formatting, typecheck, lint, tests, and build on pull requests and pushes to `main`.
 - [ ] Add the remaining folder structure with active files.
-- [ ] Configure CI.
 - [ ] Update the README with local setup instructions.
 
 The following items are required before product functionality is implemented:
