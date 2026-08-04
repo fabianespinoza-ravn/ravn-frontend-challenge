@@ -245,8 +245,8 @@ npm run build         # Build the production application
 - [x] Create reset rules, design tokens, global styles, a responsive application layout, and the reusable Button primitive.
 - [x] Configure Vitest, Testing Library, JSDOM, coverage reporting, and baseline tests for NotFoundPage, RouteErrorPage, and AppErrorBoundary.
 - [x] Configure GitHub Actions to run installation, formatting, typecheck, lint, tests, and build on pull requests and pushes to `main`.
-- [ ] Add the remaining folder structure with active files.
-- [ ] Update the README with local setup instructions.
+- [x] Confirm the folder structure through active source folders; defer `widgets`, `features`, `entities`, and other empty folders until their corresponding phase gives them an active responsibility.
+- [x] Update the README with local setup instructions, environment guidance, architecture rationale, quality commands, CI behavior, and visual-evidence follow-up.
 
 The following items are required before product functionality is implemented:
 
