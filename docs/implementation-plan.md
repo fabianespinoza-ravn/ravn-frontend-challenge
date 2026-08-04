@@ -1,7 +1,8 @@
 # Implementation Plan and Decision Log
 
-> **Status:** Planning — Initial Setup is ready to begin after architecture decisions are confirmed.  
+> **Status:** In progress — Initial Setup implementation.  
 > **Last updated:** 2026-08-04
+> **Review status:** Initial Setup is in review through [PR #3](https://github.com/fabianespinoza-ravn/ravn-frontend-challenge/pull/3).
 
 ## Documentation Rule
 
@@ -18,7 +19,7 @@ This file is the repository's source of truth for confirmed product decisions, i
 - Development workflow: issue → dedicated branch → Conventional Commits → pull request → automated checks and self-review → merge.
 - GitHub Project: [Task Management Challenge](https://github.com/users/fabianespinoza-ravn/projects/1)
 - Project workflow: `Backlog` → `Ready` → `In progress` → `In review` → `Done`.
-- Issue [#1 Initial Setup](https://github.com/fabianespinoza-ravn/ravn-frontend-challenge/issues/1) is in `Ready` and must not move to `In progress` until the architecture discussion is complete.
+- Issue [#1 Initial Setup](https://github.com/fabianespinoza-ravn/ravn-frontend-challenge/issues/1) is in `In review` in the GitHub Project and is linked to [PR #3](https://github.com/fabianespinoza-ravn/ravn-frontend-challenge/pull/3).
 
 ## Confirmed Folder Structure
 
@@ -116,13 +117,13 @@ The application is a responsive task management web application for desktop and 
 
 All routes are served by the same responsive web application. There are no desktop-only, mobile-only, iOS, Android, multi-assignee, or task-detail routes in the initial scope.
 
-| Path | Page | Behavior |
-| --- | --- | --- |
-| `/` | Redirect | Redirects to `/dashboard`. |
-| `/dashboard` | `DashboardPage` | Shows all available tasks grouped by status. Each task has zero or one assignee. |
-| `/my-tasks` | `MyTasksPage` | Shows only tasks whose `assigneeId` matches `profile.id`. |
-| `/settings` | `SettingsPage` | Shows authenticated user information from `profile`; `type` is presented as Position. |
-| `*` | `NotFoundPage` | Handles unknown URLs. |
+| Path         | Page            | Behavior                                                                              |
+| ------------ | --------------- | ------------------------------------------------------------------------------------- |
+| `/`          | Redirect        | Redirects to `/dashboard`.                                                            |
+| `/dashboard` | `DashboardPage` | Shows all available tasks grouped by status. Each task has zero or one assignee.      |
+| `/my-tasks`  | `MyTasksPage`   | Shows only tasks whose `assigneeId` matches `profile.id`.                             |
+| `/settings`  | `SettingsPage`  | Shows authenticated user information from `profile`; `type` is presented as Position. |
+| `*`          | `NotFoundPage`  | Handles unknown URLs.                                                                 |
 
 - `AppLayout` provides the shared sidebar, header, and route outlet.
 - `RouteErrorPage` is the router-level error fallback and does not require its own public URL.
@@ -164,6 +165,7 @@ AppErrorBoundary
 ## Confirmed Quality Architecture
 
 - TypeScript uses strict compiler settings, including `strict`, `noUnusedLocals`, `noUnusedParameters`, and `noFallthroughCasesInSwitch`.
+- TypeScript uses the compatible 6.0 release line required by the selected ESLint TypeScript integration.
 - ESLint is the only code-quality linter and is configured for TypeScript, React Hooks, React Refresh, and JSX accessibility.
 - Prettier is the only formatting tool and is integrated with ESLint through `eslint-config-prettier` to avoid overlapping formatting rules.
 - Vitest and React Testing Library cover component behavior and integration flows.
@@ -187,15 +189,15 @@ npm run build         # Build the production application
 
 ## Confirmed Error Handling Policy
 
-| Error source | User-facing behavior | Initial Setup scope |
-| --- | --- | --- |
-| Unknown URL | `NotFoundPage` with a return-to-dashboard action. | Implemented. |
-| Route failure | `RouteErrorPage` with retry and return-to-dashboard actions. | Implemented. |
-| Unexpected React rendering failure | `AppErrorBoundary` fallback with retry and return-to-dashboard actions. | Implemented. |
-| GraphQL query failure | Inline page-level error state with a retry action that refetches data. | Implemented with GraphQL features. |
-| Mutation failure | Preserve form values or current confirmation state and show an error notification. | Implemented with each mutation feature. |
-| Form validation failure | Field-level accessible validation messages; do not send an invalid mutation. | Implemented with task forms. |
-| Drag and drop failure | Restore or refetch the previous board state and show an error notification. | Implemented with the drag-and-drop bonus. |
+| Error source                       | User-facing behavior                                                               | Initial Setup scope                       |
+| ---------------------------------- | ---------------------------------------------------------------------------------- | ----------------------------------------- |
+| Unknown URL                        | `NotFoundPage` with a return-to-dashboard action.                                  | Implemented.                              |
+| Route failure                      | `RouteErrorPage` with retry and return-to-dashboard actions.                       | Implemented.                              |
+| Unexpected React rendering failure | `AppErrorBoundary` fallback with retry and return-to-dashboard actions.            | Implemented.                              |
+| GraphQL query failure              | Inline page-level error state with a retry action that refetches data.             | Implemented with GraphQL features.        |
+| Mutation failure                   | Preserve form values or current confirmation state and show an error notification. | Implemented with each mutation feature.   |
+| Form validation failure            | Field-level accessible validation messages; do not send an invalid mutation.       | Implemented with task forms.              |
+| Drag and drop failure              | Restore or refetch the previous board state and show an error notification.        | Implemented with the drag-and-drop bonus. |
 
 - Technical error details are logged with `console.error` in development and are not exposed to end users.
 - The challenge does not include external error-monitoring services.
@@ -210,6 +212,8 @@ npm run build         # Build the production application
 - A `shared/config/env.ts` module centralizes access to `import.meta.env` and validates GraphQL configuration when API integration begins.
 - No token, secret, or sensitive value is committed, documented, or injected into GitHub Actions.
 - Vite configuration is limited to the official React plugin, the `@` source alias, and Vitest configuration.
+- React Router uses version `7.18.2`, the latest stable version available during setup.
+- npm audit currently reports React Router advisories for RSC or server-side modes; this application is a client-side Vite application and does not configure RSC, SSR, server actions, or server endpoints. No compatible unflagged router release is currently published.
 - TypeScript, Vite, and Vitest share aliases for `@/app`, `@/pages`, `@/widgets`, `@/features`, `@/entities`, `@/shared`, and `@/test`.
 - TypeScript uses separate project, application, and Node configuration files.
 - `.editorconfig`, `.prettierrc.json`, `.prettierignore`, and `eslint.config.js` establish local formatting and linting consistency.
@@ -229,6 +233,24 @@ npm run build         # Build the production application
 
 ## Initial Setup: Current Scope
 
+**Implementation status:** In review.
+
+### Implementation Progress
+
+- [x] Create the React, TypeScript, and Vite scaffold.
+- [x] Configure the application entry point, `App`, Vite React plugin, and the `@` source alias.
+- [x] Configure strict TypeScript project references and Node types for Vite configuration.
+- [x] Verify the production build.
+- [x] Configure ESLint, Prettier, EditorConfig, and local quality scripts.
+- [x] Configure React Router, application layout, route placeholders, NotFoundPage, RouteErrorPage, and AppErrorBoundary.
+- [x] Create reset rules, design tokens, global styles, a responsive application layout, and the reusable Button primitive.
+- [x] Configure Vitest, Testing Library, JSDOM, coverage reporting, and baseline tests for NotFoundPage, RouteErrorPage, and AppErrorBoundary.
+- [x] Configure GitHub Actions to run installation, formatting, typecheck, lint, tests, and build on pull requests and pushes to `main`.
+- [x] Confirm the folder structure through active source folders; defer `widgets`, `features`, `entities`, and other empty folders until their corresponding phase gives them an active responsibility.
+- [x] Update the README with local setup instructions, environment guidance, architecture rationale, quality commands, CI behavior, and visual-evidence follow-up.
+- [x] Run final local validation: `format:check`, `typecheck`, `lint`, `test`, and `build`.
+- [x] Open [PR #3](https://github.com/fabianespinoza-ravn/ravn-frontend-challenge/pull/3) linked to Issue #1; its GitHub Actions quality checks passed.
+
 The following items are required before product functionality is implemented:
 
 - React, TypeScript, and Vite application foundation.
@@ -244,21 +266,39 @@ The following items are required before product functionality is implemented:
 
 ### Current Decisions
 
-| Area | Decision | Rationale |
-| --- | --- | --- |
-| Repository | The repository is public and owned by `fabianespinoza-ravn`. | Required by the challenge. |
-| Workflow | Scoped work uses issues, dedicated branches, Conventional Commits, pull requests, and automated checks. | Provides a clear, incremental project history. |
-| Documentation | Repository materials and application text are written in English. | Keeps the submission consistent and evaluator-friendly. |
-| Platforms | The deliverable is a responsive web application for desktop and mobile browsers on iOS and Android, not native mobile software. | Matches the React, CSS, Figma, and browser-based GraphQL scope. |
-| Task ownership | A task has zero or one assignee; task cards show only the optional assignee avatar. | The API supports one optional assignee, not multiple participants. |
-| My Tasks | My Tasks filters by authenticated user `assigneeId`. | Matches the API and gives the route a clear meaning. |
-| Settings | The required "Position" value is represented by `profile.type`. | The API exposes `type` with `ADMIN` and `CANDIDATE` values, but no separate `position` field. |
-| User avatar | Profile avatars may be `null`; use an accessible fallback rather than a broken image. | Confirmed by the profile API response. |
-| Routing | Use `/dashboard`, `/my-tasks`, and `/settings`; `/` redirects to Dashboard. | Matches visible navigation and avoids duplicate or unsupported routes. |
-| Error handling | Use NotFoundPage for unmatched URLs, RouteErrorPage for route failures, AppErrorBoundary for rendering failures, and localized recovery states for API and form errors. | Separates recovery behavior by error source. |
-| Structure | Use a simplified feature-sliced structure with `app`, `pages`, `widgets`, `features`, `entities`, `shared`, and `test`. | Separates Figma sections, domain components, interactions, and reusable primitives without overengineering. |
-| Styling | Use CSS Modules, global design tokens, mobile-first responsive CSS, and camelCase CSS Module class names. | Keeps Figma implementation consistent, scoped, and adaptable. |
-| Quality | Use strict TypeScript, ESLint, Prettier, Vitest, React Testing Library, and CI quality checks. | Provides useful correctness, accessibility, formatting, and regression checks without unnecessary tooling. |
-| Configuration | Use npm, local environment variables, shared source aliases, minimal Vite configuration, and editor consistency files. | Keeps setup secure and consistent without unnecessary infrastructure. |
-| Code conventions | Use PascalCase components, `useCamelCase` hooks, camelCase utilities, kebab-case folders, named exports, and deliberate public APIs. | Keeps the codebase predictable and avoids unnecessary export indirection. |
-| Dependency scope | Add only foundation dependencies during Initial Setup; defer feature-specific dependencies to their matching phases. | Avoids unused packages and keeps each phase focused. |
+### 1. Pre-Initial Setup: Repository and Workflow
+
+| ID  | Decision                                                                                                | Rationale                                               |
+| --- | ------------------------------------------------------------------------------------------------------- | ------------------------------------------------------- |
+| 1.1 | The repository is public and owned by `fabianespinoza-ravn`.                                            | Required by the challenge.                              |
+| 1.2 | Scoped work uses issues, dedicated branches, Conventional Commits, pull requests, and automated checks. | Provides a clear, incremental project history.          |
+| 1.3 | Repository materials and application text are written in English.                                       | Keeps the submission consistent and evaluator-friendly. |
+
+### 2. Product and API Behavior
+
+| ID  | Decision                                                                                                                        | Rationale                                                                                     |
+| --- | ------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------- |
+| 2.1 | The deliverable is a responsive web application for desktop and mobile browsers on iOS and Android, not native mobile software. | Matches the React, CSS, Figma, and browser-based GraphQL scope.                               |
+| 2.2 | A task has zero or one assignee; task cards show only the optional assignee avatar.                                             | The API supports one optional assignee, not multiple participants.                            |
+| 2.3 | My Tasks filters by authenticated user `assigneeId`.                                                                            | Matches the API and gives the route a clear meaning.                                          |
+| 2.4 | The required "Position" value is represented by `profile.type`.                                                                 | The API exposes `type` with `ADMIN` and `CANDIDATE` values, but no separate `position` field. |
+| 2.5 | Profile avatars may be `null`; shared avatar UI uses an accessible fallback rather than a broken image.                         | Confirmed by the profile API response.                                                        |
+
+### 3. Initial Setup: Architecture and Experience
+
+| ID  | Decision                                                                                                                                                                | Rationale                                                                                                   |
+| --- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------- |
+| 3.1 | Use a simplified feature-sliced structure with `app`, `pages`, `widgets`, `features`, `entities`, `shared`, and `test`.                                                 | Separates Figma sections, domain components, interactions, and reusable primitives without overengineering. |
+| 3.2 | Use `/dashboard`, `/my-tasks`, and `/settings`; `/` redirects to Dashboard.                                                                                             | Matches visible navigation and avoids duplicate or unsupported routes.                                      |
+| 3.3 | Use NotFoundPage for unmatched URLs, RouteErrorPage for route failures, AppErrorBoundary for rendering failures, and localized recovery states for API and form errors. | Separates recovery behavior by error source.                                                                |
+| 3.4 | Use CSS Modules, global design tokens, mobile-first responsive CSS, and camelCase CSS Module class names.                                                               | Keeps Figma implementation consistent, scoped, and adaptable.                                               |
+| 3.5 | Use PascalCase components, `useCamelCase` hooks, camelCase utilities, kebab-case folders, named exports, and deliberate public APIs.                                    | Keeps the codebase predictable and avoids unnecessary export indirection.                                   |
+
+### 4. Initial Setup: Quality and Configuration
+
+| ID  | Decision                                                                                                                                                     | Rationale                                                                                                  |
+| --- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------- |
+| 4.1 | Use strict TypeScript, ESLint, Prettier, Vitest, React Testing Library, and CI quality checks.                                                               | Provides useful correctness, accessibility, formatting, and regression checks without unnecessary tooling. |
+| 4.2 | Use npm, local environment variables, shared source aliases, minimal Vite configuration, and editor consistency files.                                       | Keeps setup secure and consistent without unnecessary infrastructure.                                      |
+| 4.3 | Add only foundation dependencies during Initial Setup; defer feature-specific dependencies to their matching phases.                                         | Avoids unused packages and keeps each phase focused.                                                       |
+| 4.4 | Use React Router `7.18.2`; monitor its audit advisories because the current application is client-side only and does not use the affected server-side modes. | Uses the latest stable release available while documenting the residual audit signal.                      |

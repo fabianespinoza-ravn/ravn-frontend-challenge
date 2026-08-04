@@ -1,0 +1,28 @@
+@import './reset.css';
+@import './tokens.css';
+
+html {
+  min-width: 20rem;
+  background: var(--color-page);
+  color-scheme: dark;
+}
+
+body {
+  min-width: 20rem;
+  min-height: 100dvh;
+  background: var(--color-page);
+  color: var(--color-text-primary);
+  font-family: var(--font-family);
+  font-size: var(--font-size-md);
+  line-height: var(--line-height-body);
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: var(--focus-ring);
+  outline-offset: var(--focus-offset);
+}
