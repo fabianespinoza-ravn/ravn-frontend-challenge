@@ -3,6 +3,8 @@
 > **Status:** In progress — Initial Setup implementation.  
 > **Last updated:** 2026-08-04
 > **Review status:** Initial Setup is in review through [PR #3](https://github.com/fabianespinoza-ravn/ravn-frontend-challenge/pull/3).
+> **Phase closure:** Initial Setup was merged through [PR #3](https://github.com/fabianespinoza-ravn/ravn-frontend-challenge/pull/3); Issue #1 is closed.
+> **Current phase:** Dashboard UI is ready to begin through [Issue #4](https://github.com/fabianespinoza-ravn/ravn-frontend-challenge/issues/4) on `feat/dashboard-static-ui`.
 
 ## Documentation Rule
 
@@ -19,7 +21,8 @@ This file is the repository's source of truth for confirmed product decisions, i
 - Development workflow: issue → dedicated branch → Conventional Commits → pull request → automated checks and self-review → merge.
 - GitHub Project: [Task Management Challenge](https://github.com/users/fabianespinoza-ravn/projects/1)
 - Project workflow: `Backlog` → `Ready` → `In progress` → `In review` → `Done`.
-- Issue [#1 Initial Setup](https://github.com/fabianespinoza-ravn/ravn-frontend-challenge/issues/1) is in `In review` in the GitHub Project and is linked to [PR #3](https://github.com/fabianespinoza-ravn/ravn-frontend-challenge/pull/3).
+- Issue [#1 Initial Setup](https://github.com/fabianespinoza-ravn/ravn-frontend-challenge/issues/1) is closed, was merged through [PR #3](https://github.com/fabianespinoza-ravn/ravn-frontend-challenge/pull/3), and is in `Done` in the GitHub Project.
+- Issue [#4 Dashboard UI](https://github.com/fabianespinoza-ravn/ravn-frontend-challenge/issues/4) is in `Ready` in the GitHub Project. Its implementation branch is `feat/dashboard-static-ui`.
 
 ## Confirmed Folder Structure
 
@@ -233,7 +236,7 @@ npm run build         # Build the production application
 
 ## Initial Setup: Current Scope
 
-**Implementation status:** In review.
+**Implementation status:** Complete.
 
 ### Implementation Progress
 
