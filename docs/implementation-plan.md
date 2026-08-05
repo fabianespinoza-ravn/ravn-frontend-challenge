@@ -343,7 +343,8 @@ The following items are required before product functionality is implemented:
 - [x] Verify task-query behavior with a currently valid token.
 - [x] Verify the create-task mutation with approved test data.
 - [x] Verify query, filter, update, and deletion behavior with controlled API tests; remove temporary test fixtures.
-- [ ] Configure Apollo Client and replace static task fixtures with API data.
+- [x] Install Apollo dependencies and configure typed environment access, Apollo Client, authorization headers, provider, GraphQL operations, API models, mappers, and reusable test mocks.
+- [ ] Replace static task fixtures with API data.
 - [ ] Connect creation to the confirmed create-task mutation.
 - [ ] Add GraphQL operation and state coverage.
 
@@ -389,3 +390,13 @@ The following items are required before product functionality is implemented:
 | 4.2 | Use npm, local environment variables, shared source aliases, minimal Vite configuration, and editor consistency files.                                       | Keeps setup secure and consistent without unnecessary infrastructure.                                      |
 | 4.3 | Add only foundation dependencies during Initial Setup; defer feature-specific dependencies to their matching phases.                                         | Avoids unused packages and keeps each phase focused.                                                       |
 | 4.4 | Use React Router `7.18.2`; monitor its audit advisories because the current application is client-side only and does not use the affected server-side modes. | Uses the latest stable release available while documenting the residual audit signal.                      |
+
+### 5. GraphQL Data and Creation: Foundation
+
+| ID  | Decision                                                                                                                                                           | Rationale                                                                                                                           |
+| --- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------- |
+| 5.1 | Use Apollo Client with an `HttpLink`, normalized in-memory cache, and an `Authorization: Bearer <token>` header sourced from typed Vite environment configuration. | Centralizes authentication and transport configuration without exposing or committing the token.                                    |
+| 5.2 | Keep GraphQL operation documents alongside their domain entities: user operations in `entities/user/api` and task operations in `entities/task/api`.               | Makes the verified API contract discoverable where its types and UI consumers live.                                                 |
+| 5.3 | Keep API task models separate from the existing presentation task model and convert them through a mapper.                                                         | Preserves the static dashboard's visual contract while allowing API enums, nullable fields, and server data to enter incrementally. |
+| 5.4 | Default unavailable visual-only task metadata (attachments, checklist items, and comments) to zero in the mapper.                                                  | Those values are displayed in the static reference but are not supplied by the verified API contract.                               |
+| 5.5 | Use reusable Apollo `MockedResponse` factories for query tests; do not call the live API from automated tests.                                                     | Keeps tests deterministic, private, and independent of token validity or remote data changes.                                       |
