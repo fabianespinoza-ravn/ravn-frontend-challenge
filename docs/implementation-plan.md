@@ -1,10 +1,10 @@
 # Implementation Plan and Decision Log
 
-> **Status:** In progress — Initial Setup implementation.  
-> **Last updated:** 2026-08-04
-> **Review status:** Initial Setup is in review through [PR #3](https://github.com/fabianespinoza-ravn/ravn-frontend-challenge/pull/3).
+> **Status:** In progress — GraphQL Data and Creation.
+> **Last updated:** 2026-08-05
 > **Phase closure:** Initial Setup was merged through [PR #3](https://github.com/fabianespinoza-ravn/ravn-frontend-challenge/pull/3); Issue #1 is closed.
-> **Current phase:** Dashboard UI is ready to begin through [Issue #4](https://github.com/fabianespinoza-ravn/ravn-frontend-challenge/issues/4) on `feat/dashboard-static-ui`.
+> **Phase closure:** Dashboard UI was merged through [PR #5](https://github.com/fabianespinoza-ravn/ravn-frontend-challenge/pull/5); Issue #4 is closed.
+> **Current phase:** GraphQL Data and Creation is tracked through [Issue #6](https://github.com/fabianespinoza-ravn/ravn-frontend-challenge/issues/6) on `feat/graphql-task-data`.
 
 ## Documentation Rule
 
@@ -22,7 +22,8 @@ This file is the repository's source of truth for confirmed product decisions, i
 - GitHub Project: [Task Management Challenge](https://github.com/users/fabianespinoza-ravn/projects/1)
 - Project workflow: `Backlog` → `Ready` → `In progress` → `In review` → `Done`.
 - Issue [#1 Initial Setup](https://github.com/fabianespinoza-ravn/ravn-frontend-challenge/issues/1) is closed, was merged through [PR #3](https://github.com/fabianespinoza-ravn/ravn-frontend-challenge/pull/3), and is in `Done` in the GitHub Project.
-- Issue [#4 Dashboard UI](https://github.com/fabianespinoza-ravn/ravn-frontend-challenge/issues/4) is in `In progress` in the GitHub Project. Its implementation branch is `feat/dashboard-static-ui`.
+- Issue [#4 Dashboard UI](https://github.com/fabianespinoza-ravn/ravn-frontend-challenge/issues/4) is closed, was merged through [PR #5](https://github.com/fabianespinoza-ravn/ravn-frontend-challenge/pull/5), and is in `Done` in the GitHub Project.
+- Issue [#6 GraphQL Data and Creation](https://github.com/fabianespinoza-ravn/ravn-frontend-challenge/issues/6) is the active implementation issue. Its branch is `feat/graphql-task-data`.
 
 ## Confirmed Folder Structure
 
@@ -301,14 +302,50 @@ The following items are required before product functionality is implemented:
 - The desktop My Tasks table omits the separate `My Tasks` task-count heading row; mobile retains it for its compact presentation.
 - The iOS Add Project action and Android floating action button open the same layout-controlled static composition with close, create, task-title, estimate, label, assignee, and due-date controls. It cannot be reached directly by URL. Despite its navigation label, the reference uses task-oriented fields; no new project data model or backend request is inferred during the static dashboard phase.
 - The iOS bottom navigation shows visible, compact `Dashboard`, `Add Project`, and `My Tasks` labels. Its Add Project icon is a plus symbol inside a circular background and does not show link underlining when active.
-- Android mobile uses no bottom navigation. Its left-side drawer opens from the header, closes through its backdrop or a destination selection, and the normal task views expose a floating red Add Task button in the lower-right corner. The toolbar's inline add button is hidden for this presentation.
+- Android mobile uses no bottom navigation. Its left-side drawer opens through a rightward edge swipe, closes through a leftward drawer swipe, backdrop tap, or destination selection, and the normal task views expose a floating red Add Task button in the lower-right corner. The toolbar's inline add button is hidden for this presentation.
 - Android navigation opens with a rightward swipe from the left screen edge and closes with a leftward drawer swipe, backdrop tap, or destination selection; no visible drawer trigger is shown. The profile moves to the upper-left, while search and notification become icons on the upper-right. Android's toolbar uses full-width textual `Dashboard` / `Task` tabs with an accent underline for the active view.
 - Android drawer navigation rows span the complete drawer width; labels and icons retain left inner padding while the active indicator is flush with the right edge.
 - Active navigation rows in desktop and Android sidebars use a coral gradient that starts at the right-edge indicator and fades toward the left.
 - Sidebar navigation is visually stable on pointer hover; active and inactive colors do not change until navigation state changes.
 - Interactive visual mockups are delivered incrementally. Each commit groups one coherent user flow (for example, task creation modal or task-card options menu) with its route/UI state, close behavior, accessibility coverage, and plan update; unrelated mockups are not bundled into the same change.
-- The `Add Project` control is visual-only until project creation is explicitly brought into scope. On Android phones, the sidebar is a collapsible drawer so My Tasks remains readable on narrow screens.
+- The `Add Project` control was visual-only during the Dashboard UI phase. The current GraphQL phase will connect that existing composition to task creation. On Android phones, the sidebar is a collapsible drawer so My Tasks remains readable on narrow screens.
 - Final visual validation was completed at `390×844` (mobile), `768×900` (breakpoint/tablet), and `1440×900` (desktop). Each viewport kept page-level horizontal overflow at zero; internal task-board and task-table horizontal scrolling remains intentional where required.
+
+## GraphQL Data and Creation: Current Scope
+
+**Implementation status:** In progress.
+**Tracking:** [Issue #6](https://github.com/fabianespinoza-ravn/ravn-frontend-challenge/issues/6) on `feat/graphql-task-data`.
+
+### Verified API Contracts
+
+| ID   | Contract                                                                                                                                                                                                                                                               | Evidence                                                                                  | Implementation impact                                                                                                                                                                |
+| ---- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 5.1  | The GraphQL endpoint requires authentication for the `profile` query. An unauthenticated request returns `UNAUTHENTICATED` with HTTP status `401`.                                                                                                                     | Read-only verification on 2026-08-04 against the configured endpoint.                     | Apollo Client must send the local `VITE_GRAPHQL_TOKEN` as authentication; no token is committed or logged.                                                                           |
+| 5.2  | An authenticated `profile` query returns the current user's `id`, `fullName`, `email`, nullable `avatar`, `type`, `createdAt`, and `updatedAt`.                                                                                                                        | Authenticated read-only verification on 2026-08-04.                                       | The authenticated `profile.id` is available for My Tasks filtering and the nullable avatar continues to require a visual fallback.                                                   |
+| 5.3  | The local token was not accepted by subsequent `tasks` and `profile` requests when read with a simplistic local parser; the API returned `UNAUTHENTICATED` with HTTP status `401`.                                                                                     | Rechecks performed on 2026-08-04 after the successful authenticated profile request.      | This temporary result was resolved by the `.env`-compatible handling verified in 5.4. The client must still surface authentication failures through the established API error state. |
+| 5.4  | The same local configuration succeeds when its value is interpreted with `.env`-compatible quote handling.                                                                                                                                                             | Authenticated profile and task query verification on 2026-08-04.                          | Application configuration must rely on Vite's environment loading rather than a custom parser; no token normalization logic is needed in application code.                           |
+| 5.5  | `tasks(input: {})` returned eight task records in the verified account. The schema exposes a list response with no pagination fields or arguments.                                                                                                                     | Authenticated read-only verification on 2026-08-04.                                       | The initial data layer can model tasks as an array; API ordering is not assumed and board ordering remains client-controlled.                                                        |
+| 5.6  | `tasks(input: { assigneeId: profile.id })` is valid and returned an empty list for the authenticated profile without an error.                                                                                                                                         | Authenticated read-only verification on 2026-08-04.                                       | My Tasks uses the API filter and must render its empty state when no task is assigned to the current profile.                                                                        |
+| 5.7  | `Task` exposes `createdAt` but not `updatedAt`; requesting `updatedAt` fails GraphQL validation before a mutation is executed.                                                                                                                                         | Create-task verification on 2026-08-04.                                                   | Task fragments and TypeScript models must not include `updatedAt`.                                                                                                                   |
+| 5.8  | `createTask` successfully created an unassigned task with the required `name`, `dueDate`, `pointEstimate`, `status`, and `tags` fields. The response contains the created task, nullable `assignee`, non-null `creator`, and `createdAt`.                              | Approved API mutation on 2026-08-04; its temporary audit record was subsequently deleted. | The creation feature can omit `assigneeId`, should request only confirmed Task fields, and can update the local task collection from the mutation result.                            |
+| 5.9  | The `users` query successfully returns `User` records with all documented fields. A complete `tasks(input: {})` query returned every documented Task field, a nullable `assignee`, and a non-null `creator`; `position` is a numeric, non-null server value.           | Authenticated read-only verification on 2026-08-04.                                       | The application can use the listed profile, user, and task selection sets directly; Avatar continues to handle nullable values.                                                      |
+| 5.10 | All valid `FilterTaskInput` fields were exercised. `assigneeId`, `dueDate`, `pointEstimate`, and `status` match exactly; `name` performs a partial, case-sensitive match; different filter fields combine with AND; `tags` matches when any supplied tag matches (OR). | Authenticated read-only verification on 2026-08-04.                                       | Search uses the API `name` filter and preserves case-sensitive API semantics. The future combined-filter UI can send all active fields in one input and treats multiple tags as OR.  |
+| 5.11 | `ownerId` accepts a valid UUID but does not change the task result set. An invalid UUID returns `BAD_USER_INPUT` with HTTP status `400` and message `ownerId must be a UUID`.                                                                                          | Authenticated read-only verification on 2026-08-04.                                       | `ownerId` is not used by product filtering. API error handling must preserve useful validation feedback.                                                                             |
+| 5.12 | `updateTask` successfully updates `name`, `dueDate`, `pointEstimate`, `status`, `tags`, and `assigneeId`; an explicit `assigneeId: null` clears the assignment.                                                                                                        | Controlled create/update/delete audit on 2026-08-04.                                      | The later edit feature can update these fields and clear an assignee through `null`.                                                                                                 |
+| 5.13 | Updating `position` fails with GraphQL error code `422` and database message `incorrect binary data format in bind parameter 4`. A combined update containing `position` fails for the same reason.                                                                    | Controlled create/update/delete audit on 2026-08-04.                                      | Do not send `position` through `updateTask`; drag-and-drop reordering remains blocked by the current API implementation and is not included in the initial edit flow.                |
+| 5.14 | `deleteTask` returns the deleted task and removes it from subsequent `tasks(input: {})` results. Temporary audit fixtures were deleted after verification.                                                                                                             | Controlled create/update/delete audit on 2026-08-04.                                      | The later deletion feature can remove the task from local state after a successful mutation.                                                                                         |
+
+### Implementation Progress
+
+- [x] Verify whether the configured endpoint allows unauthenticated API access.
+- [x] Confirm the local token configuration and authenticated API access.
+- [x] Inspect the schema-level task, user, status, query, and mutation contracts.
+- [x] Verify task-query behavior with a currently valid token.
+- [x] Verify the create-task mutation with approved test data.
+- [x] Verify query, filter, update, and deletion behavior with controlled API tests; remove temporary test fixtures.
+- [ ] Configure Apollo Client and replace static task fixtures with API data.
+- [ ] Connect creation to the confirmed create-task mutation.
+- [ ] Add GraphQL operation and state coverage.
 
 ## Decision Log
 
