@@ -1,22 +1,7 @@
-import type { ApiTask, PointEstimate, TaskTag } from './apiTask'
+import type { ApiTask } from './apiTask'
 import type { Task } from './task'
+import { pointEstimateValues, tagLabels } from './taskLabels'
 import { getUserInitials } from '@/entities/user/model/user'
-
-const estimateValues: Record<PointEstimate, number> = {
-  EIGHT: 8,
-  FOUR: 4,
-  ONE: 1,
-  TWO: 2,
-  ZERO: 0,
-}
-
-const tagLabels: Record<TaskTag, string> = {
-  ANDROID: 'Android',
-  IOS: 'iOS App',
-  NODE_JS: 'Node.js',
-  RAILS: 'Rails',
-  REACT: 'React',
-}
 
 function getDueDateTone(dueDate: Date) {
   const today = new Date()
@@ -71,7 +56,7 @@ export function mapApiTaskToTask(apiTask: ApiTask): Task {
     dueDateLabel: getDueDateLabel(dueDate, dueDateTone),
     dueDateTone,
     id: apiTask.id,
-    points: estimateValues[apiTask.pointEstimate],
+    points: pointEstimateValues[apiTask.pointEstimate],
     status: apiTask.status,
     tags: apiTask.tags.map((tag) => tagLabels[tag]),
     title: apiTask.name,
