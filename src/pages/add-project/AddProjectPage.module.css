@@ -1,0 +1,68 @@
+.root {
+  min-height: calc(100dvh - 10.5rem);
+  padding-top: var(--space-2);
+}
+
+.actionBar {
+  display: flex;
+  min-height: 2.75rem;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-6);
+}
+
+.actionBar :global(button) {
+  color: var(--color-text-secondary);
+}
+
+.createButton {
+  padding: var(--space-2);
+  border: 0;
+  background: transparent;
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+}
+
+.createButton:focus-visible,
+.field:focus-visible {
+  outline: var(--focus-ring);
+  outline-offset: var(--focus-offset);
+}
+
+.root h1 {
+  margin: 0 0 var(--space-6);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-semibold);
+}
+
+.fields {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.field {
+  display: flex;
+  min-height: 2.25rem;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 0 var(--space-3);
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: var(--color-surface-raised);
+  color: var(--color-text-primary);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  text-align: left;
+}
+
+.field:hover,
+.createButton:hover {
+  color: var(--color-text-primary);
+}
+
+@media (min-width: 768px) {
+  .root {
+    max-width: 30rem;
+  }
+}

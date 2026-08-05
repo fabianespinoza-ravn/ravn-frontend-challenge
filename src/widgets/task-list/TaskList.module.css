@@ -1,0 +1,228 @@
+.root {
+  padding-top: var(--space-6);
+}
+
+.header {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2);
+  margin-bottom: var(--space-4);
+}
+
+.header h1 {
+  margin: 0;
+  color: var(--color-text-primary);
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+}
+
+.header span {
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+}
+
+.tableViewport {
+  width: 100%;
+  overflow-x: auto;
+  overscroll-behavior-inline: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+.table {
+  min-width: 48rem;
+}
+
+.columnHeaders {
+  grid-template-columns:
+    2.5rem minmax(9rem, 1.7fr) minmax(9rem, 1.3fr) minmax(5.5rem, 0.7fr)
+    minmax(8rem, 0.8fr) 2rem;
+}
+
+.task {
+  grid-template-columns:
+    2.5rem minmax(9rem, 1.7fr) minmax(9rem, 1.3fr) minmax(5.5rem, 0.7fr)
+    minmax(8rem, 0.8fr) 2rem;
+}
+
+.columnHeaders {
+  display: grid;
+  min-height: 3.25rem;
+  align-items: center;
+  gap: 0;
+  padding: 0 var(--space-4);
+  margin-bottom: var(--space-3);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface-raised);
+}
+
+.categories {
+  display: grid;
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface-raised);
+}
+
+.category {
+  border-bottom: 1px solid var(--color-border);
+}
+
+.category:last-child {
+  border-bottom: 0;
+}
+
+.category summary {
+  display: flex;
+  min-height: 3.25rem;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 0 var(--space-4);
+  color: var(--color-text-primary);
+  cursor: pointer;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  list-style: none;
+  border-bottom: 1px solid transparent;
+}
+
+.category[open] summary {
+  border-bottom-color: var(--color-border);
+}
+
+.category summary::-webkit-details-marker {
+  display: none;
+}
+
+.summaryIcon {
+  display: inline-flex;
+  color: var(--color-text-secondary);
+  transition: transform 160ms ease;
+}
+
+.category:not([open]) .summaryIcon {
+  transform: rotate(-90deg);
+}
+
+.statusIndicator {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+}
+
+.tasks {
+  display: grid;
+  gap: 0;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.task {
+  display: grid;
+  gap: 0;
+  padding: var(--space-4);
+  border-radius: 0;
+  background: transparent;
+  border-left: 0.25rem solid;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.past {
+  border-left-color: #e2716a;
+}
+
+.soon {
+  border-left-color: #e3bd57;
+}
+
+.future {
+  border-left-color: #65b98b;
+}
+
+.index,
+.dueDate {
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+}
+
+.task h2 {
+  margin: 0;
+  color: var(--color-text-primary);
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-semibold);
+}
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.tag {
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-sm);
+  background: rgb(101 185 139 / 14%);
+  color: #8fcf91;
+  font-size: 0.6875rem;
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.isAndroid {
+  background: rgb(227 189 87 / 13%);
+  color: #e3bd57;
+}
+
+.points {
+  color: var(--color-text-primary);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+}
+
+.emptyState {
+  display: grid;
+  width: 100%;
+  min-height: 4.5rem;
+  place-items: center;
+  padding: var(--space-4);
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+  text-align: center;
+  box-sizing: border-box;
+  overflow-wrap: anywhere;
+}
+
+@media (min-width: 768px) {
+  .header {
+    display: none;
+  }
+}
+
+.task {
+  align-items: center;
+}
+
+.columnHeaders > span,
+.task > * {
+  min-width: 0;
+}
+
+.columnHeaders > span:not(:first-child),
+.task > :not(:first-child) {
+  border-left: 1px solid var(--color-border);
+  padding-left: var(--space-3);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .summaryIcon {
+    transition: none;
+  }
+}

@@ -25,10 +25,12 @@
   --radius-sm: 0.25rem;
   --radius-md: 0.5rem;
   --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
 
   --color-page: #101112;
   --color-surface: #202225;
   --color-surface-raised: #2a2d31;
+  --color-surface-muted: #25282c;
   --color-border: #393c40;
   --color-text-primary: #f2f3f3;
   --color-text-secondary: #aeb1b5;

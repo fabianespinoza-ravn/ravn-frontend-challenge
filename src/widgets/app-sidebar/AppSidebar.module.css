@@ -1,0 +1,315 @@
+.root {
+  position: sticky;
+  bottom: 0;
+  z-index: 1;
+  display: flex;
+  order: 2;
+  min-height: 4.5rem;
+  align-items: center;
+  justify-content: center;
+  border-top: 1px solid var(--color-border);
+  background: var(--color-surface);
+}
+
+.brand {
+  display: none;
+}
+
+.navigation {
+  display: flex;
+  width: min(100%, 30rem);
+  justify-content: space-around;
+  gap: var(--space-1);
+  padding: var(--space-2) max(var(--space-3), env(safe-area-inset-right))
+    max(var(--space-2), env(safe-area-inset-bottom)) max(var(--space-3), env(safe-area-inset-left));
+}
+
+.navigationItem {
+  display: contents;
+}
+
+.navigationLink {
+  display: inline-flex;
+  min-width: 2.75rem;
+  min-height: 2.75rem;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-md);
+  color: var(--color-text-secondary);
+  text-decoration: none;
+}
+
+.addProjectButton {
+  display: inline-flex;
+  min-width: 2.75rem;
+  min-height: 2.75rem;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-md);
+  background: transparent;
+  color: var(--color-text-secondary);
+  text-decoration: none;
+}
+
+.addProjectButton:focus-visible {
+  outline: var(--focus-ring);
+  outline-offset: var(--focus-offset);
+}
+
+.addProjectIcon {
+  display: inline-grid;
+  place-items: center;
+}
+
+.navigationLink:focus-visible {
+  outline: var(--focus-ring);
+  outline-offset: var(--focus-offset);
+}
+
+.label {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+.isActive {
+  color: var(--color-accent);
+}
+
+.backdrop {
+  display: none;
+}
+
+.edgeSwipeArea {
+  display: none;
+}
+
+@media (max-width: 767px) {
+  :global([data-mobile-navigation='bottom']) .navigationLink,
+  :global([data-mobile-navigation='bottom']) .addProjectButton {
+    flex: 1;
+    min-height: 3.25rem;
+    flex-direction: column;
+    gap: var(--space-1);
+    padding-block: var(--space-1);
+  }
+
+  :global([data-mobile-navigation='bottom']) .label {
+    position: static;
+    width: auto;
+    height: auto;
+    overflow: visible;
+    clip: auto;
+    color: inherit;
+    font-size: 0.6875rem;
+    font-weight: var(--font-weight-medium);
+    letter-spacing: 0.02em;
+    line-height: 1;
+    white-space: nowrap;
+  }
+
+  :global([data-mobile-navigation='bottom']) .addProjectIcon {
+    width: 1.125rem;
+    height: 1.125rem;
+    border-radius: 50%;
+    background: var(--color-text-secondary);
+    color: var(--color-surface);
+  }
+
+  :global([data-mobile-navigation='bottom']) .addProjectButton.isActive .addProjectIcon {
+    background: var(--color-accent);
+    color: var(--color-on-accent);
+  }
+
+  .isAndroid {
+    position: fixed;
+    inset: 0 auto 0 0;
+    z-index: 3;
+    display: block;
+    order: 0;
+    width: min(16rem, calc(100vw - var(--space-12)));
+    min-height: 100dvh;
+    padding: var(--space-6) var(--space-2);
+    border: 0;
+    border-radius: 0 var(--radius-xl) var(--radius-xl) 0;
+    background: var(--color-surface-muted);
+    transform: translateX(-100%);
+    transition: transform 180ms ease;
+  }
+
+  .isAndroid.isDrawerOpen {
+    transform: translateX(0);
+  }
+
+  .edgeSwipeArea {
+    position: fixed;
+    z-index: 1;
+    display: block;
+    inset: 0 auto 0 0;
+    width: 1.5rem;
+  }
+
+  .isDrawerOpen ~ .edgeSwipeArea {
+    pointer-events: none;
+  }
+
+  .isAndroid .brand {
+    display: grid;
+    width: 3rem;
+    height: 2.75rem;
+    place-items: center;
+    margin-inline: auto;
+    color: var(--color-text-primary);
+  }
+
+  .isAndroid .navigation {
+    display: flex;
+    width: calc(100% + var(--space-4));
+    flex-direction: column;
+    margin: var(--space-6) calc(var(--space-2) * -1) 0;
+    padding: 0;
+  }
+
+  .isAndroid .navigationItem {
+    display: block;
+    width: 100%;
+  }
+
+  .isAndroid .navigationLink,
+  .isAndroid .addProjectButton {
+    box-sizing: border-box;
+    display: flex;
+    width: 100%;
+    justify-content: flex-start;
+    gap: var(--space-3);
+    padding-inline: var(--space-4);
+    font-size: var(--font-size-md);
+    font-weight: var(--font-weight-medium);
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+  }
+
+  .isAndroid .label {
+    position: static;
+    width: auto;
+    height: auto;
+    overflow: visible;
+    clip: auto;
+    white-space: normal;
+  }
+
+  .isAndroid .isActive {
+    position: relative;
+    background: linear-gradient(to left, rgb(238 103 94 / 18%), transparent 82%);
+  }
+
+  .isAndroid .isActive::after {
+    position: absolute;
+    right: 0;
+    width: 0.1875rem;
+    height: 1.5rem;
+    border-radius: var(--radius-sm) 0 0 var(--radius-sm);
+    background: var(--color-accent);
+    content: '';
+  }
+
+  .backdrop {
+    position: fixed;
+    z-index: 2;
+    display: block;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    padding: 0;
+    border: 0;
+    background: rgb(0 0 0 / 45%);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 180ms ease;
+  }
+
+  .isBackdropVisible {
+    opacity: 1;
+    pointer-events: auto;
+  }
+}
+
+@media (min-width: 768px) {
+  .root {
+    position: sticky;
+    top: 0;
+    bottom: auto;
+    display: block;
+    order: 0;
+    width: 12rem;
+    min-height: calc(100dvh - (var(--space-6) * 2));
+    padding: var(--space-6) var(--space-2);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-xl);
+    background: var(--color-surface-muted);
+  }
+
+  .brand {
+    display: grid;
+    width: 3rem;
+    height: 2.75rem;
+    place-items: center;
+    margin-inline: auto;
+    color: var(--color-text-primary);
+  }
+
+  .navigation {
+    display: grid;
+    width: auto;
+    margin-top: var(--space-6);
+    padding: 0;
+  }
+
+  .navigationItem {
+    display: block;
+  }
+
+  .navigationLink {
+    width: 100%;
+    justify-content: flex-start;
+    gap: var(--space-3);
+    padding-inline: var(--space-4);
+    font-size: var(--font-size-md);
+    font-weight: var(--font-weight-medium);
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+  }
+
+  .addProjectButton {
+    display: none;
+  }
+
+  .label {
+    position: static;
+    width: auto;
+    height: auto;
+    overflow: visible;
+    clip: auto;
+    white-space: normal;
+  }
+
+  .isActive {
+    position: relative;
+    background: linear-gradient(to left, rgb(238 103 94 / 18%), transparent 82%);
+  }
+
+  .isActive::after {
+    position: absolute;
+    right: calc(var(--space-2) * -1);
+    width: 0.1875rem;
+    height: 1.5rem;
+    border-radius: var(--radius-sm) 0 0 var(--radius-sm);
+    background: var(--color-accent);
+    content: '';
+  }
+}
