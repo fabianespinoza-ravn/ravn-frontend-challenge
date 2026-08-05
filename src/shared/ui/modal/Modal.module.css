@@ -1,0 +1,31 @@
+.root {
+  position: fixed;
+  z-index: 20;
+  display: grid;
+  padding: var(--space-4);
+  inset: 0;
+  place-items: center;
+}
+
+.backdrop {
+  position: absolute;
+  border: 0;
+  background: rgb(0 0 0 / 60%);
+  inset: 0;
+}
+
+.panel {
+  position: relative;
+  width: min(100%, 28rem);
+  max-height: min(90dvh, 44rem);
+  padding: var(--space-6);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface-overlay);
+  box-shadow: var(--shadow-lg);
+  overflow-y: auto;
+}
+
+.panel:focus-visible {
+  outline: var(--focus-ring);
+  outline-offset: var(--focus-offset);
+}

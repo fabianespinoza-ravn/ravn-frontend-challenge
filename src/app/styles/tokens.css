@@ -31,6 +31,8 @@
   --color-surface: #202225;
   --color-surface-raised: #2a2d31;
   --color-surface-muted: #25282c;
+  --color-surface-overlay: #3a3d42;
+  --color-surface-overlay-raised: #45484e;
   --color-border: #393c40;
   --color-text-primary: #f2f3f3;
   --color-text-secondary: #aeb1b5;
@@ -39,6 +41,7 @@
   --color-on-accent: #ffffff;
 
   --shadow-md: 0 0.75rem 1.5rem rgb(0 0 0 / 12%);
+  --shadow-lg: 0 1rem 2rem rgb(0 0 0 / 32%);
   --focus-ring: 0.125rem solid var(--color-accent);
   --focus-offset: 0.125rem;
   --content-max-width: 90rem;
