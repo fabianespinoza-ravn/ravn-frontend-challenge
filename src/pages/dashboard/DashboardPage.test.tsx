@@ -5,6 +5,7 @@ import { afterEach, describe, expect, it } from 'vitest'
 import { GET_TASKS } from '@/entities/task/api/taskOperations'
 import type { ApiTask } from '@/entities/task/model/apiTask'
 import { mockProfile } from '@/test/mocks/graphql'
+import { TaskCreationTestProvider } from '@/test/taskCreation'
 import { DashboardPage } from './DashboardPage'
 
 type ApolloApiTask = ApiTask & {
@@ -37,7 +38,9 @@ const earlierTask: ApiTask = {
 function renderDashboard(mocks: ConstructorParameters<typeof MockedProvider>[0]['mocks']) {
   return render(
     <MockedProvider mocks={mocks}>
-      <DashboardPage />
+      <TaskCreationTestProvider>
+        <DashboardPage />
+      </TaskCreationTestProvider>
     </MockedProvider>,
   )
 }

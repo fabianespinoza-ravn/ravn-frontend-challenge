@@ -1,0 +1,109 @@
+/*
+ * Five rows are visible at a time and the third is the selection line, so each
+ * column carries two blank rows at either end to let the first and last values
+ * reach the centre. The scroll handler reads the settled position back, which
+ * is why the item height below and the one it measures must stay in step.
+ */
+.root {
+  position: relative;
+  display: grid;
+  width: min(100%, 22rem);
+  grid-template-columns: 1.9fr 0.7fr 1.1fr;
+  gap: var(--space-3);
+}
+
+.centreLine {
+  position: absolute;
+  z-index: 0;
+  top: 50%;
+  right: 0;
+  left: 0;
+  height: 2.25rem;
+  border-radius: var(--radius-sm);
+  background: rgb(255 255 255 / 8%);
+  pointer-events: none;
+  transform: translateY(-50%);
+}
+
+.column {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  height: 11.25rem;
+  flex-direction: column;
+  align-items: stretch;
+  scroll-snap-type: y mandatory;
+  overflow-y: auto;
+  scrollbar-width: none;
+  /* Fades both ends so the depth reads as a cylinder, like the native wheel. */
+  mask-image: linear-gradient(
+    to bottom,
+    transparent 0,
+    rgb(0 0 0 / 45%) 2.25rem,
+    #000 4.5rem,
+    #000 6.75rem,
+    rgb(0 0 0 / 45%) 9rem,
+    transparent 100%
+  );
+}
+
+.column::-webkit-scrollbar {
+  display: none;
+}
+
+.spacer {
+  height: 4.5rem;
+  flex: 0 0 auto;
+}
+
+.item {
+  height: 2.25rem;
+  flex: 0 0 auto;
+  padding: 0 var(--space-2);
+  border: 0;
+  background: transparent;
+  color: #8e8e93;
+  font-family: inherit;
+  font-size: var(--font-size-sm);
+  line-height: 2.25rem;
+  scroll-snap-align: center;
+  text-align: center;
+  transition:
+    color 120ms ease,
+    opacity 120ms ease,
+    transform 120ms ease;
+}
+
+.item:focus-visible {
+  outline: var(--focus-ring);
+  outline-offset: calc(var(--focus-offset) * -1);
+}
+
+/* Depth: the centred value is largest and white, its neighbours recede. */
+.isSelected {
+  color: #ffffff;
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  transform: scale(1);
+}
+
+.isNear {
+  opacity: 0.75;
+  transform: scale(0.9);
+}
+
+.isFar {
+  opacity: 0.45;
+  transform: scale(0.8);
+}
+
+.isDistant {
+  opacity: 0.25;
+  transform: scale(0.75);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .item {
+    transition: none;
+  }
+}

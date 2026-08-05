@@ -1,0 +1,233 @@
+/*
+ * Colours come from custom properties so one composition can restyle every
+ * field at once. The fallbacks are the desktop palette.
+ */
+.root {
+  position: relative;
+}
+
+.trigger {
+  display: inline-flex;
+  min-height: 2.25rem;
+  max-width: 100%;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 0 var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: transparent;
+  color: var(--field-text-secondary, var(--color-text-secondary));
+  font-family: inherit;
+  font-size: var(--font-size-sm);
+  white-space: nowrap;
+}
+
+.trigger:hover:not(:disabled) {
+  background: var(--field-option-hover, var(--color-surface-overlay-raised));
+  color: var(--field-text, var(--color-text-primary));
+}
+
+.trigger:focus-visible {
+  outline: var(--focus-ring);
+  outline-offset: var(--focus-offset);
+}
+
+.trigger:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.isFilled {
+  border-color: transparent;
+  background: var(--field-option-hover, var(--color-surface-overlay-raised));
+  color: var(--field-text, var(--color-text-primary));
+  font-weight: var(--font-weight-medium);
+}
+
+.triggerLabel {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Selected tags stack so the control grows downwards instead of widening the row. */
+.triggerTags {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-1);
+  padding: var(--space-1) 0;
+}
+
+.triggerTag {
+  padding: 0.125rem var(--space-2);
+  border-radius: var(--radius-sm);
+  background: var(--field-chip-background, var(--color-surface-overlay));
+  font-size: var(--font-size-sm);
+}
+
+/* The iOS row has the width to lay its applied tags out in a line. */
+.triggerTagsRow {
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.triggerTagsRow .triggerTag {
+  padding: 0.125rem var(--space-3);
+  border-radius: 999px;
+  font-size: 0.9375rem;
+}
+
+.panel {
+  position: absolute;
+  z-index: 1;
+  top: calc(100% + var(--space-2));
+  left: 0;
+  display: grid;
+  min-width: 11rem;
+  max-height: 17rem;
+  gap: var(--space-1);
+  padding: var(--space-2);
+  border-radius: var(--radius-md);
+  background: var(--field-overlay-background, var(--color-surface-overlay-raised));
+  box-shadow: var(--shadow-lg);
+  overflow-y: auto;
+}
+
+/* The calendar and the wheel size themselves; capping them adds a scrollbar. */
+.panelFitsContent {
+  max-height: none;
+  overflow: visible;
+}
+
+.panelTitle {
+  margin: 0;
+  padding: var(--space-1) var(--space-2) var(--space-2);
+  color: var(--field-text-secondary, var(--color-text-secondary));
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+}
+
+.option {
+  display: flex;
+  min-height: 2.25rem;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 0 var(--space-2);
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--field-text, var(--color-text-primary));
+  font-family: inherit;
+  font-size: var(--font-size-sm);
+  text-align: left;
+  white-space: nowrap;
+}
+
+.option:hover {
+  background: var(--field-option-hover, var(--color-surface-overlay));
+}
+
+.option:focus-visible {
+  outline: var(--focus-ring);
+  outline-offset: calc(var(--focus-offset) * -1);
+}
+
+.option[aria-pressed='true'] {
+  background: var(--field-option-hover, var(--color-surface-overlay));
+  font-weight: var(--font-weight-semibold);
+}
+
+.optionIcon {
+  display: inline-grid;
+  flex: 0 0 auto;
+  color: var(--field-text-secondary, var(--color-text-secondary));
+  place-items: center;
+}
+
+/* A selected option fills and tints its icon so the state reads without colour alone. */
+.isSelectedIcon {
+  color: var(--color-accent);
+}
+
+.checkbox {
+  display: inline-grid;
+  width: 1.125rem;
+  height: 1.125rem;
+  flex: 0 0 auto;
+  border: 1px solid var(--field-text-secondary, var(--color-text-secondary));
+  border-radius: 0.25rem;
+  color: var(--field-text, var(--color-text-primary));
+  place-items: center;
+}
+
+.isChecked {
+  border-color: transparent;
+  background: var(--field-checkbox-background, var(--color-surface-overlay));
+}
+
+.emptyState {
+  margin: 0;
+  padding: var(--space-2);
+  color: var(--field-text-secondary, var(--color-text-secondary));
+  font-size: var(--font-size-xs);
+}
+
+/* iOS composition: full-width stacked rows instead of inline chips. */
+.rowRoot {
+  width: 100%;
+}
+
+.rowTrigger {
+  display: flex;
+  width: 100%;
+  min-height: 2.75rem;
+  justify-content: flex-start;
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-4);
+  border: 0;
+  border-radius: var(--radius-md);
+  background: var(--field-row-background, var(--color-surface-raised));
+  color: var(--field-text, var(--color-text-primary));
+  font-size: 0.9375rem;
+  font-weight: var(--font-weight-medium);
+}
+
+.rowTrigger:hover:not(:disabled) {
+  background: var(--field-row-background, var(--color-surface-raised));
+}
+
+/* The iOS popovers are centred over the screen rather than anchored. */
+.overlay {
+  position: fixed;
+  z-index: 20;
+  display: grid;
+  padding: var(--space-4);
+  inset: 0;
+  place-items: center;
+}
+
+.overlayBackdrop {
+  position: absolute;
+  border: 0;
+  background: rgb(0 0 0 / 55%);
+  inset: 0;
+}
+
+.rowPanel {
+  position: relative;
+  top: auto;
+  left: auto;
+  min-width: 14rem;
+  max-width: min(100%, 22rem);
+  padding: var(--space-3);
+  border-radius: 0.875rem;
+}
+
+/* The wheel reads as its own surface, so it drops to black and grows. */
+.wheelPanel {
+  max-width: min(100%, 25rem);
+  padding: var(--space-4);
+  background: #000000;
+  color: #ffffff;
+}

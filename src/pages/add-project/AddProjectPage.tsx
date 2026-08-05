@@ -1,38 +1,45 @@
-import { CalendarDays, Calculator, Tag, UserRound, X } from 'lucide-react'
+import { X } from 'lucide-react'
+import type { User } from '@/entities/user/model/user'
+import {
+  taskCreationFormId,
+  taskCreationTitleId,
+} from '@/features/task-creation/model/taskCreationForm'
+import type { TaskCreationForm } from '@/features/task-creation/model/useTaskCreationForm'
+import { TaskForm } from '@/features/task-creation/ui/TaskForm'
 import { IconButton } from '@/shared/ui/icon-button/IconButton'
 import styles from './AddProjectPage.module.css'
 
-const projectFields = [
-  { icon: Calculator, label: 'Estimate' },
-  { icon: Tag, label: 'Label' },
-  { icon: UserRound, label: 'Assignee' },
-  { icon: CalendarDays, label: 'Due Date' },
-]
-
 type AddProjectPageProps = {
+  assignees?: User[]
+  form: TaskCreationForm
   onClose: () => void
 }
 
-export function AddProjectPage({ onClose }: AddProjectPageProps) {
+export function AddProjectPage({ assignees, form, onClose }: AddProjectPageProps) {
+  const { values } = form
+  // Visual affordance only. The mutation commit turns this into real validation.
+  const isReady = Boolean(
+    values.name && values.pointEstimate && values.status && values.dueDate && values.tags.length,
+  )
+
   return (
-    <section className={styles.root}>
+    <section aria-labelledby={taskCreationTitleId} className={styles.root}>
+      <h1 className={styles.visuallyHidden} id={taskCreationTitleId}>
+        Create Task
+      </h1>
       <header className={styles.actionBar}>
-        <IconButton aria-label="Close Add Project" onClick={onClose} size="small">
+        <IconButton aria-label="Close task creation" onClick={onClose} size="small">
           <X aria-hidden="true" size={20} />
         </IconButton>
-        <button className={styles.createButton} type="button">
+        <button
+          className={isReady ? `${styles.createButton} ${styles.isReady}` : styles.createButton}
+          form={taskCreationFormId}
+          type="submit"
+        >
           Create
         </button>
       </header>
-      <h1>Task Title</h1>
-      <div className={styles.fields} aria-label="Add Project fields">
-        {projectFields.map(({ icon: Icon, label }) => (
-          <button className={styles.field} key={label} type="button">
-            <Icon aria-hidden="true" size={18} />
-            <span>{label}</span>
-          </button>
-        ))}
-      </div>
+      <TaskForm assignees={assignees} form={form} id={taskCreationFormId} />
     </section>
   )
 }

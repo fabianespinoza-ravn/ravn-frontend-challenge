@@ -1,17 +1,81 @@
-import { render, screen } from '@testing-library/react'
-import { describe, expect, it, vi } from 'vitest'
+import { cleanup, render, screen, within } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
+import { afterEach, describe, expect, it, vi } from 'vitest'
+import { taskCreationFormId } from '@/features/task-creation/model/taskCreationForm'
+import { useTaskCreationForm } from '@/features/task-creation/model/useTaskCreationForm'
 import { AddProjectPage } from './AddProjectPage'
+import styles from './AddProjectPage.module.css'
+
+function AddProjectHarness({ onClose }: { onClose: () => void }) {
+  const form = useTaskCreationForm()
+
+  return <AddProjectPage form={form} onClose={onClose} />
+}
+
+afterEach(cleanup)
 
 describe('AddProjectPage', () => {
-  it('renders the static iOS Add Project composition', () => {
-    render(<AddProjectPage onClose={vi.fn()} />)
+  it('renders the task form inside the mobile full-page composition', () => {
+    render(<AddProjectHarness onClose={vi.fn()} />)
 
-    expect(screen.getByRole('button', { name: 'Close Add Project' })).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Create' })).toBeInTheDocument()
-    expect(screen.getByRole('heading', { name: 'Task Title' })).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Estimate' })).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Label' })).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Assignee' })).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Due Date' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Close task creation' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Create Task' })).toBeInTheDocument()
+    expect(screen.getByLabelText('Task Title')).toBeInTheDocument()
+
+    for (const label of ['Estimate', 'Label', 'Assignee', 'Due date', 'Status']) {
+      expect(screen.getByRole('button', { name: label })).toBeInTheDocument()
+    }
+  })
+
+  it('submits through the form even though its Create control sits outside it', () => {
+    render(<AddProjectHarness onClose={vi.fn()} />)
+
+    expect(screen.getByRole('button', { name: 'Create' })).toHaveAttribute(
+      'form',
+      taskCreationFormId,
+    )
+  })
+
+  it('highlights Create only once every required field carries a value', async () => {
+    const user = userEvent.setup()
+
+    render(<AddProjectHarness onClose={vi.fn()} />)
+
+    const createButton = screen.getByRole('button', { name: 'Create' })
+
+    expect(createButton).not.toHaveClass(styles.isReady)
+
+    await user.type(screen.getByLabelText('Task Title'), 'Ship the iOS form')
+
+    await user.click(screen.getByRole('button', { name: 'Estimate' }))
+    await user.click(
+      within(screen.getByRole('group', { name: 'Estimate' })).getByRole('button', {
+        name: '2 Points',
+      }),
+    )
+
+    await user.click(screen.getByRole('button', { name: 'Status' }))
+    await user.click(
+      within(screen.getByRole('group', { name: 'Status' })).getByRole('button', {
+        name: 'Backlog',
+      }),
+    )
+
+    await user.click(screen.getByRole('button', { name: 'Label' }))
+    await user.click(
+      within(screen.getByRole('group', { name: 'Tag Title' })).getByRole('button', {
+        name: 'React',
+      }),
+    )
+    await user.keyboard('{Escape}')
+
+    expect(createButton).not.toHaveClass(styles.isReady)
+
+    await user.click(screen.getByRole('button', { name: 'Due date' }))
+    await user.click(
+      within(screen.getByRole('group', { name: 'Day' })).getByRole('button', { name: '12' }),
+    )
+
+    expect(createButton).toHaveClass(styles.isReady)
   })
 })

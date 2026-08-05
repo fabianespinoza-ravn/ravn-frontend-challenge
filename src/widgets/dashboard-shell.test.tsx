@@ -7,6 +7,7 @@ import { AppSidebar } from './app-sidebar/AppSidebar'
 import sidebarStyles from './app-sidebar/AppSidebar.module.css'
 import { TaskToolbar } from './task-toolbar/TaskToolbar'
 import { createGraphqlMocks } from '@/test/mocks/graphql'
+import { TaskCreationTestProvider } from '@/test/taskCreation'
 
 afterEach(cleanup)
 
@@ -105,14 +106,23 @@ describe('Dashboard shell', () => {
     expect(screen.getByRole('button', { name: 'View notifications' })).toBeInTheDocument()
   })
 
-  it('renders static board view controls and the add-task action', () => {
-    render(<TaskToolbar />)
+  it('renders board view controls and requests task creation from the add-task action', () => {
+    const openTaskCreation = vi.fn()
+
+    render(
+      <TaskCreationTestProvider openTaskCreation={openTaskCreation}>
+        <TaskToolbar />
+      </TaskCreationTestProvider>,
+    )
 
     expect(screen.getByRole('button', { name: 'Task view' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Dashboard view' })).toHaveAttribute(
       'aria-pressed',
       'true',
     )
-    expect(screen.getByRole('button', { name: 'Add task' })).toBeInTheDocument()
+
+    fireEvent.click(screen.getByRole('button', { name: 'Add task' }))
+
+    expect(openTaskCreation).toHaveBeenCalledOnce()
   })
 })

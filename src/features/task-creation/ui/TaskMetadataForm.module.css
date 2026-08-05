@@ -1,0 +1,35 @@
+.root {
+  display: grid;
+  gap: var(--space-6);
+}
+
+.title {
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--color-text-primary);
+  font-family: inherit;
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-medium);
+}
+
+.title::placeholder {
+  color: var(--color-text-secondary);
+}
+
+/*
+ * A text field matches :focus-visible even when it is clicked, so any ring or
+ * rule here reads as an error box on the borderless title. The text caret is
+ * the focus indicator, as in the reference composition.
+ */
+.title:focus,
+.title:focus-visible {
+  outline: none;
+}
+
+.fields {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}

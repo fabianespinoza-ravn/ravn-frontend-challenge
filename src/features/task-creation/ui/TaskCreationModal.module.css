@@ -1,0 +1,32 @@
+.panel {
+  width: min(100%, 34rem);
+  max-height: none;
+  overflow: visible;
+}
+
+.footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--space-4);
+  margin-top: var(--space-8);
+}
+
+.cancelButton {
+  padding: var(--space-2);
+  border: 0;
+  background: transparent;
+  color: var(--color-text-secondary);
+  font-family: inherit;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+}
+
+.cancelButton:hover {
+  color: var(--color-text-primary);
+}
+
+.cancelButton:focus-visible {
+  outline: var(--focus-ring);
+  outline-offset: var(--focus-offset);
+}
