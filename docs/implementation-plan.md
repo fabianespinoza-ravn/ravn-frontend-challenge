@@ -268,7 +268,7 @@ The following items are required before product functionality is implemented:
 
 ## Dashboard UI: Current Scope
 
-**Implementation status:** In progress.
+**Implementation status:** Complete.
 
 ### Implementation Progress
 
@@ -278,7 +278,7 @@ The following items are required before product functionality is implemented:
 - [x] Add static board coverage for column counts, chronological card order, and the unassigned fallback.
 - [x] Replace the My Tasks placeholder with a responsive static list filtered by the mock authenticated assignee; list view is visually selected and groups task rows into expandable status categories with counts.
 - [x] Add platform-specific mobile navigation: iOS bottom actions and Android collapsible drawer navigation, with focused shell coverage.
-- [ ] Refine the dashboard against Figma across mobile, tablet, and desktop layouts; add focused coverage and visual evidence.
+- [x] Refine the dashboard against Figma across mobile, tablet, and desktop layouts; add focused coverage and visual evidence.
 
 - Dashboard shell controls are visual only in this phase. Navigation remains functional through the existing routes and NavLink active states.
 - The shared Avatar supports an accessible initials fallback for a missing or failed image source.
@@ -308,6 +308,7 @@ The following items are required before product functionality is implemented:
 - Sidebar navigation is visually stable on pointer hover; active and inactive colors do not change until navigation state changes.
 - Interactive visual mockups are delivered incrementally. Each commit groups one coherent user flow (for example, task creation modal or task-card options menu) with its route/UI state, close behavior, accessibility coverage, and plan update; unrelated mockups are not bundled into the same change.
 - The `Add Project` control is visual-only until project creation is explicitly brought into scope. On Android phones, the sidebar is a collapsible drawer so My Tasks remains readable on narrow screens.
+- Final visual validation was completed at `390×844` (mobile), `768×900` (breakpoint/tablet), and `1440×900` (desktop). Each viewport kept page-level horizontal overflow at zero; internal task-board and task-table horizontal scrolling remains intentional where required.
 
 ## Decision Log
 
