@@ -13,6 +13,9 @@ describe('TaskBoard', () => {
     expect(screen.getByRole('region', { name: 'In Progress, 2 tasks' })).toBeInTheDocument()
     expect(screen.getByRole('region', { name: 'Done, 2 tasks' })).toBeInTheDocument()
     expect(screen.getByRole('region', { name: 'Cancelled, 1 task' })).toBeInTheDocument()
+    expect(
+      screen.queryByRole('button', { name: 'More options for Backlog' }),
+    ).not.toBeInTheDocument()
   })
 
   it('orders cards chronologically within a column and renders an unassigned task fallback', () => {

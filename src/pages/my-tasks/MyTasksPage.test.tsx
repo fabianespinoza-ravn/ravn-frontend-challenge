@@ -6,7 +6,7 @@ describe('MyTasksPage', () => {
   it('renders only static tasks assigned to the mock authenticated user in list view', () => {
     render(<MyTasksPage />)
 
-    expect(screen.getByRole('button', { name: 'List view' })).toHaveAttribute(
+    expect(screen.getByRole('button', { name: 'Task view' })).toHaveAttribute(
       'aria-pressed',
       'true',
     )
@@ -15,6 +15,7 @@ describe('MyTasksPage', () => {
     expect(screen.getByText('Task Tags')).toBeInTheDocument()
     expect(screen.getByText('Estimate')).toBeInTheDocument()
     expect(screen.getByText('Due Date')).toBeInTheDocument()
+    expect(screen.getByLabelText('Task table')).toBeInTheDocument()
     expect(screen.queryByText('Task Assignee Name')).not.toBeInTheDocument()
     expect(screen.getByText('To Do').parentElement).toHaveTextContent('(1)')
     expect(screen.getByText('In Progress').parentElement).toHaveTextContent('(1)')

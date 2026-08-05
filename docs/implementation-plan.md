@@ -106,6 +106,7 @@ The application is a responsive task management web application for desktop and 
 - User type values will be presented in a human-readable format, such as `Admin` and `Candidate`.
 - The `profile` query was verified against the API: `type` returns the expected enum value and `avatar` can be `null`.
 - Settings and shared avatar UI must provide an accessible fallback when no avatar URL is available.
+- Settings is reached from the authenticated user's profile control, not from a dedicated sidebar or mobile-navigation tab.
 
 ## API Constraints and Confirmed Behavior
 
@@ -118,7 +119,7 @@ The application is a responsive task management web application for desktop and 
 
 ## Confirmed Initial Routes
 
-All routes are served by the same responsive web application. There are no desktop-only, mobile-only, iOS, Android, multi-assignee, or task-detail routes in the initial scope.
+All routes are served by the same responsive web application. Add Project is a layout-controlled screen state, not a public route: it is opened only from iOS bottom navigation or Android's floating action button. There are no multi-assignee or task-detail routes in the initial scope.
 
 | Path         | Page            | Behavior                                                                              |
 | ------------ | --------------- | ------------------------------------------------------------------------------------- |
@@ -131,7 +132,7 @@ All routes are served by the same responsive web application. There are no deskt
 - `AppLayout` provides the shared sidebar, header, and route outlet.
 - `RouteErrorPage` is the router-level error fallback and does not require its own public URL.
 - `AppErrorBoundary` wraps the application for unexpected React rendering errors and does not require its own public URL.
-- The authenticated user avatar and the Settings navigation item link to `/settings`.
+- The authenticated user avatar links to `/settings`; Settings is intentionally absent from sidebar and mobile navigation.
 
 ## Confirmed Route and Error Architecture
 
@@ -276,6 +277,7 @@ The following items are required before product functionality is implemented:
 - [x] Build the static task board with typed local mock data, five chronological status columns, TaskCard metadata, and an unassigned-avatar fallback.
 - [x] Add static board coverage for column counts, chronological card order, and the unassigned fallback.
 - [x] Replace the My Tasks placeholder with a responsive static list filtered by the mock authenticated assignee; list view is visually selected and groups task rows into expandable status categories with counts.
+- [x] Add platform-specific mobile navigation: iOS bottom actions and Android collapsible drawer navigation, with focused shell coverage.
 - [ ] Refine the dashboard against Figma across mobile, tablet, and desktop layouts; add focused coverage and visual evidence.
 
 - Dashboard shell controls are visual only in this phase. Navigation remains functional through the existing routes and NavLink active states.
@@ -285,8 +287,27 @@ The following items are required before product functionality is implemented:
 - My Tasks rows use a left due-date accent: red for past tasks, yellow for tasks due today or tomorrow, and green for later due dates.
 - The My Tasks list omits an assignee column because every row is already scoped to the authenticated user's assignment; it shows task name, tags, estimate, and due date instead.
 - Each My Tasks row keeps a trailing, visual-only options control, aligned in its own action column.
-- On desktop, My Tasks is presented as a table-like list with aligned column headers and visible row and cell separators. The header is a separate, same-width table row with a deliberate gap before task categories; the mobile layout remains stacked for readability.
+- On desktop, My Tasks is presented as a table-like list with aligned column headers and visible row and cell separators. The header is a separate, same-width table row with a deliberate gap before task categories; below the desktop breakpoint, every row reflows its title, tags, estimate, due date, and actions into a compact stacked layout.
 - Empty My Tasks status categories are expanded by default and show the existing empty-state copy in a centered, full-width table row.
+- Dashboard visual refinement preserves readable task-card dimensions by using an internal horizontal board scroll when all five status columns cannot fit. Header, toolbar, and card spacing are compacted to better match the reference composition.
+- Platform-specific mobile navigation uses a fixed three-action iOS bottom bar (`Dashboard`, visual-only `Add Project`, and `My Tasks`) and an Android collapsible, desktop-style sidebar with the centered Ravn mark and primary task navigation. Settings remains profile-only on both platforms.
+- At widths below `768px`, non-Android browsers use the iOS-style navigation pattern; its Add Project action opens the layout-controlled Create composition.
+- Selecting Dashboard or My Tasks always closes the layout-controlled Add Project composition before rendering the selected route.
+- Exactly one navigation item has the visual active state at a time: Add Project suppresses the underlying route's active styling while its composition is open.
+- If Add Project is open and the viewport reaches the desktop breakpoint (`768px`), the composition closes automatically and restores the route that was visible before it opened.
+- The search placeholder is hidden while its input has focus, leaving the active text-entry area visually clear.
+- On iOS-style mobile navigation, the search field is a bordered, rounded control and the toolbar becomes a full-width textual `Dashboard` / `Task` toggle. The separate add-task button is hidden in this presentation.
+- Dashboard status-column headers do not expose options menus; only task cards have visual options controls. My Tasks preserves its desktop table columns on mobile inside a touch-scrollable horizontal viewport.
+- The desktop My Tasks table omits the separate `My Tasks` task-count heading row; mobile retains it for its compact presentation.
+- The iOS Add Project action and Android floating action button open the same layout-controlled static composition with close, create, task-title, estimate, label, assignee, and due-date controls. It cannot be reached directly by URL. Despite its navigation label, the reference uses task-oriented fields; no new project data model or backend request is inferred during the static dashboard phase.
+- The iOS bottom navigation shows visible, compact `Dashboard`, `Add Project`, and `My Tasks` labels. Its Add Project icon is a plus symbol inside a circular background and does not show link underlining when active.
+- Android mobile uses no bottom navigation. Its left-side drawer opens from the header, closes through its backdrop or a destination selection, and the normal task views expose a floating red Add Task button in the lower-right corner. The toolbar's inline add button is hidden for this presentation.
+- Android navigation opens with a rightward swipe from the left screen edge and closes with a leftward drawer swipe, backdrop tap, or destination selection; no visible drawer trigger is shown. The profile moves to the upper-left, while search and notification become icons on the upper-right. Android's toolbar uses full-width textual `Dashboard` / `Task` tabs with an accent underline for the active view.
+- Android drawer navigation rows span the complete drawer width; labels and icons retain left inner padding while the active indicator is flush with the right edge.
+- Active navigation rows in desktop and Android sidebars use a coral gradient that starts at the right-edge indicator and fades toward the left.
+- Sidebar navigation is visually stable on pointer hover; active and inactive colors do not change until navigation state changes.
+- Interactive visual mockups are delivered incrementally. Each commit groups one coherent user flow (for example, task creation modal or task-card options menu) with its route/UI state, close behavior, accessibility coverage, and plan update; unrelated mockups are not bundled into the same change.
+- The `Add Project` control is visual-only until project creation is explicitly brought into scope. On Android phones, the sidebar is a collapsible drawer so My Tasks remains readable on narrow screens.
 
 ## Decision Log
 
@@ -302,13 +323,15 @@ The following items are required before product functionality is implemented:
 
 ### 2. Product and API Behavior
 
-| ID  | Decision                                                                                                                        | Rationale                                                                                     |
-| --- | ------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------- |
-| 2.1 | The deliverable is a responsive web application for desktop and mobile browsers on iOS and Android, not native mobile software. | Matches the React, CSS, Figma, and browser-based GraphQL scope.                               |
-| 2.2 | A task has zero or one assignee; task cards show only the optional assignee avatar.                                             | The API supports one optional assignee, not multiple participants.                            |
-| 2.3 | My Tasks filters by authenticated user `assigneeId`.                                                                            | Matches the API and gives the route a clear meaning.                                          |
-| 2.4 | The required "Position" value is represented by `profile.type`.                                                                 | The API exposes `type` with `ADMIN` and `CANDIDATE` values, but no separate `position` field. |
-| 2.5 | Profile avatars may be `null`; shared avatar UI uses an accessible fallback rather than a broken image.                         | Confirmed by the profile API response.                                                        |
+| ID  | Decision                                                                                                                        | Rationale                                                                                      |
+| --- | ------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
+| 2.1 | The deliverable is a responsive web application for desktop and mobile browsers on iOS and Android, not native mobile software. | Matches the React, CSS, Figma, and browser-based GraphQL scope.                                |
+| 2.2 | A task has zero or one assignee; task cards show only the optional assignee avatar.                                             | The API supports one optional assignee, not multiple participants.                             |
+| 2.3 | My Tasks filters by authenticated user `assigneeId`.                                                                            | Matches the API and gives the route a clear meaning.                                           |
+| 2.4 | The required "Position" value is represented by `profile.type`.                                                                 | The API exposes `type` with `ADMIN` and `CANDIDATE` values, but no separate `position` field.  |
+| 2.5 | Profile avatars may be `null`; shared avatar UI uses an accessible fallback rather than a broken image.                         | Confirmed by the profile API response.                                                         |
+| 2.6 | Settings remains available at `/settings` but is accessed exclusively from the profile control.                                 | Keeps primary navigation focused on task work and applies consistently on desktop and mobile.  |
+| 2.7 | Mobile navigation differs by platform: iOS has a three-action bottom bar; Android uses a desktop-style sidebar.                 | Requested visual navigation model; it remains one responsive web application, not native apps. |
 
 ### 3. Initial Setup: Architecture and Experience
 

@@ -4,9 +4,18 @@ import { Avatar } from '@/shared/ui/avatar/Avatar'
 import { IconButton } from '@/shared/ui/icon-button/IconButton'
 import styles from './AppHeader.module.css'
 
-export function AppHeader() {
+type AppHeaderProps = {
+  isAndroid?: boolean
+}
+
+export function AppHeader({ isAndroid = false }: AppHeaderProps) {
   return (
-    <header className={styles.root}>
+    <header className={`${styles.root} ${isAndroid ? styles.isAndroid : ''}`}>
+      {isAndroid ? (
+        <NavLink aria-label="Open settings" className={styles.androidProfileLink} to="/settings">
+          <Avatar alt="Profile" initials="FE" />
+        </NavLink>
+      ) : null}
       <div className={styles.search}>
         <Search aria-hidden="true" size={19} />
         <input aria-label="Search tasks" placeholder="Search" type="search" />
@@ -16,9 +25,11 @@ export function AppHeader() {
           <Bell aria-hidden="true" size={20} />
           <span className={styles.notificationIndicator} aria-hidden="true" />
         </IconButton>
-        <NavLink aria-label="Open settings" className={styles.profileLink} to="/settings">
-          <Avatar alt="Profile" initials="FE" />
-        </NavLink>
+        {!isAndroid ? (
+          <NavLink aria-label="Open settings" className={styles.profileLink} to="/settings">
+            <Avatar alt="Profile" initials="FE" />
+          </NavLink>
+        ) : null}
       </div>
     </header>
   )

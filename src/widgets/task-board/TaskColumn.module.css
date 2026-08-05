@@ -28,10 +28,6 @@
   font-size: var(--font-size-xs);
 }
 
-.header button {
-  margin-left: auto;
-}
-
 .cards {
   display: grid;
   gap: var(--space-3);

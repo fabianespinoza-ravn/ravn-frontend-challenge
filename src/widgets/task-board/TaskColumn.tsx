@@ -1,7 +1,5 @@
-import { MoreHorizontal } from 'lucide-react'
 import type { Task } from '@/entities/task/model/task'
 import { TaskCard } from '@/entities/task/ui/TaskCard'
-import { IconButton } from '@/shared/ui/icon-button/IconButton'
 import styles from './TaskColumn.module.css'
 
 type TaskColumnProps = {
@@ -23,9 +21,6 @@ export function TaskColumn({ color, name, tasks }: TaskColumnProps) {
         />
         <h2>{name}</h2>
         <span className={styles.count}>{taskCountLabel}</span>
-        <IconButton aria-label={`More options for ${name}`} size="small">
-          <MoreHorizontal aria-hidden="true" size={18} />
-        </IconButton>
       </header>
       <ol className={styles.cards}>
         {tasks.map((task) => (

@@ -21,6 +21,17 @@
   font-size: var(--font-size-sm);
 }
 
+.tableViewport {
+  width: 100%;
+  overflow-x: auto;
+  overscroll-behavior-inline: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+.table {
+  min-width: 48rem;
+}
+
 .columnHeaders {
   grid-template-columns:
     2.5rem minmax(9rem, 1.7fr) minmax(9rem, 1.3fr) minmax(5.5rem, 0.7fr)
@@ -34,7 +45,7 @@
 }
 
 .columnHeaders {
-  display: none;
+  display: grid;
   min-height: 3.25rem;
   align-items: center;
   gap: 0;
@@ -177,6 +188,7 @@
 
 .emptyState {
   display: grid;
+  width: 100%;
   min-height: 4.5rem;
   place-items: center;
   padding: var(--space-4);
@@ -184,28 +196,29 @@
   color: var(--color-text-secondary);
   font-size: var(--font-size-sm);
   text-align: center;
+  box-sizing: border-box;
+  overflow-wrap: anywhere;
 }
 
-@media (min-width: 1024px) {
-  .columnHeaders,
-  .task {
-    display: grid;
+@media (min-width: 768px) {
+  .header {
+    display: none;
   }
+}
 
-  .task {
-    align-items: center;
-  }
+.task {
+  align-items: center;
+}
 
-  .columnHeaders > span,
-  .task > * {
-    min-width: 0;
-  }
+.columnHeaders > span,
+.task > * {
+  min-width: 0;
+}
 
-  .columnHeaders > span:not(:first-child),
-  .task > :not(:first-child) {
-    border-left: 1px solid var(--color-border);
-    padding-left: var(--space-3);
-  }
+.columnHeaders > span:not(:first-child),
+.task > :not(:first-child) {
+  border-left: 1px solid var(--color-border);
+  padding-left: var(--space-3);
 }
 
 @media (prefers-reduced-motion: reduce) {
