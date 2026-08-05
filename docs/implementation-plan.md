@@ -345,7 +345,7 @@ The following items are required before product functionality is implemented:
 - [x] Verify query, filter, update, and deletion behavior with controlled API tests; remove temporary test fixtures.
 - [x] Install Apollo dependencies and configure typed environment access, Apollo Client, authorization headers, provider, GraphQL operations, API models, mappers, and reusable test mocks.
 - [x] Replace Dashboard task fixtures with `GET_TASKS`, use `GET_PROFILE` for the authenticated header, and provide accessible loading, error-with-retry, and empty states.
-- [ ] Replace My Tasks fixtures with API data.
+- [x] Replace My Tasks fixtures with `GET_PROFILE` followed by `GET_TASKS(input: { assigneeId: profile.id })`; preserve categories, mobile table scrolling, and accessible loading, error-with-retry, and empty states.
 - [ ] Connect creation to the confirmed create-task mutation.
 - [ ] Add GraphQL operation and state coverage.
 
@@ -393,6 +393,11 @@ The following items are required before product functionality is implemented:
 | 4.4 | Use React Router `7.18.2`; monitor its audit advisories because the current application is client-side only and does not use the affected server-side modes. | Uses the latest stable release available while documenting the residual audit signal.                      |
 
 ### 5. GraphQL Data and Creation: Foundation
+
+Dashboard data decisions:
+
+- **5.9:** Resolve `profile.id` before requesting My Tasks and send it as `tasks(input: { assigneeId })`; do not filter the complete collection in the client. This applies the verified API contract directly and avoids downloading irrelevant tasks.
+- **5.10:** Keep the My Tasks table and all five expandable categories visible when the assigned-task query returns an empty array. This preserves the established responsive table and makes the empty result understandable without a layout change.
 
 | ID  | Decision                                                                                                                                                                       | Rationale                                                                                                                           |
 | --- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------- |

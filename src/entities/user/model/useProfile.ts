@@ -2,7 +2,7 @@ import { useQuery } from '@apollo/client/react'
 import { GET_PROFILE } from '@/entities/user/api/userOperations'
 import type { User } from './user'
 
-type ProfileQueryData = {
+export type ProfileQueryData = {
   profile: User
 }
 

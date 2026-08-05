@@ -4,7 +4,8 @@ import { GET_PROFILE, GET_USERS } from '@/entities/user/api/userOperations'
 import type { ApiTask } from '@/entities/task/model/apiTask'
 import type { User } from '@/entities/user/model/user'
 
-export const mockProfile: User = {
+export const mockProfile: User & { __typename: 'User' } = {
+  __typename: 'User',
   avatar: null,
   createdAt: '2026-08-04T00:00:00.000Z',
   email: 'fabian@example.com',
