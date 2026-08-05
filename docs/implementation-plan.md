@@ -273,12 +273,20 @@ The following items are required before product functionality is implemented:
 
 - [x] Install `lucide-react` and build the dashboard shell with AppSidebar, AppHeader, TaskToolbar, IconButton, and Avatar primitives.
 - [x] Add focused shell coverage for active navigation, header controls, profile fallback, view controls, and the add-task action.
-- [ ] Build the static task board, mock task data, columns, and task cards.
+- [x] Build the static task board with typed local mock data, five chronological status columns, TaskCard metadata, and an unassigned-avatar fallback.
+- [x] Add static board coverage for column counts, chronological card order, and the unassigned fallback.
+- [x] Replace the My Tasks placeholder with a responsive static list filtered by the mock authenticated assignee; list view is visually selected and groups task rows into expandable status categories with counts.
 - [ ] Refine the dashboard against Figma across mobile, tablet, and desktop layouts; add focused coverage and visual evidence.
 
 - Dashboard shell controls are visual only in this phase. Navigation remains functional through the existing routes and NavLink active states.
 - The shared Avatar supports an accessible initials fallback for a missing or failed image source.
 - The dashboard shell uses the provided visual reference for its contained desktop canvas, compact sidebar and toolbar controls, search field, and official Ravn SVG mark. The planned five-column task-status model remains unchanged.
+- My Tasks uses a static list during the dashboard phase. It filters local fixtures by the mock authenticated assignee ID; GraphQL will later replace this fixture source with `assigneeId: profile.id`.
+- My Tasks rows use a left due-date accent: red for past tasks, yellow for tasks due today or tomorrow, and green for later due dates.
+- The My Tasks list omits an assignee column because every row is already scoped to the authenticated user's assignment; it shows task name, tags, estimate, and due date instead.
+- Each My Tasks row keeps a trailing, visual-only options control, aligned in its own action column.
+- On desktop, My Tasks is presented as a table-like list with aligned column headers and visible row and cell separators. The header is a separate, same-width table row with a deliberate gap before task categories; the mobile layout remains stacked for readability.
+- Empty My Tasks status categories are expanded by default and show the existing empty-state copy in a centered, full-width table row.
 
 ## Decision Log
 

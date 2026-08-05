@@ -3,14 +3,18 @@ import { Button } from '@/shared/ui/button/Button'
 import { IconButton } from '@/shared/ui/icon-button/IconButton'
 import styles from './TaskToolbar.module.css'
 
-export function TaskToolbar() {
+type TaskToolbarProps = {
+  activeView?: 'board' | 'list'
+}
+
+export function TaskToolbar({ activeView = 'board' }: TaskToolbarProps) {
   return (
     <div className={styles.root}>
       <div className={styles.viewToggle} aria-label="Task view" role="group">
-        <IconButton aria-label="List view" size="small">
+        <IconButton aria-label="List view" aria-pressed={activeView === 'list'} size="small">
           <List aria-hidden="true" size={18} />
         </IconButton>
-        <IconButton aria-label="Board view" aria-pressed="true" size="small">
+        <IconButton aria-label="Board view" aria-pressed={activeView === 'board'} size="small">
           <Grid2X2 aria-hidden="true" size={18} />
         </IconButton>
       </div>
