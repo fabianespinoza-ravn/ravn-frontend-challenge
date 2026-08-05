@@ -1,10 +1,12 @@
 import { cleanup, fireEvent, render, screen } from '@testing-library/react'
+import { MockedProvider } from '@apollo/client/testing/react'
 import { MemoryRouter } from 'react-router-dom'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { AppHeader } from './app-header/AppHeader'
 import { AppSidebar } from './app-sidebar/AppSidebar'
 import sidebarStyles from './app-sidebar/AppSidebar.module.css'
 import { TaskToolbar } from './task-toolbar/TaskToolbar'
+import { createGraphqlMocks } from '@/test/mocks/graphql'
 
 afterEach(cleanup)
 
@@ -37,9 +39,11 @@ describe('Dashboard shell', () => {
 
   it('renders search, notification, and profile controls', () => {
     render(
-      <MemoryRouter>
-        <AppHeader />
-      </MemoryRouter>,
+      <MockedProvider mocks={createGraphqlMocks()}>
+        <MemoryRouter>
+          <AppHeader />
+        </MemoryRouter>
+      </MockedProvider>,
     )
 
     expect(screen.getByRole('searchbox', { name: 'Search tasks' })).toBeInTheDocument()
@@ -89,9 +93,11 @@ describe('Dashboard shell', () => {
 
   it('renders the Android header with the profile on the left and icon-only search', () => {
     render(
-      <MemoryRouter>
-        <AppHeader isAndroid />
-      </MemoryRouter>,
+      <MockedProvider mocks={createGraphqlMocks()}>
+        <MemoryRouter>
+          <AppHeader isAndroid />
+        </MemoryRouter>
+      </MockedProvider>,
     )
 
     expect(screen.getByRole('link', { name: 'Open settings' })).toBeInTheDocument()

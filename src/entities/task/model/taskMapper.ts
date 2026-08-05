@@ -35,6 +35,10 @@ function getDueDateTone(dueDate: Date) {
 }
 
 function getDueDateLabel(dueDate: Date, tone: Task['dueDateTone']) {
+  if (Number.isNaN(dueDate.getTime())) {
+    return 'Date unavailable'
+  }
+
   if (tone === 'past') {
     return 'Past due'
   }
