@@ -1,4 +1,4 @@
-import { act, cleanup, fireEvent, render, screen } from '@testing-library/react'
+import { act, cleanup, fireEvent, render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MockedProvider } from '@apollo/client/testing/react'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
@@ -183,5 +183,24 @@ describe('AppLayout task creation', () => {
     await user.click(screen.getByRole('button', { name: 'Add task' }))
 
     expect(screen.getByLabelText('Task Title')).toHaveValue('')
+  })
+
+  it('assigns the draft to a teammate loaded from the API', async () => {
+    platformMock.value = 'other'
+    setViewportWidth(1024)
+    const user = userEvent.setup()
+
+    renderLayout(<TaskToolbar />)
+
+    await user.click(screen.getByRole('button', { name: 'Add task' }))
+    await user.click(screen.getByRole('button', { name: 'Assignee' }))
+
+    const panel = screen.getByRole('group', { name: 'Assign To...' })
+
+    // Only the users query knows this teammate, so finding her proves the list
+    // is the API's rather than the profile the header already holds.
+    await user.click(await within(panel).findByRole('button', { name: 'Ada Lovelace' }))
+
+    expect(screen.getByRole('button', { name: 'Assignee: Ada Lovelace' })).toBeInTheDocument()
   })
 })

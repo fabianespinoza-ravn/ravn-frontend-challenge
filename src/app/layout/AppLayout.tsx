@@ -4,6 +4,7 @@ import { Outlet } from 'react-router-dom'
 import { TaskCreationContext } from '@/features/task-creation/model/taskCreationContext'
 import { useTaskCreationForm } from '@/features/task-creation/model/useTaskCreationForm'
 import { TaskCreationModal } from '@/features/task-creation/ui/TaskCreationModal'
+import { useUsers } from '@/entities/user/model/useUsers'
 import { getMobilePlatform } from '@/shared/lib/platform/getMobilePlatform'
 import { AddProjectPage } from '@/pages/add-project/AddProjectPage'
 import { IconButton } from '@/shared/ui/icon-button/IconButton'
@@ -27,6 +28,9 @@ export function AppLayout() {
   )
   const taskCreationForm = useTaskCreationForm()
   const resetTaskCreationForm = taskCreationForm.reset
+  // Both containers assign from the same list, so the layout that owns the
+  // draft also fetches it, and only once a draft exists to assign.
+  const { data: usersData } = useUsers({ skip: !isTaskCreationOpen })
   const mobilePlatform = getMobilePlatform()
   const isAndroid = mobilePlatform === 'android'
 
@@ -77,7 +81,11 @@ export function AppLayout() {
           {isFullPageTaskCreationOpen ? null : <AppHeader isAndroid={isAndroid} />}
           <main className={isFullPageTaskCreationOpen ? styles.addProjectContent : styles.content}>
             {isFullPageTaskCreationOpen ? (
-              <AddProjectPage form={taskCreationForm} onClose={closeTaskCreation} />
+              <AddProjectPage
+                assignees={usersData?.users}
+                form={taskCreationForm}
+                onClose={closeTaskCreation}
+              />
             ) : (
               <Outlet />
             )}
@@ -93,7 +101,11 @@ export function AppLayout() {
           ) : null}
         </div>
         {isModalTaskCreationOpen ? (
-          <TaskCreationModal form={taskCreationForm} onClose={closeTaskCreation} />
+          <TaskCreationModal
+            assignees={usersData?.users}
+            form={taskCreationForm}
+            onClose={closeTaskCreation}
+          />
         ) : null}
       </div>
     </TaskCreationContext>

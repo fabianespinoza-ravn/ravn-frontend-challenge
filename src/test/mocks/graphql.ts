@@ -15,7 +15,19 @@ export const mockProfile: User & { __typename: 'User' } = {
   updatedAt: '2026-08-04T00:00:00.000Z',
 }
 
-export const mockUsers: User[] = [mockProfile]
+/** A teammate who is not the authenticated profile, so assignment is observable. */
+export const mockTeammate: User & { __typename: 'User' } = {
+  __typename: 'User',
+  avatar: null,
+  createdAt: '2026-08-04T00:00:00.000Z',
+  email: 'ada@example.com',
+  fullName: 'Ada Lovelace',
+  id: 'user-2',
+  type: 'ADMIN',
+  updatedAt: '2026-08-04T00:00:00.000Z',
+}
+
+export const mockUsers: User[] = [mockProfile, mockTeammate]
 
 export const mockApiTasks: ApiTask[] = []
 
