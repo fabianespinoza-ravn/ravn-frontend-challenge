@@ -28,6 +28,8 @@ export const longMonthNames = [
   'December',
 ]
 
+export const shortWeekdayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
+
 /**
  * The draft keeps a local `YYYY-MM-DD` value. Building it from local date parts
  * avoids the timezone shift that `toISOString` introduces west of UTC.
@@ -63,6 +65,11 @@ export function formatDueDateLabel(value: string) {
 
 export function formatMonthLabel(year: number, month: number) {
   return `${longMonthNames[month]} ${year}`
+}
+
+/** `Mon, Jan 13`, the headline the Material dialog gives its pending day. */
+export function formatWeekdayDateLabel(date: Date) {
+  return `${shortWeekdayNames[date.getDay()]}, ${shortMonthNames[date.getMonth()]} ${date.getDate()}`
 }
 
 export function formatFullDateLabel(date: Date) {

@@ -1,6 +1,6 @@
 import { cleanup, render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { afterEach, describe, expect, it } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 import type { User } from '@/entities/user/model/user'
 import { mockProfile } from '@/test/mocks/graphql'
 import { formatDueDateLabel, longMonthNames, toDueDateValue } from '../model/dueDate'
@@ -8,6 +8,13 @@ import { taskCreationFormId } from '../model/taskCreationForm'
 import { useTaskCreationForm } from '../model/useTaskCreationForm'
 import fieldStyles from './fields/FieldDropdown.module.css'
 import { TaskForm } from './TaskForm'
+
+/* jsdom carries no mobile user agent, so the default keeps the iOS presentation. */
+const platformMock = vi.hoisted(() => ({ value: 'other' }))
+
+vi.mock('@/shared/lib/platform/getMobilePlatform', () => ({
+  getMobilePlatform: () => platformMock.value,
+}))
 
 const teammates: User[] = [{ ...mockProfile, fullName: 'Jerome Bell', id: 'user-jerome' }]
 
@@ -17,7 +24,10 @@ function TaskFormHarness({ assignees }: { assignees?: User[] }) {
   return <TaskForm assignees={assignees} form={form} id={taskCreationFormId} />
 }
 
-afterEach(cleanup)
+afterEach(() => {
+  cleanup()
+  platformMock.value = 'other'
+})
 
 describe('TaskForm', () => {
   it('renders a prominent title above one collapsed row per field', () => {
@@ -127,6 +137,21 @@ describe('TaskForm', () => {
     )
 
     expect(screen.getByRole('button', { name: `Due date: ${expected}` })).toBeInTheDocument()
+  })
+
+  it('offers Android the Material dialog rather than the iOS wheel', async () => {
+    platformMock.value = 'android'
+    const user = userEvent.setup()
+
+    render(<TaskFormHarness />)
+
+    await user.click(screen.getByRole('button', { name: 'Due date' }))
+
+    const panel = screen.getByRole('group', { name: 'Due date' })
+
+    expect(panel).toHaveClass(fieldStyles.materialPanel)
+    expect(within(panel).getByRole('button', { name: 'OK' })).toBeInTheDocument()
+    expect(within(panel).queryByRole('group', { name: 'Month' })).not.toBeInTheDocument()
   })
 
   it('lists teammates with an avatar and selects one', async () => {

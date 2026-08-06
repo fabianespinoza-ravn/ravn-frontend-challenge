@@ -239,3 +239,16 @@
   background: #000000;
   color: #ffffff;
 }
+
+/*
+ * The Material dialog paints its own coral header and its footer edge to edge,
+ * so the panel contributes only the surface it sits on and clips it to the
+ * radius. `overflow` is reclaimed from `.panelFitsContent` for that clip.
+ */
+.materialPanel {
+  width: min(100%, 20rem);
+  max-width: none;
+  padding: 0;
+  background: #1c1c1e;
+  overflow: hidden;
+}
