@@ -10,10 +10,11 @@ import styles from './FieldDropdown.module.css'
 
 type DueDateFieldProps = {
   form: TaskCreationForm
+  isInvalid?: boolean
   variant?: FieldVariant
 }
 
-export function DueDateField({ form, variant }: DueDateFieldProps) {
+export function DueDateField({ form, isInvalid, variant }: DueDateFieldProps) {
   const { setFieldValue, values } = form
   const selectedLabel = formatDueDateLabel(values.dueDate)
   const isRow = variant === 'row'
@@ -39,6 +40,7 @@ export function DueDateField({ form, variant }: DueDateFieldProps) {
   return (
     <FieldDropdown
       isFilled={Boolean(selectedLabel)}
+      isInvalid={isInvalid}
       label="Due date"
       panelClassName={getPanelClassName()}
       trigger={

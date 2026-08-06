@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react'
+import { taskCreationStatusId } from '../../model/taskCreationForm'
 import styles from './FieldDropdown.module.css'
 
 /**
@@ -12,6 +13,7 @@ type FieldDropdownProps = {
   children: (close: () => void) => ReactNode
   disabled?: boolean
   isFilled?: boolean
+  isInvalid?: boolean
   label: string
   panelClassName?: string
   panelTitle?: string
@@ -62,6 +64,7 @@ export function FieldDropdown({
   children,
   disabled = false,
   isFilled = false,
+  isInvalid = false,
   label,
   panelClassName,
   panelTitle,
@@ -116,10 +119,16 @@ export function FieldDropdown({
   return (
     <div className={isRow ? `${styles.root} ${styles.rowRoot}` : styles.root} ref={containerRef}>
       <button
+        aria-describedby={isInvalid ? taskCreationStatusId : undefined}
         aria-expanded={isOpen}
         aria-haspopup="true"
         aria-label={value ? `${label}: ${value}` : label}
-        className={[styles.trigger, isFilled ? styles.isFilled : '', isRow ? styles.rowTrigger : '']
+        className={[
+          styles.trigger,
+          isFilled ? styles.isFilled : '',
+          isRow ? styles.rowTrigger : '',
+          isInvalid ? styles.isInvalid : '',
+        ]
           .filter(Boolean)
           .join(' ')}
         disabled={disabled}

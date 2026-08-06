@@ -7,10 +7,11 @@ import styles from './FieldDropdown.module.css'
 
 type LabelFieldProps = {
   form: TaskCreationForm
+  isInvalid?: boolean
   variant?: FieldVariant
 }
 
-export function LabelField({ form, variant }: LabelFieldProps) {
+export function LabelField({ form, isInvalid, variant }: LabelFieldProps) {
   const { toggleTag, values } = form
   const selectedLabels = values.tags.map((tag) => tagLabels[tag])
   const isRow = variant === 'row'
@@ -19,6 +20,7 @@ export function LabelField({ form, variant }: LabelFieldProps) {
   return (
     <FieldDropdown
       isFilled={selectedLabels.length > 0}
+      isInvalid={isInvalid}
       label="Label"
       panelTitle="Tag Title"
       trigger={

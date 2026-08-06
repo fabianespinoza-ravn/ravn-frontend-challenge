@@ -31,6 +31,21 @@ export const mockUsers: User[] = [mockProfile, mockTeammate]
 
 export const mockApiTasks: ApiTask[] = []
 
+/** What `createTask` hands back; only its shape matters to the cache. */
+export const mockCreatedTask: ApiTask & { __typename: 'Task' } = {
+  __typename: 'Task',
+  assignee: null,
+  createdAt: '2026-08-06T00:00:00.000Z',
+  creator: mockProfile,
+  dueDate: '2026-08-10T12:00:00.000Z',
+  id: 'task-created',
+  name: 'Ship the mutation',
+  pointEstimate: 'FOUR',
+  position: 1,
+  status: 'TODO',
+  tags: ['REACT'],
+}
+
 export function createGraphqlMocks(tasks: ApiTask[] = mockApiTasks): MockedResponse[] {
   return [
     {

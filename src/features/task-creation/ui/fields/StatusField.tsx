@@ -6,16 +6,18 @@ import styles from './FieldDropdown.module.css'
 
 type StatusFieldProps = {
   form: TaskCreationForm
+  isInvalid?: boolean
   variant?: FieldVariant
 }
 
-export function StatusField({ form, variant }: StatusFieldProps) {
+export function StatusField({ form, isInvalid, variant }: StatusFieldProps) {
   const { setFieldValue, values } = form
   const selectedStatus = taskStatuses.find((status) => status.value === values.status) ?? null
 
   return (
     <FieldDropdown
       isFilled={Boolean(selectedStatus)}
+      isInvalid={isInvalid}
       label="Status"
       panelTitle="Status"
       trigger={

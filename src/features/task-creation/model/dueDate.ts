@@ -53,6 +53,21 @@ export function parseDueDateValue(value: string) {
   return Number.isNaN(date.getTime()) ? null : date
 }
 
+/**
+ * The draft holds a local calendar day, but the API takes a timestamp. Noon UTC
+ * names the same day from `UTC-11` to `UTC+11`, where midnight would roll into
+ * the neighbouring one for anybody far enough east or west of the meridian.
+ */
+export function toApiDueDate(value: string) {
+  const date = parseDueDateValue(value)
+
+  if (!date) {
+    return null
+  }
+
+  return new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate(), 12)).toISOString()
+}
+
 export function formatDueDateLabel(value: string) {
   const date = parseDueDateValue(value)
 

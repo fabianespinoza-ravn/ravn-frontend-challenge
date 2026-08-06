@@ -10,10 +10,17 @@
 
 .footer {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: flex-end;
   gap: var(--space-4);
   margin-top: var(--space-8);
+}
+
+/* Holds the left of the action row; a long message takes a line of its own. */
+.status {
+  margin-right: auto;
+  text-align: left;
 }
 
 .cancelButton {

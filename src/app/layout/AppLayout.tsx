@@ -2,6 +2,8 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Plus } from 'lucide-react'
 import { Outlet } from 'react-router-dom'
 import { TaskCreationContext } from '@/features/task-creation/model/taskCreationContext'
+import { toCreateTaskInput } from '@/features/task-creation/model/taskCreationForm'
+import { useCreateTask } from '@/features/task-creation/model/useCreateTask'
 import { useTaskCreationForm } from '@/features/task-creation/model/useTaskCreationForm'
 import { TaskCreationModal } from '@/features/task-creation/ui/TaskCreationModal'
 import { useUsers } from '@/entities/user/model/useUsers'
@@ -31,6 +33,8 @@ export function AppLayout() {
   // Both containers assign from the same list, so the layout that owns the
   // draft also fetches it, and only once a draft exists to assign.
   const { data: usersData } = useUsers({ skip: !isTaskCreationOpen })
+  const [createTask, { error: creationError, loading: isCreatingTask, reset: resetCreation }] =
+    useCreateTask()
   const mobilePlatform = getMobilePlatform()
   const isAndroid = mobilePlatform === 'android'
 
@@ -47,7 +51,30 @@ export function AppLayout() {
   const closeTaskCreation = useCallback(() => {
     setIsTaskCreationOpen(false)
     resetTaskCreationForm()
-  }, [resetTaskCreationForm])
+    // Otherwise a failure from this draft would greet the next one.
+    resetCreation()
+  }, [resetCreation, resetTaskCreationForm])
+
+  /*
+   * An incomplete draft never reaches the API: the form has already recorded the
+   * attempt by the time this runs, so returning here is what turns the press
+   * into field messages instead of a request. A failure leaves the draft open,
+   * and the mutation's own error state is what the containers render.
+   */
+  const submitTaskCreation = useCallback(async () => {
+    const input = toCreateTaskInput(taskCreationForm.values)
+
+    if (!input) {
+      return
+    }
+
+    try {
+      await createTask({ variables: { input } })
+      closeTaskCreation()
+    } catch {
+      // Reported through `creationError`; the draft stays exactly as it was.
+    }
+  }, [closeTaskCreation, createTask, taskCreationForm.values])
 
   const taskCreation = useMemo(() => ({ openTaskCreation: () => setIsTaskCreationOpen(true) }), [])
 
@@ -84,7 +111,10 @@ export function AppLayout() {
               <AddProjectPage
                 assignees={usersData?.users}
                 form={taskCreationForm}
+                hasFailed={Boolean(creationError)}
+                isSubmitting={isCreatingTask}
                 onClose={closeTaskCreation}
+                onSubmit={submitTaskCreation}
               />
             ) : (
               <Outlet />
@@ -104,7 +134,10 @@ export function AppLayout() {
           <TaskCreationModal
             assignees={usersData?.users}
             form={taskCreationForm}
+            hasFailed={Boolean(creationError)}
+            isSubmitting={isCreatingTask}
             onClose={closeTaskCreation}
+            onSubmit={submitTaskCreation}
           />
         ) : null}
       </div>

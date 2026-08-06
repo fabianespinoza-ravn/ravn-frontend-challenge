@@ -7,16 +7,18 @@ import styles from './FieldDropdown.module.css'
 
 type EstimateFieldProps = {
   form: TaskCreationForm
+  isInvalid?: boolean
   variant?: FieldVariant
 }
 
-export function EstimateField({ form, variant }: EstimateFieldProps) {
+export function EstimateField({ form, isInvalid, variant }: EstimateFieldProps) {
   const { setFieldValue, values } = form
   const selectedLabel = values.pointEstimate ? getPointEstimateLabel(values.pointEstimate) : null
 
   return (
     <FieldDropdown
       isFilled={Boolean(selectedLabel)}
+      isInvalid={isInvalid}
       label="Estimate"
       panelTitle="Estimate"
       trigger={

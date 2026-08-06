@@ -1,5 +1,6 @@
 import { useEffect, useRef, type FormEvent } from 'react'
 import type { User } from '@/entities/user/model/user'
+import { taskCreationStatusId } from '../model/taskCreationForm'
 import type { TaskCreationForm } from '../model/useTaskCreationForm'
 import { AssigneeField } from './fields/AssigneeField'
 import { DueDateField } from './fields/DueDateField'
@@ -20,7 +21,7 @@ type TaskFormProps = {
  * stack of full-width fields, each opening its own popover.
  */
 export function TaskForm({ assignees = [], form, id, onSubmit }: TaskFormProps) {
-  const { setFieldValue, values } = form
+  const { markSubmitAttempted, missingFields, setFieldValue, values } = form
   const nameRef = useRef<HTMLInputElement>(null)
 
   /*
@@ -32,14 +33,21 @@ export function TaskForm({ assignees = [], form, id, onSubmit }: TaskFormProps) 
     nameRef.current?.focus()
   }, [])
 
+  /*
+   * Every attempt is recorded, including the ones that go no further, because
+   * that is what turns the missing fields from silence into messages.
+   */
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
+    markSubmitAttempted()
     onSubmit?.()
   }
 
   return (
     <form className={styles.root} id={id} noValidate onSubmit={handleSubmit}>
       <input
+        aria-describedby={missingFields.includes('name') ? taskCreationStatusId : undefined}
+        aria-invalid={missingFields.includes('name') || undefined}
         aria-label="Task Title"
         autoComplete="off"
         className={styles.title}
@@ -51,11 +59,15 @@ export function TaskForm({ assignees = [], form, id, onSubmit }: TaskFormProps) 
         value={values.name}
       />
       <div className={styles.fields}>
-        <EstimateField form={form} variant="row" />
-        <LabelField form={form} variant="row" />
+        <EstimateField
+          form={form}
+          isInvalid={missingFields.includes('pointEstimate')}
+          variant="row"
+        />
+        <LabelField form={form} isInvalid={missingFields.includes('tags')} variant="row" />
         <AssigneeField assignees={assignees} form={form} variant="row" />
-        <DueDateField form={form} variant="row" />
-        <StatusField form={form} variant="row" />
+        <DueDateField form={form} isInvalid={missingFields.includes('dueDate')} variant="row" />
+        <StatusField form={form} isInvalid={missingFields.includes('status')} variant="row" />
       </div>
     </form>
   )

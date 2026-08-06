@@ -1,10 +1,12 @@
-import { act, cleanup, fireEvent, render, screen, within } from '@testing-library/react'
+import { act, cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MockedProvider } from '@apollo/client/testing/react'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import { afterEach, describe, expect, it, vi } from 'vitest'
+import type { MockedResponse } from '@apollo/client/testing'
 import { AppLayout } from './AppLayout'
-import { createGraphqlMocks } from '@/test/mocks/graphql'
+import { CREATE_TASK } from '@/entities/task/api/taskOperations'
+import { createGraphqlMocks, mockCreatedTask } from '@/test/mocks/graphql'
 import sidebarStyles from '@/widgets/app-sidebar/AppSidebar.module.css'
 import { TaskToolbar } from '@/widgets/task-toolbar/TaskToolbar'
 
@@ -25,9 +27,9 @@ function resizeTo(width: number) {
   })
 }
 
-function renderLayout(routeElement = <h1>Dashboard</h1>) {
+function renderLayout(routeElement = <h1>Dashboard</h1>, extraMocks: MockedResponse[] = []) {
   return render(
-    <MockedProvider mocks={createGraphqlMocks()}>
+    <MockedProvider mocks={[...createGraphqlMocks(), ...extraMocks]}>
       <MemoryRouter initialEntries={['/dashboard']}>
         <Routes>
           <Route element={<AppLayout />}>
@@ -37,6 +39,41 @@ function renderLayout(routeElement = <h1>Dashboard</h1>) {
       </MemoryRouter>
     </MockedProvider>,
   )
+}
+
+const draftTitle = 'Ship the mutation'
+
+/** Every required field, through the controls a user would actually press. */
+async function fillDraft(user: ReturnType<typeof userEvent.setup>) {
+  await user.type(screen.getByLabelText('Task Title'), draftTitle)
+
+  await user.click(screen.getByRole('button', { name: 'Estimate' }))
+  await user.click(screen.getByRole('button', { name: '4 Points' }))
+
+  await user.click(screen.getByRole('button', { name: 'Label' }))
+  await user.click(screen.getByRole('button', { name: 'React' }))
+  // Tags are a multiple selection, so the panel waits to be dismissed.
+  await user.keyboard('{Escape}')
+
+  await user.click(screen.getByRole('button', { name: 'Due date' }))
+  await user.click(screen.getByRole('button', { name: 'Today' }))
+
+  await user.click(screen.getByRole('button', { name: 'Status' }))
+  await user.click(screen.getByRole('button', { name: 'To Do' }))
+}
+
+function expectedCreateInput() {
+  const today = new Date()
+
+  return {
+    dueDate: new Date(
+      Date.UTC(today.getFullYear(), today.getMonth(), today.getDate(), 12),
+    ).toISOString(),
+    name: draftTitle,
+    pointEstimate: 'FOUR',
+    status: 'TODO',
+    tags: ['REACT'],
+  }
 }
 
 afterEach(() => {
@@ -202,5 +239,67 @@ describe('AppLayout task creation', () => {
     await user.click(await within(panel).findByRole('button', { name: 'Ada Lovelace' }))
 
     expect(screen.getByRole('button', { name: 'Assignee: Ada Lovelace' })).toBeInTheDocument()
+  })
+
+  it('names the missing fields instead of sending an incomplete draft', async () => {
+    platformMock.value = 'other'
+    setViewportWidth(1024)
+    const user = userEvent.setup()
+
+    // No mutation mock: anything sent from here would fail this test outright.
+    renderLayout(<TaskToolbar />)
+
+    await user.click(screen.getByRole('button', { name: 'Add task' }))
+    await user.click(screen.getByRole('button', { name: 'Create' }))
+
+    expect(screen.getByRole('alert')).toHaveTextContent(
+      'Add Task title, Status, Estimate, Label and Due date before creating this task.',
+    )
+    // Each control the draft is short of points at the message that names it.
+    expect(screen.getByRole('button', { name: 'Status' })).toHaveAttribute(
+      'aria-describedby',
+      screen.getByRole('alert').id,
+    )
+    expect(screen.getByRole('dialog')).toBeInTheDocument()
+  })
+
+  it('creates the drafted task and closes on success', async () => {
+    platformMock.value = 'other'
+    setViewportWidth(1024)
+    const user = userEvent.setup()
+
+    renderLayout(<TaskToolbar />, [
+      {
+        request: { query: CREATE_TASK, variables: { input: expectedCreateInput() } },
+        result: { data: { createTask: mockCreatedTask } },
+      },
+    ])
+
+    await user.click(screen.getByRole('button', { name: 'Add task' }))
+    await fillDraft(user)
+    await user.click(screen.getByRole('button', { name: 'Create' }))
+
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument())
+  })
+
+  it('keeps the draft and reports a creation that failed', async () => {
+    platformMock.value = 'other'
+    setViewportWidth(1024)
+    const user = userEvent.setup()
+
+    renderLayout(<TaskToolbar />, [
+      {
+        request: { query: CREATE_TASK, variables: { input: expectedCreateInput() } },
+        error: new Error('Creation failed'),
+      },
+    ])
+
+    await user.click(screen.getByRole('button', { name: 'Add task' }))
+    await fillDraft(user)
+    await user.click(screen.getByRole('button', { name: 'Create' }))
+
+    expect(await screen.findByRole('alert')).toHaveTextContent('The task could not be created')
+    expect(screen.getByRole('dialog')).toBeInTheDocument()
+    expect(screen.getByLabelText('Task Title')).toHaveValue(draftTitle)
   })
 })

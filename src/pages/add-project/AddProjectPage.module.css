@@ -41,6 +41,11 @@
   color: var(--field-text);
 }
 
+/* The action bar already carries the gap below itself, so this only reclaims it. */
+.status {
+  margin-bottom: var(--space-4);
+}
+
 .createButton {
   padding: var(--space-2);
   border: 0;

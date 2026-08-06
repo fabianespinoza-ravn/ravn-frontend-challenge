@@ -46,6 +46,15 @@
   font-weight: var(--font-weight-medium);
 }
 
+/*
+ * The design system has no dedicated error colour yet, so the accent carries the
+ * invalid state. It follows `.isFilled` so that a control which somehow held a
+ * value and still failed validation would show the complaint rather than hide it.
+ */
+.isInvalid {
+  border-color: var(--color-accent);
+}
+
 .triggerLabel {
   overflow: hidden;
   text-overflow: ellipsis;
