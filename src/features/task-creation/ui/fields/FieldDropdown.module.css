@@ -9,6 +9,8 @@
 .trigger {
   display: inline-flex;
   min-height: 2.25rem;
+  /* Lets a chip shrink past its text so the label below can ellipsize. */
+  min-width: 0;
   max-width: 100%;
   align-items: center;
   gap: var(--space-2);

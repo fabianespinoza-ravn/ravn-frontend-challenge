@@ -28,8 +28,19 @@
   outline: none;
 }
 
+/*
+ * One row, always, centred at every fill state. Wrapping made the modal change
+ * height as controls swapped their label for a longer value, so the controls
+ * share the width instead and truncate under pressure rather than dropping to a
+ * second line. `safe` keeps a row that somehow cannot shrink far enough from
+ * centring its own overflow, which would push its first control past the left
+ * edge where nothing can reach it; the plain value stays for browsers that do
+ * not know the keyword.
+ */
 .fields {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
+  justify-content: center;
+  justify-content: safe center;
   gap: var(--space-2);
 }

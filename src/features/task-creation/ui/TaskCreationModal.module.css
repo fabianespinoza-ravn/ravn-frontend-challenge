@@ -1,5 +1,9 @@
+/*
+ * Wide enough for the five metadata controls to sit on one line at the narrowest
+ * width the modal appears at, which is the `768px` breakpoint itself.
+ */
 .panel {
-  width: min(100%, 34rem);
+  width: min(100%, 44rem);
   max-height: none;
   overflow: visible;
 }
