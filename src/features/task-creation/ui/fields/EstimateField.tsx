@@ -1,4 +1,4 @@
-import { ArrowLeftRight } from 'lucide-react'
+import { Diff } from 'lucide-react'
 import { pointEstimates } from '@/entities/task/model/apiTask'
 import { getPointEstimateLabel } from '@/entities/task/model/taskLabels'
 import type { TaskCreationForm } from '../../model/useTaskCreationForm'
@@ -21,7 +21,7 @@ export function EstimateField({ form, variant }: EstimateFieldProps) {
       panelTitle="Estimate"
       trigger={
         <>
-          <ArrowLeftRight aria-hidden="true" size={16} />
+          <Diff aria-hidden="true" size={16} />
           <span className={styles.triggerLabel}>{selectedLabel ?? 'Estimate'}</span>
         </>
       }
@@ -41,7 +41,7 @@ export function EstimateField({ form, variant }: EstimateFieldProps) {
             type="button"
           >
             <span className={styles.optionIcon}>
-              <ArrowLeftRight aria-hidden="true" size={16} />
+              <Diff aria-hidden="true" size={16} />
             </span>
             {getPointEstimateLabel(pointEstimate)}
           </button>

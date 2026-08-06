@@ -55,7 +55,9 @@ export function AppLayout() {
   return (
     <TaskCreationContext value={taskCreation}>
       <div
-        className={styles.root}
+        className={
+          isFullPageTaskCreationOpen ? `${styles.root} ${styles.isTaskCreationOpen}` : styles.root
+        }
         data-mobile-navigation={isAndroid ? 'drawer' : 'bottom'}
         data-mobile-platform={mobilePlatform}
       >

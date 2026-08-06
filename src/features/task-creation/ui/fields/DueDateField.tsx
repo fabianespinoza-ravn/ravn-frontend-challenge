@@ -23,7 +23,6 @@ export function DueDateField({ form, variant }: DueDateFieldProps) {
       panelClassName={
         isRow ? `${styles.panelFitsContent} ${styles.wheelPanel}` : styles.panelFitsContent
       }
-      panelTitle={isRow ? 'Due Date' : undefined}
       trigger={
         <>
           <CalendarCheck aria-hidden="true" size={16} />

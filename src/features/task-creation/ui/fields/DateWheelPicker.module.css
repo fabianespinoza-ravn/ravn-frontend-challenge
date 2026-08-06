@@ -4,11 +4,16 @@
  * reach the centre. The scroll handler reads the settled position back, which
  * is why the item height below and the one it measures must stay in step.
  */
+/*
+ * The panel owns the width; the columns only divide it. Each track is floored at
+ * zero because a bare `fr` is `minmax(auto, fr)`, so a long month name would
+ * raise its own minimum and widen the whole wheel as the month changed.
+ */
 .root {
   position: relative;
   display: grid;
-  width: min(100%, 22rem);
-  grid-template-columns: 1.9fr 0.7fr 1.1fr;
+  width: 100%;
+  grid-template-columns: minmax(0, 1.9fr) minmax(0, 0.7fr) minmax(0, 1.1fr);
   gap: var(--space-3);
 }
 
@@ -34,6 +39,8 @@
   align-items: stretch;
   scroll-snap-type: y mandatory;
   overflow-y: auto;
+  /* Only programmatic scrolls are smoothed; a dragging finger is untouched. */
+  scroll-behavior: smooth;
   scrollbar-width: none;
   /* Fades both ends so the depth reads as a cylinder, like the native wheel. */
   mask-image: linear-gradient(
@@ -62,12 +69,14 @@
   padding: 0 var(--space-2);
   border: 0;
   background: transparent;
-  color: #8e8e93;
+  color: var(--field-text-secondary, var(--color-text-secondary));
   font-family: inherit;
   font-size: var(--font-size-sm);
   line-height: 2.25rem;
   scroll-snap-align: center;
   text-align: center;
+  /* A wrapped label would double the height the scroll maths reads back. */
+  white-space: nowrap;
   transition:
     color 120ms ease,
     opacity 120ms ease,
@@ -79,9 +88,9 @@
   outline-offset: calc(var(--focus-offset) * -1);
 }
 
-/* Depth: the centred value is largest and white, its neighbours recede. */
+/* Depth: the centred value is largest and brightest, its neighbours recede. */
 .isSelected {
-  color: #ffffff;
+  color: var(--field-text, var(--color-text-primary));
   font-size: var(--font-size-lg);
   font-weight: var(--font-weight-semibold);
   transform: scale(1);
@@ -103,6 +112,10 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .column {
+    scroll-behavior: auto;
+  }
+
   .item {
     transition: none;
   }

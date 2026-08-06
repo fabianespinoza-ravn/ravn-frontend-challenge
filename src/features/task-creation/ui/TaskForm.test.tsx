@@ -108,7 +108,7 @@ describe('TaskForm', () => {
 
     await user.click(screen.getByRole('button', { name: 'Due date' }))
 
-    const panel = screen.getByRole('group', { name: 'Due Date' })
+    const panel = screen.getByRole('group', { name: 'Due date' })
 
     expect(panel).toHaveClass(fieldStyles.wheelPanel)
 
@@ -120,7 +120,7 @@ describe('TaskForm', () => {
 
     await user.click(within(monthColumn).getByRole('button', { name: longMonthNames[0] }))
 
-    expect(screen.getByRole('group', { name: 'Due Date' })).toBeInTheDocument()
+    expect(screen.getByRole('group', { name: 'Due date' })).toBeInTheDocument()
 
     const expected = formatDueDateLabel(
       toDueDateValue(new Date(today.getFullYear(), 0, today.getDate())),

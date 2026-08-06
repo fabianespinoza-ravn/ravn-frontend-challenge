@@ -73,6 +73,30 @@ describe('DateWheelPicker', () => {
     expect(onSelect).toHaveBeenCalledWith('2026-09-10')
   })
 
+  it('moves the highlight while the scroll is still settling', () => {
+    const onSelect = vi.fn()
+
+    render(<DateWheelPicker onSelect={onSelect} value="2026-03-10" />)
+
+    const monthColumn = screen.getByRole('group', { name: 'Month' })
+
+    monthColumn.scrollTop = longMonthNames.indexOf('September') * itemHeight
+    fireEvent.scroll(monthColumn)
+
+    // The wheel follows the finger immediately.
+    expect(within(monthColumn).getByRole('button', { name: 'September' })).toHaveClass(
+      styles.isSelected,
+    )
+    expect(within(monthColumn).getByRole('button', { name: 'March' })).toHaveClass(styles.isDistant)
+
+    // The form still holds the old value, and that is what is reported.
+    expect(onSelect).not.toHaveBeenCalled()
+    expect(within(monthColumn).getByRole('button', { name: 'March' })).toHaveAttribute(
+      'aria-pressed',
+      'true',
+    )
+  })
+
   it('clamps the day when the settled month is shorter', () => {
     const onSelect = vi.fn()
 

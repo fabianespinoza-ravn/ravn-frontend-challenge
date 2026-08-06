@@ -1,6 +1,6 @@
 /*
- * iOS creation palette, scoped to this composition. The shared field styles
- * read these custom properties, so the whole screen restyles from here.
+ * iOS creation palette, scoped to this composition. Every field, popover, and
+ * wheel reads these custom properties, so the screen restyles from here alone.
  */
 .root {
   --field-row-background: #2c2c2e;
@@ -11,9 +11,12 @@
   --field-text: #ffffff;
   --field-text-secondary: #8e8e93;
 
-  min-height: calc(100dvh - 10.5rem);
+  /*
+   * The composition paints no surface of its own: it sits directly on the page,
+   * so the field rows are the only raised colour on the screen. This padding
+   * completes the `--space-6` top rhythm every other page starts with.
+   */
   padding-top: var(--space-2);
-  background: #1c1c1e;
   color: var(--field-text);
 }
 
@@ -56,12 +59,4 @@
 .createButton:focus-visible {
   outline: var(--focus-ring);
   outline-offset: var(--focus-offset);
-}
-
-@media (min-width: 768px) {
-  .root {
-    max-width: 30rem;
-    padding: var(--space-4);
-    border-radius: var(--radius-xl);
-  }
 }

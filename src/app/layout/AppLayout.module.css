@@ -6,6 +6,16 @@
   color: var(--color-text-primary);
 }
 
+/*
+ * The full-page task composition owns the whole screen, so the page steps down
+ * to its darker surface. The tone is set here rather than on the composition
+ * because only this element spans the viewport: painted lower, the page colour
+ * would still show through the content padding and below the last field.
+ */
+.isTaskCreationOpen {
+  background: #1c1c1e;
+}
+
 .workspace {
   min-width: 0;
   flex: 1;

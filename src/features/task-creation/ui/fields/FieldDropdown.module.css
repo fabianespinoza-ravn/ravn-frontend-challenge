@@ -224,9 +224,17 @@
   border-radius: 0.875rem;
 }
 
-/* The wheel reads as its own surface, so it drops to black and grows. */
+/*
+ * The wheel reads as its own surface, so it drops to black and grows: the depth
+ * fade on its receding values needs that contrast to read. Its width is definite
+ * rather than a cap, because the overlay centres this panel with `place-items`,
+ * so a content-sized panel would follow the widest visible month and change
+ * width as the wheel scrolls. `max-width` is released because `.rowPanel` caps
+ * every other field at a narrower 22rem.
+ */
 .wheelPanel {
-  max-width: min(100%, 25rem);
+  width: min(100%, 25rem);
+  max-width: none;
   padding: var(--space-4);
   background: #000000;
   color: #ffffff;
