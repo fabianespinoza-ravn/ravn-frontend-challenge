@@ -3,41 +3,77 @@ import type { Task } from './task'
 import { pointEstimateValues, tagLabels } from './taskLabels'
 import { getUserInitials } from '@/entities/user/model/user'
 
-function getDueDateTone(dueDate: Date) {
-  const today = new Date()
-  const tomorrow = new Date(today)
-  tomorrow.setDate(today.getDate() + 1)
+const millisecondsPerDay = 86_400_000
 
-  if (dueDate < new Date(today.getFullYear(), today.getMonth(), today.getDate())) {
+function startOfLocalDay(date: Date) {
+  return new Date(date.getFullYear(), date.getMonth(), date.getDate())
+}
+
+/**
+ * Whole days from today to the due date, both reduced to a local calendar day
+ * first. The API stores an instant, so a task due today arrives as a moment that
+ * is only "today" once it is read in the viewer's own timezone; comparing the
+ * instants directly would call it yesterday for anyone far enough west. Rounding
+ * absorbs the daylight-saving days that are 23 or 25 hours long.
+ */
+function getDayOffset(dueDate: Date) {
+  const difference = startOfLocalDay(dueDate).getTime() - startOfLocalDay(new Date()).getTime()
+
+  return Math.round(difference / millisecondsPerDay)
+}
+
+function getDueDateTone(dayOffset: number) {
+  if (dayOffset < 0) {
     return 'past' as const
   }
 
-  if (dueDate < new Date(tomorrow.getFullYear(), tomorrow.getMonth(), tomorrow.getDate() + 1)) {
-    return 'soon' as const
-  }
-
-  return 'future' as const
+  // Today and tomorrow share a tone; only their labels tell them apart.
+  return dayOffset <= 1 ? ('soon' as const) : ('future' as const)
 }
 
-function getDueDateLabel(dueDate: Date, tone: Task['dueDateTone']) {
+const dueDateParts = new Intl.DateTimeFormat('en-US', {
+  day: 'numeric',
+  month: 'short',
+  year: 'numeric',
+})
+
+/**
+ * `10 Aug, 2026`, the order the reference composition reads in. The parts come
+ * from `Intl` rather than a month table so the abbreviations stay its business,
+ * and only their arrangement belongs here.
+ */
+function formatDueDate(dueDate: Date) {
+  const parts = Object.fromEntries(
+    dueDateParts.formatToParts(dueDate).map((part) => [part.type, part.value]),
+  )
+
+  return `${parts.day} ${parts.month}, ${parts.year}`
+}
+
+function getDueDateLabel(dueDate: Date, dayOffset: number) {
   if (Number.isNaN(dueDate.getTime())) {
     return 'Date unavailable'
   }
 
-  if (tone === 'past') {
+  if (dayOffset < 0) {
     return 'Past due'
   }
 
-  return new Intl.DateTimeFormat('en-US', {
-    day: 'numeric',
-    month: 'short',
-    year: 'numeric',
-  }).format(dueDate)
+  if (dayOffset === 0) {
+    return 'Today'
+  }
+
+  if (dayOffset === 1) {
+    return 'Tomorrow'
+  }
+
+  return formatDueDate(dueDate)
 }
 
 export function mapApiTaskToTask(apiTask: ApiTask): Task {
   const dueDate = new Date(apiTask.dueDate)
-  const dueDateTone = getDueDateTone(dueDate)
+  const dayOffset = getDayOffset(dueDate)
+  const dueDateTone = getDueDateTone(dayOffset)
 
   return {
     ...(apiTask.assignee
@@ -53,7 +89,7 @@ export function mapApiTaskToTask(apiTask: ApiTask): Task {
     checklistCount: 0,
     commentCount: 0,
     dueDate: apiTask.dueDate,
-    dueDateLabel: getDueDateLabel(dueDate, dueDateTone),
+    dueDateLabel: getDueDateLabel(dueDate, dayOffset),
     dueDateTone,
     id: apiTask.id,
     points: pointEstimateValues[apiTask.pointEstimate],
