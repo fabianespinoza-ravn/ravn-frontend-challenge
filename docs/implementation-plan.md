@@ -1,7 +1,7 @@
 # Implementation Plan and Decision Log
 
-> **Status:** In progress — GraphQL Data and Creation.
-> **Last updated:** 2026-08-05
+> **Status:** GraphQL Data and Creation is implemented and awaiting its pull request.
+> **Last updated:** 2026-08-06
 > **Phase closure:** Initial Setup was merged through [PR #3](https://github.com/fabianespinoza-ravn/ravn-frontend-challenge/pull/3); Issue #1 is closed.
 > **Phase closure:** Dashboard UI was merged through [PR #5](https://github.com/fabianespinoza-ravn/ravn-frontend-challenge/pull/5); Issue #4 is closed.
 > **Current phase:** GraphQL Data and Creation is tracked through [Issue #6](https://github.com/fabianespinoza-ravn/ravn-frontend-challenge/issues/6) on `feat/graphql-task-data`.
@@ -322,7 +322,7 @@ The following items are required before product functionality is implemented:
 
 ## GraphQL Data and Creation: Current Scope
 
-**Implementation status:** In progress.
+**Implementation status:** Complete; the pull request is still to be opened.
 **Tracking:** [Issue #6](https://github.com/fabianespinoza-ravn/ravn-frontend-challenge/issues/6) on `feat/graphql-task-data`.
 
 ### Verified API Contracts
@@ -359,6 +359,15 @@ The following items are required before product functionality is implemented:
 - [x] Load users with `GET_USERS` and pass them to the assignee control, which already renders and selects from a supplied list.
 - [x] Connect creation to the confirmed create-task mutation.
 - [x] Add GraphQL operation and state coverage.
+
+### Deferred From This Phase
+
+Each of these was reached, judged, and left on purpose rather than missed.
+
+- The Android composition wears the iOS palette apart from its Material date dialog. Only the picker was in scope; aligning the whole screen to Material is its own piece of work (5.40).
+- The desktop tag control stacks its selected tags downwards, so it grows taller than the four controls beside it now that the row cannot wrap (5.42).
+- A due date is stored as an instant, so a reader across the date line sees the neighbouring calendar day. This is the limit of the representation rather than a defect in the arithmetic (5.45).
+- The design system has no error colour; the accent carries invalid controls and failure messages until it gains one (5.44).
 
 ## Decision Log
 
