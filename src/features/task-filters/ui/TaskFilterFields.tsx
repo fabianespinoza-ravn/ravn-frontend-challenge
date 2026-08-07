@@ -1,6 +1,7 @@
-import { CalendarClock, Circle, Tag, UserRound } from 'lucide-react'
+import { CalendarClock, Tag, UserRound } from 'lucide-react'
 import { pointEstimates, taskTags } from '@/entities/task/model/apiTask'
 import { taskStatuses } from '@/entities/task/model/task'
+import { StatusDot } from '@/entities/task/ui/StatusDot'
 import { getPointEstimateLabel, tagLabels } from '@/entities/task/model/taskLabels'
 import { getUserInitials, type User } from '@/entities/user/model/user'
 import { formatDueDateLabel } from '@/shared/lib/date/dueDate'
@@ -30,7 +31,9 @@ export function StatusFilter({ onChange, value }: FilterFieldProps<'status'>) {
       label="Status"
       trigger={
         <>
-          <Circle aria-hidden="true" size={16} />
+          {/* Takes the colour of the chosen status, and stays an outline
+              while none is, exactly as the options below it do. */}
+          <StatusDot color={selected?.color} />
           <span className={dropdownStyles.triggerLabel}>{selected?.label ?? 'Status'}</span>
         </>
       }
@@ -50,13 +53,7 @@ export function StatusFilter({ onChange, value }: FilterFieldProps<'status'>) {
               }}
               type="button"
             >
-              <span
-                aria-hidden="true"
-                className={dropdownStyles.optionIcon}
-                style={{ color: status.color }}
-              >
-                <Circle fill="currentColor" size={12} />
-              </span>
+              <StatusDot color={status.color} />
               {status.label}
             </button>
           ))}

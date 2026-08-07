@@ -1,5 +1,5 @@
-import { Circle } from 'lucide-react'
 import { taskStatuses } from '@/entities/task/model/task'
+import { StatusDot } from '@/entities/task/ui/StatusDot'
 import { taskFormStatusId } from '../../model/taskForm'
 import type { TaskFormState } from '../../model/useTaskFormState'
 import { FieldDropdown, type FieldVariant } from '@/shared/ui/field-dropdown/FieldDropdown'
@@ -49,17 +49,5 @@ export function StatusField({ form, isInvalid, variant }: StatusFieldProps) {
         ))
       }
     </FieldDropdown>
-  )
-}
-
-/**
- * Each status reuses the colour its board column already carries, and stays an
- * outline until one is chosen so the empty state is not mistaken for a value.
- */
-function StatusDot({ color }: { color?: string }) {
-  return (
-    <span className={styles.optionIcon} style={color ? { color } : undefined}>
-      <Circle aria-hidden="true" fill={color ?? 'none'} size={12} />
-    </span>
   )
 }

@@ -1,0 +1,11 @@
+/*
+ * Matches the icon slot the dropdown gives its options, so the dot sits on the
+ * same line as everything beside it. Its own colour is set inline from the
+ * status; without one it inherits the secondary text colour and reads as empty.
+ */
+.root {
+  display: inline-grid;
+  flex: 0 0 auto;
+  place-items: center;
+  color: var(--field-text-secondary, var(--color-text-secondary));
+}
