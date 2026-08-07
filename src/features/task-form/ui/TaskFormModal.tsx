@@ -11,6 +11,8 @@ type TaskFormModalProps = {
   assignees?: User[]
   form: TaskFormState
   hasFailed?: boolean
+  /* The same composition serves both mutations, so it has to say which. */
+  isEditing?: boolean
   isSubmitting?: boolean
   onClose: () => void
   onSubmit?: () => void
@@ -20,12 +22,17 @@ export function TaskFormModal({
   assignees,
   form,
   hasFailed = false,
+  isEditing = false,
   isSubmitting = false,
   onClose,
   onSubmit,
 }: TaskFormModalProps) {
   return (
-    <Modal label="Create Task" onClose={onClose} panelClassName={styles.panel}>
+    <Modal
+      label={isEditing ? 'Edit Task' : 'Create Task'}
+      onClose={onClose}
+      panelClassName={styles.panel}
+    >
       <TaskMetadataForm assignees={assignees} form={form} id={taskFormId} onSubmit={onSubmit} />
       <footer className={styles.footer}>
         <TaskFormStatus
@@ -46,7 +53,7 @@ export function TaskFormModal({
          * fields get named. Only a request already in flight takes it away.
          */}
         <Button disabled={isSubmitting} form={taskFormId} type="submit">
-          {isSubmitting ? 'Creating…' : 'Create'}
+          {isEditing ? (isSubmitting ? 'Saving…' : 'Save') : isSubmitting ? 'Creating…' : 'Create'}
         </Button>
       </footer>
     </Modal>

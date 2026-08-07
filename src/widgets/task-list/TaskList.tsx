@@ -1,8 +1,8 @@
-import { ChevronDown, MoreHorizontal } from 'lucide-react'
+import { ChevronDown } from 'lucide-react'
 import type { Task } from '@/entities/task/model/task'
 import { taskStatuses } from '@/entities/task/model/task'
 import { pointEstimateValues, tagLabels } from '@/entities/task/model/taskLabels'
-import { IconButton } from '@/shared/ui/icon-button/IconButton'
+import { TaskActionsMenu } from '@/features/task-actions/ui/TaskActionsMenu'
 import styles from './TaskList.module.css'
 
 type TaskListProps = {
@@ -79,9 +79,7 @@ export function TaskList({ tasks }: TaskListProps) {
                               {pointEstimateValues[task.pointEstimate]} points
                             </span>
                             <span className={styles.dueDate}>{task.dueDateLabel}</span>
-                            <IconButton aria-label={`More options for ${task.title}`} size="small">
-                              <MoreHorizontal aria-hidden="true" size={18} />
-                            </IconButton>
+                            <TaskActionsMenu task={task} />
                           </article>
                         </li>
                       ))}

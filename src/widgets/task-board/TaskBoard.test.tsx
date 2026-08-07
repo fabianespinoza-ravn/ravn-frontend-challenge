@@ -1,13 +1,18 @@
 import { cleanup, render, screen } from '@testing-library/react'
 import { afterEach, describe, expect, it } from 'vitest'
 import { mockTasks } from '@/entities/task/model/mockTasks'
+import { TaskActionsTestProvider } from '@/test/taskActions'
 import { TaskBoard } from './TaskBoard'
 
 describe('TaskBoard', () => {
   afterEach(cleanup)
 
   it('renders the five static task-status columns with their task counts', () => {
-    render(<TaskBoard tasks={mockTasks} />)
+    render(
+      <TaskActionsTestProvider>
+        <TaskBoard tasks={mockTasks} />
+      </TaskActionsTestProvider>,
+    )
 
     expect(screen.getByRole('region', { name: 'Backlog, 2 tasks' })).toBeInTheDocument()
     expect(screen.getByRole('region', { name: 'To Do, 1 task' })).toBeInTheDocument()
@@ -20,7 +25,11 @@ describe('TaskBoard', () => {
   })
 
   it('orders cards chronologically within a column and renders an unassigned task fallback', () => {
-    render(<TaskBoard tasks={mockTasks} />)
+    render(
+      <TaskActionsTestProvider>
+        <TaskBoard tasks={mockTasks} />
+      </TaskActionsTestProvider>,
+    )
 
     const backlogCards = screen
       .getByRole('region', { name: 'Backlog, 2 tasks' })

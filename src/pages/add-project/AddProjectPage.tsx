@@ -11,6 +11,8 @@ type AddProjectPageProps = {
   assignees?: User[]
   form: TaskFormState
   hasFailed?: boolean
+  /* The same composition serves both mutations, so it has to say which. */
+  isEditing?: boolean
   isSubmitting?: boolean
   onClose: () => void
   onSubmit?: () => void
@@ -20,19 +22,28 @@ export function AddProjectPage({
   assignees,
   form,
   hasFailed = false,
+  isEditing = false,
   isSubmitting = false,
   onClose,
   onSubmit,
 }: AddProjectPageProps) {
+  /*
+   * Completeness is the same question for either mutation, since both refuse
+   * the same missing fields, so the creation input is what answers it.
+   */
   const isReady = toCreateTaskInput(form.values) !== null
 
   return (
     <section aria-labelledby={taskFormTitleId} className={styles.root}>
       <h1 className={styles.visuallyHidden} id={taskFormTitleId}>
-        Create Task
+        {isEditing ? 'Edit Task' : 'Create Task'}
       </h1>
       <header className={styles.actionBar}>
-        <IconButton aria-label="Close task creation" onClick={onClose} size="small">
+        <IconButton
+          aria-label={isEditing ? 'Close task editing' : 'Close task creation'}
+          onClick={onClose}
+          size="small"
+        >
           <X aria-hidden="true" size={20} />
         </IconButton>
         {/*
@@ -46,7 +57,7 @@ export function AddProjectPage({
           form={taskFormId}
           type="submit"
         >
-          {isSubmitting ? 'Creating…' : 'Create'}
+          {isEditing ? (isSubmitting ? 'Saving…' : 'Save') : isSubmitting ? 'Creating…' : 'Create'}
         </button>
       </header>
       <TaskFormStatus

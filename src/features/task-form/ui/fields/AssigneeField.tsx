@@ -40,21 +40,43 @@ export function AssigneeField({ assignees, form, variant }: AssigneeFieldProps) 
         assignees.length === 0 ? (
           <p className={styles.emptyState}>No teammates are available yet.</p>
         ) : (
-          assignees.map((assignee) => (
+          /*
+           * Nobody is an option, not just a starting state. A new draft reaches
+           * it by leaving the control alone, but an existing task cannot be
+           * handed back without it, and clearing an assignee is the one edit
+           * that has to travel as an explicit null (6.1).
+           */
+          <>
             <button
-              aria-pressed={assignee.id === values.assigneeId}
+              aria-pressed={values.assigneeId === ''}
               className={styles.option}
-              key={assignee.id}
               onClick={() => {
-                setFieldValue('assigneeId', assignee.id)
+                setFieldValue('assigneeId', '')
                 close()
               }}
               type="button"
             >
-              <AssigneeAvatar assignee={assignee} />
-              {assignee.fullName}
+              <span aria-hidden="true" className={styles.optionIcon}>
+                <UserRound size={16} />
+              </span>
+              Unassigned
             </button>
-          ))
+            {assignees.map((assignee) => (
+              <button
+                aria-pressed={assignee.id === values.assigneeId}
+                className={styles.option}
+                key={assignee.id}
+                onClick={() => {
+                  setFieldValue('assigneeId', assignee.id)
+                  close()
+                }}
+                type="button"
+              >
+                <AssigneeAvatar assignee={assignee} />
+                {assignee.fullName}
+              </button>
+            ))}
+          </>
         )
       }
     </FieldDropdown>

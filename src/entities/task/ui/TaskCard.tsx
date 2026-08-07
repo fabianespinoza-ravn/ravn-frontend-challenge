@@ -1,22 +1,26 @@
-import { CalendarClock, CheckSquare2, MessageCircle, MoreHorizontal, Paperclip } from 'lucide-react'
+import type { ReactNode } from 'react'
+import { CalendarClock, CheckSquare2, MessageCircle, Paperclip } from 'lucide-react'
 import type { Task } from '@/entities/task/model/task'
 import { pointEstimateValues, tagLabels } from '@/entities/task/model/taskLabels'
 import { Avatar } from '@/shared/ui/avatar/Avatar'
-import { IconButton } from '@/shared/ui/icon-button/IconButton'
 import styles from './TaskCard.module.css'
 
 type TaskCardProps = {
+  /*
+   * The card is task UI, not an interaction, so what its options control does
+   * arrives from whoever composes it. Reaching for that feature from here would
+   * have an entity depending on a layer above it.
+   */
+  actions?: ReactNode
   task: Task
 }
 
-export function TaskCard({ task }: TaskCardProps) {
+export function TaskCard({ actions, task }: TaskCardProps) {
   return (
     <article aria-label={task.title} className={styles.root}>
       <header className={styles.header}>
         <h3>{task.title}</h3>
-        <IconButton aria-label={`More options for ${task.title}`} size="small">
-          <MoreHorizontal aria-hidden="true" size={18} />
-        </IconButton>
+        {actions}
       </header>
 
       <div className={styles.taskDetails}>

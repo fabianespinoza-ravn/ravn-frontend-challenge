@@ -4,8 +4,8 @@ import type {
   TaskTag,
   UpdateTaskInput,
 } from '@/entities/task/model/apiTask'
-import type { TaskStatus } from '@/entities/task/model/task'
-import { toApiDueDate } from './dueDate'
+import type { Task, TaskStatus } from '@/entities/task/model/task'
+import { toApiDueDate, toDueDateValue } from './dueDate'
 
 /**
  * Shared identifiers so a container can render its own submit control outside
@@ -60,6 +60,24 @@ export function getMissingFields(values: TaskFormValues): RequiredField[] {
 
     return values[field] === ''
   })
+}
+
+/**
+ * A draft built from a task that already exists. The estimate, the tags and the
+ * status travel as the API spells them, which is why the board keeps them that
+ * way (6.3), and the due date returns to the local calendar day the controls
+ * work in. An absent assignee becomes the empty string the controls use for
+ * nobody, which `toUpdateTaskInput` turns back into an explicit `null`.
+ */
+export function toTaskFormValues(task: Task): TaskFormValues {
+  return {
+    assigneeId: task.assignee?.id ?? '',
+    dueDate: toDueDateValue(new Date(task.dueDate)),
+    name: task.title,
+    pointEstimate: task.pointEstimate,
+    status: task.status,
+    tags: task.tags,
+  }
 }
 
 /**

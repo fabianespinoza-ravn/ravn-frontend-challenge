@@ -1,10 +1,11 @@
 # Implementation Plan and Decision Log
 
-> **Status:** GraphQL Data and Creation is implemented and awaiting its pull request.
-> **Last updated:** 2026-08-06
+> **Status:** Task Editing and Deletion is in progress.
+> **Last updated:** 2026-08-07
 > **Phase closure:** Initial Setup was merged through [PR #3](https://github.com/fabianespinoza-ravn/ravn-frontend-challenge/pull/3); Issue #1 is closed.
 > **Phase closure:** Dashboard UI was merged through [PR #5](https://github.com/fabianespinoza-ravn/ravn-frontend-challenge/pull/5); Issue #4 is closed.
-> **Current phase:** GraphQL Data and Creation is tracked through [Issue #6](https://github.com/fabianespinoza-ravn/ravn-frontend-challenge/issues/6) on `feat/graphql-task-data`.
+> **Phase closure:** GraphQL Data and Creation was merged through [PR #7](https://github.com/fabianespinoza-ravn/ravn-frontend-challenge/pull/7); Issue #6 is closed.
+> **Current phase:** Task Editing and Deletion is tracked through [Issue #8](https://github.com/fabianespinoza-ravn/ravn-frontend-challenge/issues/8) on `feat/task-edit-delete`.
 
 ## Documentation Rule
 
@@ -73,7 +74,7 @@ shared/
 
 - No generic `components` directory is used.
 - New folders are created only when they have an active responsibility; empty placeholder folders are avoided.
-- `features/` became active during the GraphQL phase with `features/task-creation`, which owned the draft state, its context, and the shared form and modal UI. The editing phase renamed it to `features/task-form`, because creation and editing share all of it. Deletion and the task-card options menu will get their own `features/task-actions`, created with the commit that gives it a responsibility rather than ahead of it.
+- `features/` became active during the GraphQL phase with `features/task-creation`, which owned the draft state, its context, and the shared form and modal UI. The editing phase renamed it to `features/task-form`, because creation and editing share all of it. The task-card options menu, and deletion after it, live in `features/task-actions`; the two never import each other, because the layout that owns the draft is what the menu asks to open it.
 - Shared UI primitives belong in `shared/ui`; task- and user-specific UI belongs in `entities`.
 - Each feature owns its interaction logic and API mutation/query coordination.
 
@@ -384,10 +385,10 @@ The input shapes were read from the schema rather than inferred, through unauthe
 
 - [x] Rename `features/task-creation` to `features/task-form`, since creation and editing share all of it.
 - [x] Keep the API estimate and tags on the presentation model and derive their wording at render, so an edit can send back what the board is showing.
-- [ ] Add `features/task-actions` for the task-card options menu and deletion, so no feature imports a sibling.
+- [x] Add `features/task-actions` for the task-card options menu, so no feature imports a sibling.
 - [x] Add `toUpdateTaskInput` beside `toCreateTaskInput`, translating an empty assignee to an explicit `null` instead of omitting it.
-- [ ] Open task actions from the existing task-card options control.
-- [ ] Prefill the shared responsive composition from the selected task and connect it to `updateTask`.
+- [x] Open task actions from the existing task-card options control.
+- [x] Prefill the shared responsive composition from the selected task and connect it to `updateTask`.
 - [ ] Connect deletion to `deleteTask` behind an accessible confirmation step.
 - [ ] Keep Dashboard and My Tasks consistent after a successful mutation.
 - [ ] Add coverage for edit prefill, a successful update, a cleared assignee, a successful deletion, and failure states.
@@ -496,5 +497,7 @@ Task creation decisions:
 ### 6. Task Editing and Deletion
 
 - **6.1:** An empty assignee means different things to the two mutations, so each operation gets its own translation from the draft: `toCreateTaskInput` omits `assigneeId` when it is empty, per contract 5.8, and `toUpdateTaskInput` sends an explicit `null`, per contract 5.12. Reusing the creation mapper for an update would let a user clear an assignee, receive a successful response, and find the assignment intact, with nothing anywhere to explain it; the request succeeds, and only the arguments it carried reveal the mistake, which is why the tests assert those arguments rather than that a mutation was called. Two alternatives were rejected. Widening the draft's `assigneeId` to `string | null | undefined` models `updateTask` fully, but it adds a "leave this field alone" state that the composition can never produce, because it edits a complete task rather than a patch; it would touch every field component and the verified creation path in order to represent a case that does not exist. Diffing the current values against the prefilled original computes what changed in order to infer what the API should do, when the draft already states how the task should end up; it cannot diff blindly either, since `position` has to be excluded per 5.13, and it would add a second piece of state that must survive the container swap in 5.14 alongside the draft it is meant to describe. Keeping the difference in the mappers leaves the form, its fields, and the creation path untouched, and puts each rule beside the contract that causes it. **This assumes the composition always submits every field.** A later partial update, such as changing status straight from the task-card menu without opening the form, would break that assumption and reopen the rejected tri-state.
+- **6.4:** The assignee control gains an `Unassigned` option. It listed teammates only, which was enough while the field started empty and creation could simply leave it alone, but it meant an assigned task could never be handed back: nothing in the interface could return the draft to the empty value, so the explicit `null` of 6.1 was correct and unreachable at the same time. Wiring the edit flow is what surfaced it — the integration test could not clear an assignee because no control could. The option is offered to creation as well, where it undoes a mis-click, and it reports its own state through `aria-pressed` like every other option in the panel.
+- **6.5:** The menu lives in `features/task-actions` and reads what its actions do from a context the layout provides, rather than receiving them through the board, its columns and the card. `TaskCard` takes an `actions` slot instead, so an entity never reaches for a feature above it, and the widget that composes the card is what puts the menu in it. This is 5.13's arrangement applied again: the layout already owns the single task-form state, and the menu is another control that asks it to open. Both containers then say `Edit Task` and `Save` rather than `Create`, since one composition now serves two mutations.
 - **6.3:** The presentation `Task` carries `pointEstimate` and `tags` exactly as the API spells them, and `TaskCard` and `TaskList` derive their wording through `taskLabels` when they render. The mapper used to convert them on the way in, which suited a board that only had to display them but leaves editing unable to prefill: `4` and `Node.js` cannot name `FOUR` and `NODE_JS` again without an inverse table, and a table read backwards breaks the moment a label is reworded, silently and in the direction that writes to the API. This extends 5.20, which had already made the form and the board read one source for those labels, by making them read one source for the values as well. The loss was not only theoretical — two fixtures carried estimates of `3` and `5`, which no `PointEstimate` can express, and the model had accepted them. The mapper's test asserted the conversion, so the assertions move to a new `TaskCard` test rather than disappearing with it.
 - **6.2:** `features/task-creation` becomes `features/task-form`, which serves creation and editing alike, and deletion goes to a new `features/task-actions` with the task-card options menu. Naming the whole folder for the form would have misdescribed deletion, which has no form at all. The folder structure already describes `features/` as "user actions such as creating, editing, filtering, and moving tasks", so both belong there as siblings. Neither imports the other: the options menu reports that an edit was requested and `AppLayout` opens the composition, extending the ownership 5.13 already gave it over the single creation state. The rename lands in its own `refactor:` commit before any behavior changes, so the feature diff can be read without import churn; only five files outside the folder refer to it, because everything inside it imports relatively.

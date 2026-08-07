@@ -8,6 +8,7 @@ import {
 } from './taskForm'
 
 export type TaskFormState = {
+  loadValues: (values: TaskFormValues) => void
   markSubmitAttempted: () => void
   missingFields: RequiredField[]
   reset: () => void
@@ -44,6 +45,15 @@ export function useTaskFormState(): TaskFormState {
     }))
   }, [])
 
+  /*
+   * Starts a draft from a task that already exists. Nothing is reported missing
+   * yet, because opening an editor is not an attempt to save one.
+   */
+  const loadValues = useCallback((nextValues: TaskFormValues) => {
+    setValues(nextValues)
+    setHasAttemptedSubmit(false)
+  }, [])
+
   const markSubmitAttempted = useCallback(() => setHasAttemptedSubmit(true), [])
 
   const reset = useCallback(() => {
@@ -63,7 +73,15 @@ export function useTaskFormState(): TaskFormState {
   )
 
   return useMemo(
-    () => ({ markSubmitAttempted, missingFields, reset, setFieldValue, toggleTag, values }),
-    [markSubmitAttempted, missingFields, reset, setFieldValue, toggleTag, values],
+    () => ({
+      loadValues,
+      markSubmitAttempted,
+      missingFields,
+      reset,
+      setFieldValue,
+      toggleTag,
+      values,
+    }),
+    [loadValues, markSubmitAttempted, missingFields, reset, setFieldValue, toggleTag, values],
   )
 }

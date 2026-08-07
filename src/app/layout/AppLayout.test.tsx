@@ -5,7 +5,10 @@ import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import type { MockedResponse } from '@apollo/client/testing'
 import { AppLayout } from './AppLayout'
-import { CREATE_TASK } from '@/entities/task/api/taskOperations'
+import { CREATE_TASK, UPDATE_TASK } from '@/entities/task/api/taskOperations'
+import type { Task } from '@/entities/task/model/task'
+import { TaskActionsMenu } from '@/features/task-actions/ui/TaskActionsMenu'
+import { toApiDueDate, toDueDateValue } from '@/features/task-form/model/dueDate'
 import { createGraphqlMocks, mockCreatedTask } from '@/test/mocks/graphql'
 import sidebarStyles from '@/widgets/app-sidebar/AppSidebar.module.css'
 import { TaskToolbar } from '@/widgets/task-toolbar/TaskToolbar'
@@ -238,7 +241,10 @@ describe('AppLayout task creation', () => {
     // is the API's rather than the profile the header already holds.
     await user.click(await within(panel).findByRole('button', { name: 'Ada Lovelace' }))
 
-    expect(screen.getByRole('button', { name: 'Assignee: Ada Lovelace' })).toBeInTheDocument()
+    /* The name resolves from the users query, so it arrives after the dialog. */
+    expect(
+      await screen.findByRole('button', { name: 'Assignee: Ada Lovelace' }),
+    ).toBeInTheDocument()
   })
 
   it('names the missing fields instead of sending an incomplete draft', async () => {
@@ -301,5 +307,88 @@ describe('AppLayout task creation', () => {
     expect(await screen.findByRole('alert')).toHaveTextContent('The task could not be created')
     expect(screen.getByRole('dialog')).toBeInTheDocument()
     expect(screen.getByLabelText('Task Title')).toHaveValue(draftTitle)
+  })
+})
+
+const assignedTask: Task = {
+  assignee: { id: 'user-2', initials: 'AL', name: 'Ada Lovelace' },
+  attachmentCount: 0,
+  checklistCount: 0,
+  commentCount: 0,
+  dueDate: '2026-08-10T12:00:00.000Z',
+  dueDateLabel: '10 Aug, 2026',
+  dueDateTone: 'future',
+  id: 'task-1',
+  pointEstimate: 'FOUR',
+  status: 'TODO',
+  tags: ['REACT'],
+  title: draftTitle,
+}
+
+/*
+ * Built through the same round trip the draft makes rather than written out, so
+ * the expectation does not become the date-line case 5.45 accepts.
+ */
+function expectedUpdateInput(assigneeId: string | null) {
+  return {
+    assigneeId,
+    dueDate: toApiDueDate(toDueDateValue(new Date(assignedTask.dueDate))),
+    id: assignedTask.id,
+    name: draftTitle,
+    pointEstimate: 'FOUR',
+    status: 'TODO',
+    tags: ['REACT'],
+  }
+}
+
+describe('AppLayout task editing', () => {
+  it('opens the composition already filled with the task its menu belongs to', async () => {
+    const user = userEvent.setup()
+
+    renderLayout(<TaskActionsMenu task={assignedTask} />)
+
+    await user.click(screen.getByRole('button', { name: `More options for ${draftTitle}` }))
+    await user.click(screen.getByRole('menuitem', { name: 'Edit' }))
+
+    expect(screen.getByRole('dialog', { name: 'Edit Task' })).toBeInTheDocument()
+    expect(screen.getByLabelText('Task Title')).toHaveValue(draftTitle)
+    expect(screen.getByRole('button', { name: 'Save' })).toBeInTheDocument()
+
+    /*
+     * The assignee control resolves a name by looking the id up in the users
+     * query, so it can only say who this is once that query answers. The draft
+     * has carried the id since the dialog opened either way, which is why the
+     * request in the next test does not wait for this.
+     */
+    await waitFor(() =>
+      expect(screen.getByRole('button', { name: 'Assignee: Ada Lovelace' })).toBeInTheDocument(),
+    )
+  })
+
+  /*
+   * The mock answers one exact set of variables, so the dialog closing is what
+   * proves the cleared assignee left as an explicit null. Had it been omitted,
+   * the way creation omits it, nothing would have matched and the composition
+   * would still be open — which is the quiet failure 6.1 exists to prevent.
+   */
+  it('clears an assignee by sending an explicit null', async () => {
+    const user = userEvent.setup()
+
+    renderLayout(<TaskActionsMenu task={assignedTask} />, [
+      {
+        request: { query: UPDATE_TASK, variables: { input: expectedUpdateInput(null) } },
+        result: { data: { updateTask: mockCreatedTask } },
+      },
+    ])
+
+    await user.click(screen.getByRole('button', { name: `More options for ${draftTitle}` }))
+    await user.click(screen.getByRole('menuitem', { name: 'Edit' }))
+
+    await user.click(await screen.findByRole('button', { name: 'Assignee: Ada Lovelace' }))
+    await user.click(screen.getByRole('button', { name: 'Unassigned' }))
+
+    await user.click(screen.getByRole('button', { name: 'Save' }))
+
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument())
   })
 })

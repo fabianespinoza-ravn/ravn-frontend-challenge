@@ -1,7 +1,12 @@
-import type { ButtonHTMLAttributes } from 'react'
+import type { ComponentPropsWithRef } from 'react'
 import styles from './IconButton.module.css'
 
-type IconButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
+/*
+ * `ComponentPropsWithRef` rather than `ButtonHTMLAttributes` so a caller can
+ * hold the element, which a control that opens something has to do in order to
+ * take focus back when it closes.
+ */
+type IconButtonProps = ComponentPropsWithRef<'button'> & {
   size?: 'small' | 'medium'
 }
 
