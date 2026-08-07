@@ -3,6 +3,8 @@ import { Plus } from 'lucide-react'
 import { Outlet } from 'react-router-dom'
 import type { Task } from '@/entities/task/model/task'
 import { TaskActionsContext } from '@/features/task-actions/model/taskActionsContext'
+import { useDeleteTask } from '@/features/task-actions/model/useDeleteTask'
+import { DeleteTaskDialog } from '@/features/task-actions/ui/DeleteTaskDialog'
 import { TaskFormContext } from '@/features/task-form/model/taskFormContext'
 import {
   toCreateTaskInput,
@@ -41,6 +43,12 @@ export function AppLayout() {
    * name what they are doing.
    */
   const [editingTask, setEditingTask] = useState<Task | null>(null)
+  /*
+   * The task awaiting a delete confirmation. It is held here rather than in the
+   * menu because a successful deletion refetches the board, which unmounts the
+   * card the menu belongs to; a dialog owned by that card would go with it.
+   */
+  const [deletingTask, setDeletingTask] = useState<Task | null>(null)
   const taskForm = useTaskFormState()
   const resetTaskFormState = taskForm.reset
   const loadTaskFormValues = taskForm.loadValues
@@ -51,6 +59,8 @@ export function AppLayout() {
     useCreateTask()
   const [updateTask, { error: updateError, loading: isUpdatingTask, reset: resetUpdate }] =
     useUpdateTask()
+  const [runDeleteTask, { error: deletionError, loading: isDeletingTask, reset: resetDeletion }] =
+    useDeleteTask()
   const mobilePlatform = getMobilePlatform()
   const isAndroid = mobilePlatform === 'android'
 
@@ -130,7 +140,26 @@ export function AppLayout() {
     [],
   )
 
-  const taskActionsContext = useMemo(() => ({ editTask }), [editTask])
+  const cancelTaskDeletion = useCallback(() => {
+    setDeletingTask(null)
+    // Otherwise a failure from this task would greet the next confirmation.
+    resetDeletion()
+  }, [resetDeletion])
+
+  const confirmTaskDeletion = useCallback(async () => {
+    if (!deletingTask) {
+      return
+    }
+
+    try {
+      await runDeleteTask({ variables: { input: { id: deletingTask.id } } })
+      setDeletingTask(null)
+    } catch {
+      // Reported in the dialog, which stays open so it can be tried again.
+    }
+  }, [deletingTask, runDeleteTask])
+
+  const taskActionsContext = useMemo(() => ({ deleteTask: setDeletingTask, editTask }), [editTask])
 
   const isFullPageTaskFormOpen = isTaskFormOpen && !supportsTaskFormModal
   const isModalTaskFormOpen = isTaskFormOpen && supportsTaskFormModal
@@ -195,6 +224,15 @@ export function AppLayout() {
               isSubmitting={isCreatingTask || isUpdatingTask}
               onClose={closeTaskForm}
               onSubmit={submitTaskForm}
+            />
+          ) : null}
+          {deletingTask ? (
+            <DeleteTaskDialog
+              hasFailed={Boolean(deletionError)}
+              isDeleting={isDeletingTask}
+              onCancel={cancelTaskDeletion}
+              onConfirm={confirmTaskDeletion}
+              taskTitle={deletingTask.title}
             />
           ) : null}
         </div>

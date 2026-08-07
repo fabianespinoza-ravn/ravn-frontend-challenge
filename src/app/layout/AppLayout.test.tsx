@@ -5,7 +5,7 @@ import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import type { MockedResponse } from '@apollo/client/testing'
 import { AppLayout } from './AppLayout'
-import { CREATE_TASK, UPDATE_TASK } from '@/entities/task/api/taskOperations'
+import { CREATE_TASK, DELETE_TASK, UPDATE_TASK } from '@/entities/task/api/taskOperations'
 import type { Task } from '@/entities/task/model/task'
 import { TaskActionsMenu } from '@/features/task-actions/ui/TaskActionsMenu'
 import { toApiDueDate, toDueDateValue } from '@/features/task-form/model/dueDate'
@@ -390,5 +390,85 @@ describe('AppLayout task editing', () => {
     await user.click(screen.getByRole('button', { name: 'Save' }))
 
     await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument())
+  })
+})
+
+describe('AppLayout task deletion', () => {
+  async function openDeleteConfirmation(
+    user: ReturnType<typeof userEvent.setup>,
+    extraMocks: MockedResponse[] = [],
+  ) {
+    renderLayout(<TaskActionsMenu task={assignedTask} />, extraMocks)
+
+    await user.click(screen.getByRole('button', { name: `More options for ${draftTitle}` }))
+    await user.click(screen.getByRole('menuitem', { name: 'Delete' }))
+  }
+
+  /*
+   * The menu is closed by the time this is read, so the dialog has to name the
+   * task itself rather than rely on what was under the pointer.
+   */
+  it('confirms before deleting, naming the task and warning that it is final', async () => {
+    const user = userEvent.setup()
+
+    await openDeleteConfirmation(user)
+
+    const dialog = screen.getByRole('dialog', { name: 'Delete task' })
+
+    expect(within(dialog).getByText(`Delete “${draftTitle}”?`)).toBeInTheDocument()
+    expect(within(dialog).getByText('This cannot be undone.')).toBeInTheDocument()
+  })
+
+  /* Enter on an unread dialog must back out, not destroy the task. */
+  it('places focus on Cancel rather than on the destructive action', async () => {
+    const user = userEvent.setup()
+
+    await openDeleteConfirmation(user)
+
+    expect(screen.getByRole('button', { name: 'Cancel' })).toHaveFocus()
+  })
+
+  it('leaves the task alone when the confirmation is cancelled', async () => {
+    const user = userEvent.setup()
+
+    await openDeleteConfirmation(user)
+    await user.click(screen.getByRole('button', { name: 'Cancel' }))
+
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+  })
+
+  /*
+   * The mock answers one exact id, so the dialog closing is what proves the
+   * confirmed task is the one that was sent.
+   */
+  it('deletes the confirmed task', async () => {
+    const user = userEvent.setup()
+
+    await openDeleteConfirmation(user, [
+      {
+        request: { query: DELETE_TASK, variables: { input: { id: assignedTask.id } } },
+        result: { data: { deleteTask: mockCreatedTask } },
+      },
+    ])
+
+    await user.click(screen.getByRole('button', { name: 'Delete' }))
+
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument())
+  })
+
+  it('keeps the confirmation open and reports a failed deletion', async () => {
+    const user = userEvent.setup()
+
+    await openDeleteConfirmation(user, [
+      {
+        request: { query: DELETE_TASK, variables: { input: { id: assignedTask.id } } },
+        error: new Error('Deletion failed'),
+      },
+    ])
+
+    await user.click(screen.getByRole('button', { name: 'Delete' }))
+
+    expect(await screen.findByRole('alert')).toHaveTextContent('could not be deleted')
+    expect(screen.getByRole('dialog', { name: 'Delete task' })).toBeInTheDocument()
   })
 })

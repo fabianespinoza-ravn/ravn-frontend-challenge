@@ -59,6 +59,26 @@ describe('TaskActionsMenu', () => {
     expect(editTask).toHaveBeenCalledWith(task)
   })
 
+  /*
+   * Deleting is confirmed elsewhere, so choosing it here only asks. The menu
+   * never performs the change itself.
+   */
+  it('asks to delete the task it belongs to', async () => {
+    const user = userEvent.setup()
+    const deleteTask = vi.fn()
+
+    render(
+      <TaskActionsTestProvider deleteTask={deleteTask}>
+        <TaskActionsMenu task={task} />
+      </TaskActionsTestProvider>,
+    )
+
+    await user.click(screen.getByRole('button', { name: 'More options for GraphQL task' }))
+    await user.click(screen.getByRole('menuitem', { name: 'Delete' }))
+
+    expect(deleteTask).toHaveBeenCalledWith(task)
+  })
+
   it('closes once an action is chosen', async () => {
     const user = userEvent.setup()
     const { trigger } = renderMenu()

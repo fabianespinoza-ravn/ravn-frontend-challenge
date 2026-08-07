@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { MoreHorizontal, Pencil } from 'lucide-react'
+import { MoreHorizontal, Pencil, Trash2 } from 'lucide-react'
 import type { Task } from '@/entities/task/model/task'
 import { IconButton } from '@/shared/ui/icon-button/IconButton'
 import { useTaskActions } from '../model/useTaskActions'
@@ -20,7 +20,7 @@ type TaskActionsMenuProps = {
  */
 export function TaskActionsMenu({ task }: TaskActionsMenuProps) {
   const [isOpen, setIsOpen] = useState(false)
-  const { editTask } = useTaskActions()
+  const { deleteTask, editTask } = useTaskActions()
   const containerRef = useRef<HTMLDivElement>(null)
   const triggerRef = useRef<HTMLButtonElement>(null)
   const wasOpenRef = useRef(false)
@@ -87,6 +87,18 @@ export function TaskActionsMenu({ task }: TaskActionsMenuProps) {
           >
             <Pencil aria-hidden="true" size={16} />
             Edit
+          </button>
+          <button
+            className={`${styles.item} ${styles.isDestructive}`}
+            onClick={() => {
+              close()
+              deleteTask(task)
+            }}
+            role="menuitem"
+            type="button"
+          >
+            <Trash2 aria-hidden="true" size={16} />
+            Delete
           </button>
         </div>
       ) : null}

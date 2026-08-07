@@ -4,6 +4,7 @@ import { TaskActionsContext } from '@/features/task-actions/model/taskActionsCon
 
 type TaskActionsTestProviderProps = {
   children: ReactNode
+  deleteTask?: (task: Task) => void
   editTask?: (task: Task) => void
 }
 
@@ -14,7 +15,8 @@ type TaskActionsTestProviderProps = {
  */
 export function TaskActionsTestProvider({
   children,
+  deleteTask = () => {},
   editTask = () => {},
 }: TaskActionsTestProviderProps) {
-  return <TaskActionsContext value={{ editTask }}>{children}</TaskActionsContext>
+  return <TaskActionsContext value={{ deleteTask, editTask }}>{children}</TaskActionsContext>
 }

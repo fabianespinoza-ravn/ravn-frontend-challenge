@@ -39,3 +39,11 @@
 .item:hover {
   background: var(--color-surface-overlay);
 }
+
+/*
+ * The accent doubles as the destructive colour until the design system gains
+ * one of its own, the same substitution 5.44 made for invalid controls.
+ */
+.isDestructive {
+  color: var(--color-accent);
+}

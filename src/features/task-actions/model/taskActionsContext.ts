@@ -2,6 +2,8 @@ import { createContext } from 'react'
 import type { Task } from '@/entities/task/model/task'
 
 export type TaskActionsContextValue = {
+  /** Both open something the layout owns; neither performs the change itself. */
+  deleteTask: (task: Task) => void
   editTask: (task: Task) => void
 }
 
