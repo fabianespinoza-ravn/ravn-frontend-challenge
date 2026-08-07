@@ -1,6 +1,6 @@
 # Implementation Plan and Decision Log
 
-> **Status:** Settings is in progress.
+> **Status:** Settings is implemented and in review.
 > **Last updated:** 2026-08-07
 > **Phase closure:** Initial Setup was merged through [PR #3](https://github.com/fabianespinoza-ravn/ravn-frontend-challenge/pull/3); Issue #1 is closed.
 > **Phase closure:** Dashboard UI was merged through [PR #5](https://github.com/fabianespinoza-ravn/ravn-frontend-challenge/pull/5); Issue #4 is closed.
@@ -27,7 +27,7 @@ This file is the repository's source of truth for confirmed product decisions, i
 - Issue [#4 Dashboard UI](https://github.com/fabianespinoza-ravn/ravn-frontend-challenge/issues/4) is closed, was merged through [PR #5](https://github.com/fabianespinoza-ravn/ravn-frontend-challenge/pull/5), and is in `Done` in the GitHub Project.
 - Issue [#6 GraphQL Data and Creation](https://github.com/fabianespinoza-ravn/ravn-frontend-challenge/issues/6) is closed, was merged through [PR #7](https://github.com/fabianespinoza-ravn/ravn-frontend-challenge/pull/7), and is in `Done` in the GitHub Project.
 - Issue [#8 Task Editing and Deletion](https://github.com/fabianespinoza-ravn/ravn-frontend-challenge/issues/8) is closed, was merged through [PR #9](https://github.com/fabianespinoza-ravn/ravn-frontend-challenge/pull/9), and is in `Done` in the GitHub Project.
-- Issue [#10 Settings](https://github.com/fabianespinoza-ravn/ravn-frontend-challenge/issues/10) is the active implementation issue. Its branch is `feat/settings-route`.
+- Issue [#10 Settings](https://github.com/fabianespinoza-ravn/ravn-frontend-challenge/issues/10) is the active implementation issue. Its branch is `feat/settings-route`, and it is in review through [PR #11](https://github.com/fabianespinoza-ravn/ravn-frontend-challenge/pull/11).
 
 ## Confirmed Folder Structure
 
@@ -399,7 +399,7 @@ The input shapes were read from the schema rather than inferred, through unauthe
 
 ## Settings: Current Scope
 
-**Implementation status:** In progress.
+**Implementation status:** Complete.
 **Tracking:** [Issue #10](https://github.com/fabianespinoza-ravn/ravn-frontend-challenge/issues/10) on `feat/settings-route`.
 
 No API work is required. `GET_PROFILE` and `useProfile` already exist and are read by the shared header, and contract 5.2 records the fields the query returns, including the nullable `avatar`. Schema introspection during the previous phase also confirmed that the only mutations are `createTask`, `updateTask` and `deleteTask`, so this route is read-only because the API is, rather than by choice.
@@ -413,7 +413,7 @@ No API work is required. `GET_PROFILE` and `useProfile` already exist and are re
 - [x] Compose the layout as a decision rather than a match, there being no reference composition for this route; its visual review is deferred below.
 - [x] Add coverage for the rendered profile, the Position wording, the joining month, the avatar fallback, and both states.
 - [x] Run final local validation: `format:check`, `typecheck`, `lint`, `test`, and `build`.
-- [ ] Open the pull request linked to Issue #10 and confirm its GitHub Actions quality checks pass.
+- [x] Open [PR #11](https://github.com/fabianespinoza-ravn/ravn-frontend-challenge/pull/11) linked to Issue #10; its GitHub Actions quality checks passed.
 
 ### Deferred From This Phase
 
