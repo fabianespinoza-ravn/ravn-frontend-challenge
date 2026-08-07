@@ -7,6 +7,7 @@ import { TaskActionsContext } from '@/features/task-actions/model/taskActionsCon
 import { useDeleteTask } from '@/features/task-actions/model/useDeleteTask'
 import { DeleteTaskDialog } from '@/features/task-actions/ui/DeleteTaskDialog'
 import { TaskFormContext } from '@/features/task-form/model/taskFormContext'
+import { emptyTaskFilters, type TaskFilters } from '@/features/task-filters/model/taskFilters'
 import { TaskFiltersContext } from '@/features/task-filters/model/taskFiltersContext'
 import {
   toCreateTaskInput,
@@ -77,12 +78,13 @@ export function AppLayout() {
   const mobilePlatform = getMobilePlatform()
   const isAndroid = mobilePlatform === 'android'
   const hasTaskSearch = taskRoutes.includes(useLocation().pathname)
-  const [searchTerm, setSearchTerm] = useState('')
+  const [filters, setFilters] = useState<TaskFilters>(emptyTaskFilters)
   /*
-   * The field follows every keystroke; the query waits for a pause. Trimmed
+   * Only the name waits. It is typed a character at a time, while every other
+   * control commits a whole choice at once and has nothing to settle. Trimmed,
    * because a trailing space is a search nobody meant to run.
    */
-  const appliedSearchTerm = useDebouncedValue(searchTerm.trim(), searchDebounceDelay)
+  const appliedName = useDebouncedValue(filters.name.trim(), searchDebounceDelay)
 
   useEffect(() => {
     function syncViewport() {
@@ -194,9 +196,23 @@ export function AppLayout() {
 
   const taskActionsContext = useMemo(() => ({ deleteTask: setDeletingTask, editTask }), [editTask])
 
-  const taskSearchContext = useMemo(
-    () => ({ appliedTerm: appliedSearchTerm, setTerm: setSearchTerm, term: searchTerm }),
-    [appliedSearchTerm, searchTerm],
+  const setFilter = useCallback(
+    <TKey extends keyof TaskFilters>(key: TKey, value: TaskFilters[TKey]) => {
+      setFilters((currentFilters) => ({ ...currentFilters, [key]: value }))
+    },
+    [],
+  )
+
+  const clearFilters = useCallback(() => setFilters(emptyTaskFilters), [])
+
+  const taskFiltersContext = useMemo(
+    () => ({
+      appliedFilters: { ...filters, name: appliedName },
+      clearFilters,
+      filters,
+      setFilter,
+    }),
+    [appliedName, clearFilters, filters, setFilter],
   )
 
   const isFullPageTaskFormOpen = isTaskFormOpen && !supportsTaskFormModal
@@ -207,7 +223,7 @@ export function AppLayout() {
   return (
     <TaskFormContext value={taskFormContext}>
       <TaskActionsContext value={taskActionsContext}>
-        <TaskFiltersContext value={taskSearchContext}>
+        <TaskFiltersContext value={taskFiltersContext}>
           <div
             className={
               isFullPageTaskFormOpen ? `${styles.root} ${styles.isTaskFormOpen}` : styles.root

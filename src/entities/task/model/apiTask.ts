@@ -53,8 +53,15 @@ export type DeleteTaskInput = {
   id: string
 }
 
+/*
+ * `ownerId` is deliberately absent. The schema accepts it and the API ignores
+ * it: filtering by any of the four creators in the verified account, or by a
+ * UUID belonging to nobody, returns every task. Leaving it off the type is what
+ * stops a control being built for a filter that cannot filter.
+ */
 export type TaskFilterInput = {
-  assigneeId?: string
+  /** `null` asks for the unassigned ones, which the API answers for. */
+  assigneeId?: string | null
   dueDate?: string
   name?: string
   pointEstimate?: PointEstimate

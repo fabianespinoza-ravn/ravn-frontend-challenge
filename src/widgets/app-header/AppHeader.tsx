@@ -20,7 +20,7 @@ type AppHeaderProps = {
 
 export function AppHeader({ hasTaskSearch = true, isAndroid = false }: AppHeaderProps) {
   const { data } = useProfile()
-  const { setTerm, term } = useTaskFilters()
+  const { filters, setFilter } = useTaskFilters()
   const profile = data?.profile
   const initials = profile ? getUserInitials(profile.fullName) : 'FE'
 
@@ -36,10 +36,10 @@ export function AppHeader({ hasTaskSearch = true, isAndroid = false }: AppHeader
           <Search aria-hidden="true" size={19} />
           <input
             aria-label="Search tasks"
-            onChange={(event) => setTerm(event.target.value)}
+            onChange={(event) => setFilter('name', event.target.value)}
             placeholder="Search"
             type="search"
-            value={term}
+            value={filters.name}
           />
         </div>
       ) : (

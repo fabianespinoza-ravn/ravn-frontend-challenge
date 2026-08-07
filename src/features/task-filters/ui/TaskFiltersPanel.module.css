@@ -1,0 +1,103 @@
+.root {
+  position: relative;
+  display: inline-flex;
+}
+
+.trigger {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-raised);
+  color: var(--color-text-secondary);
+  font: inherit;
+  font-size: var(--font-size-sm);
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.trigger:hover {
+  color: var(--color-text-primary);
+}
+
+.trigger:focus-visible {
+  outline: var(--focus-ring);
+  outline-offset: var(--focus-offset);
+}
+
+/* Narrowed results should be visible without opening the panel to check. */
+.isActive {
+  border-color: var(--color-accent);
+  color: var(--color-text-primary);
+}
+
+.count {
+  display: inline-grid;
+  min-width: 1.25rem;
+  place-items: center;
+  padding: 0 var(--space-1);
+  border-radius: var(--radius-sm);
+  background: var(--color-accent);
+  color: var(--color-on-accent);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+}
+
+/*
+ * Anchored to the right of its trigger, which sits at the right of the toolbar,
+ * so the panel opens inwards rather than past the edge.
+ */
+.panel {
+  position: absolute;
+  z-index: 2;
+  top: calc(100% + var(--space-2));
+  right: 0;
+  display: grid;
+  gap: var(--space-3);
+  padding: var(--space-3);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-overlay);
+  box-shadow: var(--shadow-lg);
+}
+
+/*
+ * A column, not the form's single row: these carry longer values and the panel
+ * is not competing for width with anything beside it.
+ */
+.fields {
+  display: grid;
+  gap: var(--space-2);
+  min-width: 14rem;
+}
+
+.clear {
+  padding: var(--space-2);
+  border: 0;
+  border-top: 1px solid var(--color-border);
+  border-radius: 0;
+  background: none;
+  color: var(--color-accent);
+  font: inherit;
+  font-size: var(--font-size-sm);
+  cursor: pointer;
+}
+
+.clear:disabled {
+  color: var(--color-text-secondary);
+  cursor: default;
+  opacity: 0.6;
+}
+
+.clear:focus-visible {
+  outline: var(--focus-ring);
+  outline-offset: var(--focus-offset);
+}
+
+@media (max-width: 47.99rem) {
+  /* The label would crowd the row on a phone; the icon carries it. */
+  .triggerLabel {
+    display: none;
+  }
+}

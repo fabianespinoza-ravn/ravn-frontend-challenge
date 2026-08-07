@@ -3,6 +3,11 @@ import { useCallback, useMemo } from 'react'
 import { GET_TASKS } from '@/entities/task/api/taskOperations'
 import type { ApiTask } from '@/entities/task/model/apiTask'
 import { mapApiTaskToTask } from '@/entities/task/model/taskMapper'
+import {
+  applyClientFilters,
+  hasActiveFilters,
+  toTaskFilterInput,
+} from '@/features/task-filters/model/taskFilters'
 import { useTaskFilters } from '@/features/task-filters/model/useTaskFilters'
 
 type TasksQueryData = {
@@ -14,21 +19,22 @@ function sortTasksByDueDate(firstTask: ApiTask, secondTask: ApiTask) {
 }
 
 export function useDashboardTasks() {
-  const { appliedTerm } = useTaskFilters()
+  const { appliedFilters } = useTaskFilters()
   /*
    * The server filters, not the client: it owns what a match is, and filtering
    * here would only ever search what happened to be loaded. An empty term sends
    * no `name` at all rather than an empty one.
    */
-  const variables = useMemo(
-    () => ({ input: appliedTerm ? { name: appliedTerm } : {} }),
-    [appliedTerm],
-  )
+  const variables = useMemo(() => ({ input: toTaskFilterInput(appliedFilters) }), [appliedFilters])
   const { data, error, loading, refetch } = useQuery<TasksQueryData>(GET_TASKS, { variables })
 
   const tasks = useMemo(
-    () => [...(data?.tasks ?? [])].sort(sortTasksByDueDate).map(mapApiTaskToTask),
-    [data?.tasks],
+    () =>
+      applyClientFilters(
+        [...(data?.tasks ?? [])].sort(sortTasksByDueDate).map(mapApiTaskToTask),
+        appliedFilters,
+      ),
+    [appliedFilters, data?.tasks],
   )
 
   const retry = useCallback(() => {
@@ -38,7 +44,7 @@ export function useDashboardTasks() {
   return {
     error,
     /* Lets the view say "nothing matches" rather than "there are no tasks". */
-    isFiltered: appliedTerm !== '',
+    isFiltered: hasActiveFilters(appliedFilters),
     isLoading: loading,
     retry,
     tasks,

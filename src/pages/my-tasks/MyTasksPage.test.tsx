@@ -8,6 +8,7 @@ import type { ApiTask } from '@/entities/task/model/apiTask'
 import { GET_PROFILE } from '@/entities/user/api/userOperations'
 import { mockProfile } from '@/test/mocks/graphql'
 import { TaskActionsTestProvider } from '@/test/taskActions'
+import { emptyTaskFilters } from '@/features/task-filters/model/taskFilters'
 import { TaskFiltersTestProvider } from '@/test/taskFilters'
 import { TaskFormTestProvider } from '@/test/taskForm'
 import { MyTasksPage } from './MyTasksPage'
@@ -46,12 +47,12 @@ function tasksMock(tasks: ApolloApiTask[]): MockedResponse {
   }
 }
 
-function renderMyTasks(mocks: MockedResponse[], appliedTerm = '') {
+function renderMyTasks(mocks: MockedResponse[], name = '') {
   return render(
     <MockedProvider mocks={mocks}>
       <TaskFormTestProvider>
         <TaskActionsTestProvider>
-          <TaskFiltersTestProvider appliedTerm={appliedTerm}>
+          <TaskFiltersTestProvider filters={{ ...emptyTaskFilters, name }}>
             <MyTasksPage />
           </TaskFiltersTestProvider>
         </TaskActionsTestProvider>
@@ -145,7 +146,7 @@ describe('MyTasksPage search', () => {
     )
 
     expect(
-      await screen.findByRole('heading', { name: 'No assigned tasks match your search' }),
+      await screen.findByRole('heading', { name: 'No assigned tasks match your filters' }),
     ).toBeInTheDocument()
   })
 })

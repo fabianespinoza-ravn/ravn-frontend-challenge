@@ -6,6 +6,7 @@ import { GET_TASKS } from '@/entities/task/api/taskOperations'
 import type { ApiTask } from '@/entities/task/model/apiTask'
 import { mockProfile } from '@/test/mocks/graphql'
 import { TaskActionsTestProvider } from '@/test/taskActions'
+import { emptyTaskFilters } from '@/features/task-filters/model/taskFilters'
 import { TaskFiltersTestProvider } from '@/test/taskFilters'
 import { TaskFormTestProvider } from '@/test/taskForm'
 import { DashboardPage } from './DashboardPage'
@@ -39,13 +40,13 @@ const earlierTask: ApiTask = {
 
 function renderDashboard(
   mocks: ConstructorParameters<typeof MockedProvider>[0]['mocks'],
-  appliedTerm = '',
+  name = '',
 ) {
   return render(
     <MockedProvider mocks={mocks}>
       <TaskFormTestProvider>
         <TaskActionsTestProvider>
-          <TaskFiltersTestProvider appliedTerm={appliedTerm}>
+          <TaskFiltersTestProvider filters={{ ...emptyTaskFilters, name }}>
             <DashboardPage />
           </TaskFiltersTestProvider>
         </TaskActionsTestProvider>
@@ -147,7 +148,7 @@ describe('DashboardPage search', () => {
     )
 
     expect(
-      await screen.findByRole('heading', { name: 'No tasks match your search' }),
+      await screen.findByRole('heading', { name: 'No tasks match your filters' }),
     ).toBeInTheDocument()
     expect(
       screen.queryByRole('heading', { name: 'No tasks are available' }),

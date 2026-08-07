@@ -115,9 +115,13 @@ describe('Dashboard shell', () => {
     const openTaskForm = vi.fn()
 
     render(
-      <TaskFormTestProvider openTaskForm={openTaskForm}>
-        <TaskToolbar />
-      </TaskFormTestProvider>,
+      <MockedProvider mocks={createGraphqlMocks()}>
+        <TaskFormTestProvider openTaskForm={openTaskForm}>
+          <TaskFiltersTestProvider>
+            <TaskToolbar />
+          </TaskFiltersTestProvider>
+        </TaskFormTestProvider>
+      </MockedProvider>,
     )
 
     expect(screen.getByRole('button', { name: 'Task view' })).toBeInTheDocument()

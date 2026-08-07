@@ -1,0 +1,280 @@
+import { CalendarClock, Circle, Tag, UserRound } from 'lucide-react'
+import { pointEstimates, taskTags } from '@/entities/task/model/apiTask'
+import { taskStatuses } from '@/entities/task/model/task'
+import { getPointEstimateLabel, tagLabels } from '@/entities/task/model/taskLabels'
+import { getUserInitials, type User } from '@/entities/user/model/user'
+import { formatDueDateLabel } from '@/shared/lib/date/dueDate'
+import { Avatar } from '@/shared/ui/avatar/Avatar'
+import { DatePicker } from '@/shared/ui/date-picker/DatePicker'
+import { FieldDropdown } from '@/shared/ui/field-dropdown/FieldDropdown'
+import dropdownStyles from '@/shared/ui/field-dropdown/FieldDropdown.module.css'
+import type { AssigneeFilter, TaskFilters } from '../model/taskFilters'
+
+type FilterFieldProps<TKey extends keyof TaskFilters> = {
+  onChange: (value: TaskFilters[TKey]) => void
+  value: TaskFilters[TKey]
+}
+
+/**
+ * The filter controls. They share the dropdown primitive with the task form and
+ * nothing else: a form field validates an incomplete draft and reports what is
+ * missing, while these only narrow a query, so every one of them offers an
+ * `Any` option that a required field could never have.
+ */
+export function StatusFilter({ onChange, value }: FilterFieldProps<'status'>) {
+  const selected = taskStatuses.find((status) => status.value === value)
+
+  return (
+    <FieldDropdown
+      isFilled={Boolean(selected)}
+      label="Status"
+      trigger={
+        <>
+          <Circle aria-hidden="true" size={16} />
+          <span className={dropdownStyles.triggerLabel}>{selected?.label ?? 'Status'}</span>
+        </>
+      }
+      value={selected?.label}
+    >
+      {(close) => (
+        <>
+          <AnyOption isSelected={value === ''} onSelect={() => onChange('')} close={close} />
+          {taskStatuses.map((status) => (
+            <button
+              aria-pressed={status.value === value}
+              className={dropdownStyles.option}
+              key={status.value}
+              onClick={() => {
+                onChange(status.value)
+                close()
+              }}
+              type="button"
+            >
+              <span
+                aria-hidden="true"
+                className={dropdownStyles.optionIcon}
+                style={{ color: status.color }}
+              >
+                <Circle fill="currentColor" size={12} />
+              </span>
+              {status.label}
+            </button>
+          ))}
+        </>
+      )}
+    </FieldDropdown>
+  )
+}
+
+export function EstimateFilter({ onChange, value }: FilterFieldProps<'pointEstimate'>) {
+  return (
+    <FieldDropdown
+      isFilled={value !== ''}
+      label="Estimate"
+      trigger={
+        <span className={dropdownStyles.triggerLabel}>
+          {value === '' ? 'Estimate' : getPointEstimateLabel(value)}
+        </span>
+      }
+      value={value === '' ? undefined : getPointEstimateLabel(value)}
+    >
+      {(close) => (
+        <>
+          <AnyOption isSelected={value === ''} onSelect={() => onChange('')} close={close} />
+          {pointEstimates.map((estimate) => (
+            <button
+              aria-pressed={estimate === value}
+              className={dropdownStyles.option}
+              key={estimate}
+              onClick={() => {
+                onChange(estimate)
+                close()
+              }}
+              type="button"
+            >
+              {getPointEstimateLabel(estimate)}
+            </button>
+          ))}
+        </>
+      )}
+    </FieldDropdown>
+  )
+}
+
+/**
+ * Several tags at once, because the API matches any of them (5.10) and closing
+ * after each choice would force the control open again for the next one, the
+ * same reason the form's label control stays open (5.23).
+ */
+export function TagsFilter({ onChange, value }: FilterFieldProps<'tags'>) {
+  const selectedLabels = value.map((tag) => tagLabels[tag])
+
+  return (
+    <FieldDropdown
+      isFilled={value.length > 0}
+      label="Label"
+      trigger={
+        <>
+          <Tag aria-hidden="true" size={16} />
+          <span className={dropdownStyles.triggerLabel}>
+            {selectedLabels.length > 0 ? selectedLabels.join(', ') : 'Label'}
+          </span>
+        </>
+      }
+      value={selectedLabels.join(', ') || undefined}
+    >
+      {() => (
+        <>
+          <AnyOption isSelected={value.length === 0} onSelect={() => onChange([])} />
+          {taskTags.map((tag) => (
+            <button
+              aria-pressed={value.includes(tag)}
+              className={dropdownStyles.option}
+              key={tag}
+              onClick={() =>
+                onChange(
+                  value.includes(tag)
+                    ? value.filter((current) => current !== tag)
+                    : [...value, tag],
+                )
+              }
+              type="button"
+            >
+              {tagLabels[tag]}
+            </button>
+          ))}
+        </>
+      )}
+    </FieldDropdown>
+  )
+}
+
+export function DueDateFilter({ onChange, value }: FilterFieldProps<'dueDate'>) {
+  return (
+    <FieldDropdown
+      isFilled={value !== ''}
+      label="Due date"
+      panelClassName={dropdownStyles.panelFitsContent}
+      trigger={
+        <>
+          <CalendarClock aria-hidden="true" size={16} />
+          <span className={dropdownStyles.triggerLabel}>
+            {formatDueDateLabel(value) ?? 'Due date'}
+          </span>
+        </>
+      }
+      value={formatDueDateLabel(value) ?? undefined}
+    >
+      {(close) => (
+        <>
+          <AnyOption isSelected={value === ''} onSelect={() => onChange('')} close={close} />
+          <DatePicker
+            onSelect={(nextValue) => {
+              onChange(nextValue)
+              close()
+            }}
+            value={value}
+          />
+        </>
+      )}
+    </FieldDropdown>
+  )
+}
+
+type AssigneeFilterProps = {
+  assignees: User[]
+  onChange: (value: AssigneeFilter) => void
+  value: AssigneeFilter
+}
+
+/**
+ * Three states, and the API answers all three: anybody, nobody, or a teammate.
+ * `null` really does return the unassigned tasks, confirmed by creating one and
+ * finding it alone.
+ */
+export function AssigneeFilterField({ assignees, onChange, value }: AssigneeFilterProps) {
+  const selected = assignees.find((assignee) => assignee.id === value)
+  const label = value === null ? 'Unassigned' : selected?.fullName
+
+  return (
+    <FieldDropdown
+      isFilled={value !== ''}
+      label="Assignee"
+      panelTitle="Assigned to..."
+      trigger={
+        <>
+          <UserRound aria-hidden="true" size={16} />
+          <span className={dropdownStyles.triggerLabel}>{label ?? 'Assignee'}</span>
+        </>
+      }
+      value={label}
+    >
+      {(close) => (
+        <>
+          <AnyOption isSelected={value === ''} onSelect={() => onChange('')} close={close} />
+          <button
+            aria-pressed={value === null}
+            className={dropdownStyles.option}
+            onClick={() => {
+              onChange(null)
+              close()
+            }}
+            type="button"
+          >
+            <span aria-hidden="true" className={dropdownStyles.optionIcon}>
+              <UserRound size={16} />
+            </span>
+            Unassigned
+          </button>
+          {assignees.map((assignee) => (
+            <button
+              aria-pressed={assignee.id === value}
+              className={dropdownStyles.option}
+              key={assignee.id}
+              onClick={() => {
+                onChange(assignee.id)
+                close()
+              }}
+              type="button"
+            >
+              <span aria-hidden="true" className={dropdownStyles.optionIcon}>
+                <Avatar
+                  alt=""
+                  initials={getUserInitials(assignee.fullName)}
+                  size="small"
+                  src={assignee.avatar}
+                />
+              </span>
+              {assignee.fullName}
+            </button>
+          ))}
+        </>
+      )}
+    </FieldDropdown>
+  )
+}
+
+/** Every filter can be switched off, which a required form field cannot. */
+function AnyOption({
+  close,
+  isSelected,
+  onSelect,
+}: {
+  close?: () => void
+  isSelected: boolean
+  onSelect: () => void
+}) {
+  return (
+    <button
+      aria-pressed={isSelected}
+      className={dropdownStyles.option}
+      onClick={() => {
+        onSelect()
+        close?.()
+      }}
+      type="button"
+    >
+      Any
+    </button>
+  )
+}
