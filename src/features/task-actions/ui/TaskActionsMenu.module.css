@@ -4,8 +4,14 @@
 }
 
 /*
- * Anchored to the right edge of its trigger, which sits at the right edge of a
- * card and of a task row, so the panel opens inwards instead of past it.
+ * Anchored to the right edge of its trigger, which sits at the top-right corner
+ * of a card and at the end of a task row, so the panel opens inwards instead of
+ * past it.
+ *
+ * No minimum width: the grid column takes the width of the widest action and
+ * both stretch to it, so the panel measures exactly what `Delete` needs. The
+ * floor this used to carry only mattered while the icons could be squeezed to
+ * nothing; `flex-shrink: 0` below is what makes fitting the content safe.
  */
 .menu {
   position: absolute;
@@ -13,19 +19,23 @@
   top: calc(100% + var(--space-1));
   right: 0;
   display: grid;
-  min-width: 9rem;
-  gap: var(--space-1);
-  padding: var(--space-2);
+  padding: var(--space-1);
   border-radius: var(--radius-md);
   background: var(--color-surface-overlay-raised);
   box-shadow: var(--shadow-lg);
 }
 
+/*
+ * Icons lead, labels follow, both flush left. The column is as wide as the
+ * longer action, so centring each icon and label as a group left the shorter
+ * one starting further in and the two icons never lined up.
+ */
 .item {
   display: flex;
   align-items: center;
+  justify-content: flex-start;
   gap: var(--space-2);
-  padding: var(--space-2);
+  padding: var(--space-1) var(--space-2);
   border: none;
   border-radius: var(--radius-sm);
   background: none;
@@ -33,7 +43,18 @@
   font: inherit;
   font-size: var(--font-size-sm);
   text-align: left;
+  white-space: nowrap;
   cursor: pointer;
+}
+
+/*
+ * The reset gives every svg `max-width: 100%`, and a flex item shrinks by
+ * default, so a narrow row can squeeze an icon down to nothing while the label
+ * beside it still reads perfectly. Refusing to shrink is what keeps the icon a
+ * fixed 16px whatever the panel does.
+ */
+.item svg {
+  flex-shrink: 0;
 }
 
 .item:hover {
