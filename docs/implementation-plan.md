@@ -23,7 +23,8 @@ This file is the repository's source of truth for confirmed product decisions, i
 - Project workflow: `Backlog` → `Ready` → `In progress` → `In review` → `Done`.
 - Issue [#1 Initial Setup](https://github.com/fabianespinoza-ravn/ravn-frontend-challenge/issues/1) is closed, was merged through [PR #3](https://github.com/fabianespinoza-ravn/ravn-frontend-challenge/pull/3), and is in `Done` in the GitHub Project.
 - Issue [#4 Dashboard UI](https://github.com/fabianespinoza-ravn/ravn-frontend-challenge/issues/4) is closed, was merged through [PR #5](https://github.com/fabianespinoza-ravn/ravn-frontend-challenge/pull/5), and is in `Done` in the GitHub Project.
-- Issue [#6 GraphQL Data and Creation](https://github.com/fabianespinoza-ravn/ravn-frontend-challenge/issues/6) is the active implementation issue. Its branch is `feat/graphql-task-data`.
+- Issue [#6 GraphQL Data and Creation](https://github.com/fabianespinoza-ravn/ravn-frontend-challenge/issues/6) is closed, was merged through [PR #7](https://github.com/fabianespinoza-ravn/ravn-frontend-challenge/pull/7), and is in `Done` in the GitHub Project.
+- Issue [#8 Task Editing and Deletion](https://github.com/fabianespinoza-ravn/ravn-frontend-challenge/issues/8) is the active implementation issue. Its branch is `feat/task-edit-delete`.
 
 ## Confirmed Folder Structure
 
@@ -322,7 +323,7 @@ The following items are required before product functionality is implemented:
 
 ## GraphQL Data and Creation: Current Scope
 
-**Implementation status:** Complete; the pull request is still to be opened.
+**Implementation status:** Complete.
 **Tracking:** [Issue #6](https://github.com/fabianespinoza-ravn/ravn-frontend-challenge/issues/6) on `feat/graphql-task-data`.
 
 ### Verified API Contracts
@@ -359,6 +360,7 @@ The following items are required before product functionality is implemented:
 - [x] Load users with `GET_USERS` and pass them to the assignee control, which already renders and selects from a supplied list.
 - [x] Connect creation to the confirmed create-task mutation.
 - [x] Add GraphQL operation and state coverage.
+- [x] Open [PR #7](https://github.com/fabianespinoza-ravn/ravn-frontend-challenge/pull/7) linked to Issue #6; its GitHub Actions quality checks passed after a rerun, the first attempt having been cancelled by a GitHub Actions incident that never acquired a runner.
 
 ### Deferred From This Phase
 
@@ -368,6 +370,25 @@ Each of these was reached, judged, and left on purpose rather than missed.
 - The desktop tag control stacks its selected tags downwards, so it grows taller than the four controls beside it now that the row cannot wrap (5.42).
 - A due date is stored as an instant, so a reader across the date line sees the neighbouring calendar day. This is the limit of the representation rather than a defect in the arithmetic (5.45).
 - The design system has no error colour; the accent carries invalid controls and failure messages until it gains one (5.44).
+
+## Task Editing and Deletion: Current Scope
+
+**Implementation status:** In progress.
+**Tracking:** [Issue #8](https://github.com/fabianespinoza-ravn/ravn-frontend-challenge/issues/8) on `feat/task-edit-delete`.
+
+No API verification is required before implementation. Every contract this phase needs was confirmed during the previous one and is recorded above: 5.12 for the fields `updateTask` accepts and for clearing an assignee with an explicit `null`, 5.13 for the `position` limitation that keeps reordering out of scope, and 5.14 for deletion.
+
+### Implementation Progress
+
+- [ ] Rename `features/task-creation` to `features/task-form` and add `features/task-actions`, so no feature has to import a sibling.
+- [ ] Add `toUpdateTaskInput` beside `toCreateTaskInput`, translating an empty assignee to an explicit `null` instead of omitting it.
+- [ ] Open task actions from the existing task-card options control.
+- [ ] Prefill the shared responsive composition from the selected task and connect it to `updateTask`.
+- [ ] Connect deletion to `deleteTask` behind an accessible confirmation step.
+- [ ] Keep Dashboard and My Tasks consistent after a successful mutation.
+- [ ] Add coverage for edit prefill, a successful update, a cleared assignee, a successful deletion, and failure states.
+- [ ] Run final local validation: `format:check`, `typecheck`, `lint`, `test`, and `build`.
+- [ ] Open the pull request linked to Issue #8 and confirm its GitHub Actions quality checks pass.
 
 ## Decision Log
 
@@ -467,3 +488,8 @@ Task creation decisions:
 | 5.6 | Fetch Dashboard tasks with Apollo `useQuery` and derive mapped, chronological presentation data with `useMemo`; do not use `useEffect` or component state for remote fetching. | Apollo owns request, cache, loading, error, and refetch lifecycles, while the component retains only render responsibility.         |
 | 5.7 | Make `TaskBoard` receive presentation tasks through props instead of importing fixtures.                                                                                       | Removes its data-source coupling and allows the static visual component to render API, test, or future filtered data.               |
 | 5.8 | Keep profile retrieval in the shared header and preserve initials fallback until profile data is available or if the query fails.                                              | The authenticated identity is relevant throughout the app and should not block task-board rendering.                                |
+
+### 6. Task Editing and Deletion
+
+- **6.1:** An empty assignee means different things to the two mutations, so each operation gets its own translation from the draft: `toCreateTaskInput` omits `assigneeId` when it is empty, per contract 5.8, and `toUpdateTaskInput` sends an explicit `null`, per contract 5.12. Reusing the creation mapper for an update would let a user clear an assignee, receive a successful response, and find the assignment intact, with nothing anywhere to explain it; the request succeeds, and only the arguments it carried reveal the mistake, which is why the tests assert those arguments rather than that a mutation was called. Two alternatives were rejected. Widening the draft's `assigneeId` to `string | null | undefined` models `updateTask` fully, but it adds a "leave this field alone" state that the composition can never produce, because it edits a complete task rather than a patch; it would touch every field component and the verified creation path in order to represent a case that does not exist. Diffing the current values against the prefilled original computes what changed in order to infer what the API should do, when the draft already states how the task should end up; it cannot diff blindly either, since `position` has to be excluded per 5.13, and it would add a second piece of state that must survive the container swap in 5.14 alongside the draft it is meant to describe. Keeping the difference in the mappers leaves the form, its fields, and the creation path untouched, and puts each rule beside the contract that causes it. **This assumes the composition always submits every field.** A later partial update, such as changing status straight from the task-card menu without opening the form, would break that assumption and reopen the rejected tri-state.
+- **6.2:** `features/task-creation` becomes `features/task-form`, which serves creation and editing alike, and deletion goes to a new `features/task-actions` with the task-card options menu. Naming the whole folder for the form would have misdescribed deletion, which has no form at all. The folder structure already describes `features/` as "user actions such as creating, editing, filtering, and moving tasks", so both belong there as siblings. Neither imports the other: the options menu reports that an edit was requested and `AppLayout` opens the composition, extending the ownership 5.13 already gave it over the single creation state. The rename lands in its own `refactor:` commit before any behavior changes, so the feature diff can be read without import churn; only five files outside the folder refer to it, because everything inside it imports relatively.
