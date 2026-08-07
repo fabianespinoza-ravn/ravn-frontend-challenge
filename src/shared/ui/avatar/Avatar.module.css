@@ -20,6 +20,16 @@
   height: 2.25rem;
 }
 
+/*
+ * Large enough to be the subject of a page rather than a marker beside one, so
+ * it sets its own type size; the shared one is scaled for the other two.
+ */
+.large {
+  width: 6rem;
+  height: 6rem;
+  font-size: var(--font-size-xl);
+}
+
 .image {
   width: 100%;
   height: 100%;

@@ -1,11 +1,12 @@
 # Implementation Plan and Decision Log
 
-> **Status:** Task Editing and Deletion is implemented and in review.
+> **Status:** Settings is implemented and in review.
 > **Last updated:** 2026-08-07
 > **Phase closure:** Initial Setup was merged through [PR #3](https://github.com/fabianespinoza-ravn/ravn-frontend-challenge/pull/3); Issue #1 is closed.
 > **Phase closure:** Dashboard UI was merged through [PR #5](https://github.com/fabianespinoza-ravn/ravn-frontend-challenge/pull/5); Issue #4 is closed.
 > **Phase closure:** GraphQL Data and Creation was merged through [PR #7](https://github.com/fabianespinoza-ravn/ravn-frontend-challenge/pull/7); Issue #6 is closed.
-> **Current phase:** Task Editing and Deletion is tracked through [Issue #8](https://github.com/fabianespinoza-ravn/ravn-frontend-challenge/issues/8) on `feat/task-edit-delete`.
+> **Phase closure:** Task Editing and Deletion was merged through [PR #9](https://github.com/fabianespinoza-ravn/ravn-frontend-challenge/pull/9); Issue #8 is closed.
+> **Current phase:** Settings is tracked through [Issue #10](https://github.com/fabianespinoza-ravn/ravn-frontend-challenge/issues/10) on `feat/settings-route`.
 
 ## Documentation Rule
 
@@ -25,7 +26,8 @@ This file is the repository's source of truth for confirmed product decisions, i
 - Issue [#1 Initial Setup](https://github.com/fabianespinoza-ravn/ravn-frontend-challenge/issues/1) is closed, was merged through [PR #3](https://github.com/fabianespinoza-ravn/ravn-frontend-challenge/pull/3), and is in `Done` in the GitHub Project.
 - Issue [#4 Dashboard UI](https://github.com/fabianespinoza-ravn/ravn-frontend-challenge/issues/4) is closed, was merged through [PR #5](https://github.com/fabianespinoza-ravn/ravn-frontend-challenge/pull/5), and is in `Done` in the GitHub Project.
 - Issue [#6 GraphQL Data and Creation](https://github.com/fabianespinoza-ravn/ravn-frontend-challenge/issues/6) is closed, was merged through [PR #7](https://github.com/fabianespinoza-ravn/ravn-frontend-challenge/pull/7), and is in `Done` in the GitHub Project.
-- Issue [#8 Task Editing and Deletion](https://github.com/fabianespinoza-ravn/ravn-frontend-challenge/issues/8) is the active implementation issue. Its branch is `feat/task-edit-delete`, and it is in review through [PR #9](https://github.com/fabianespinoza-ravn/ravn-frontend-challenge/pull/9).
+- Issue [#8 Task Editing and Deletion](https://github.com/fabianespinoza-ravn/ravn-frontend-challenge/issues/8) is closed, was merged through [PR #9](https://github.com/fabianespinoza-ravn/ravn-frontend-challenge/pull/9), and is in `Done` in the GitHub Project.
+- Issue [#10 Settings](https://github.com/fabianespinoza-ravn/ravn-frontend-challenge/issues/10) is the active implementation issue. Its branch is `feat/settings-route`, and it is in review through [PR #11](https://github.com/fabianespinoza-ravn/ravn-frontend-challenge/pull/11).
 
 ## Confirmed Folder Structure
 
@@ -374,7 +376,7 @@ Each of these was reached, judged, and left on purpose rather than missed.
 
 ## Task Editing and Deletion: Current Scope
 
-**Implementation status:** In progress.
+**Implementation status:** Complete.
 **Tracking:** [Issue #8](https://github.com/fabianespinoza-ravn/ravn-frontend-challenge/issues/8) on `feat/task-edit-delete`.
 
 No behavioral API verification is required before implementation. Every contract this phase needs was confirmed during the previous one and is recorded above: 5.12 for the fields `updateTask` accepts and for clearing an assignee with an explicit `null`, 5.13 for the `position` limitation that keeps reordering out of scope, and 5.14 for deletion.
@@ -394,6 +396,31 @@ The input shapes were read from the schema rather than inferred, through unauthe
 - [x] Add coverage for edit prefill, a successful update, a cleared assignee, a successful deletion, and failure states.
 - [x] Run final local validation: `format:check`, `typecheck`, `lint`, `test`, and `build`.
 - [x] Open [PR #9](https://github.com/fabianespinoza-ravn/ravn-frontend-challenge/pull/9) linked to Issue #8; its GitHub Actions quality checks passed.
+
+## Settings: Current Scope
+
+**Implementation status:** Complete.
+**Tracking:** [Issue #10](https://github.com/fabianespinoza-ravn/ravn-frontend-challenge/issues/10) on `feat/settings-route`.
+
+No API work is required. `GET_PROFILE` and `useProfile` already exist and are read by the shared header, and contract 5.2 records the fields the query returns, including the nullable `avatar`. Schema introspection during the previous phase also confirmed that the only mutations are `createTask`, `updateTask` and `deleteTask`, so this route is read-only because the API is, rather than by choice.
+
+### Implementation Progress
+
+- [x] Replace the Settings placeholder with the authenticated profile: full name, email, avatar, Position, and the month the account was opened.
+- [x] Present `profile.type` in human-readable form as the challenge's "Position" value.
+- [x] Use the accessible avatar fallback when no avatar URL is available.
+- [x] Provide accessible loading and error-with-retry states matching the ones the task routes established.
+- [x] Compose the layout as a decision rather than a match, there being no reference composition for this route; its visual review is deferred below.
+- [x] Add coverage for the rendered profile, the Position wording, the joining month, the avatar fallback, and both states.
+- [x] Run final local validation: `format:check`, `typecheck`, `lint`, `test`, and `build`.
+- [x] Open [PR #11](https://github.com/fabianespinoza-ravn/ravn-frontend-challenge/pull/11) linked to Issue #10; its GitHub Actions quality checks passed.
+
+### Deferred From This Phase
+
+Reached and judged rather than missed.
+
+- The route has not been reviewed in a browser at mobile, tablet, and desktop widths, which every previous phase did before its pull request. It ships on the strength of its tests and a deliberate decision to refine the presentation afterwards, since there is no reference composition to be measured against and the layout is our own proposal. Nothing but its appearance rests on that: the values, their wording, the avatar fallback and both states are covered.
+- `updatedAt` is available and unused. It records when the account last changed, which is not something this page gives a reader any use for.
 
 ## Decision Log
 
@@ -493,6 +520,14 @@ Task creation decisions:
 | 5.6 | Fetch Dashboard tasks with Apollo `useQuery` and derive mapped, chronological presentation data with `useMemo`; do not use `useEffect` or component state for remote fetching. | Apollo owns request, cache, loading, error, and refetch lifecycles, while the component retains only render responsibility.         |
 | 5.7 | Make `TaskBoard` receive presentation tasks through props instead of importing fixtures.                                                                                       | Removes its data-source coupling and allows the static visual component to render API, test, or future filtered data.               |
 | 5.8 | Keep profile retrieval in the shared header and preserve initials fallback until profile data is available or if the query fails.                                              | The authenticated identity is relevant throughout the app and should not block task-board rendering.                                |
+
+### 7. Settings
+
+- **7.1:** The design files carry no Settings composition, so this route's layout is a decision taken here rather than a match to a reference, and the plan says so instead of implying a source that does not exist. It is a single card, centred and capped at `26rem`: there are four values to read, and a card spanning a desktop would leave every label a long way from what it labels. Each value sits under its own label in a description list, so assistive technology announces the pair rather than two loose strings, and the label sits above the value rather than beside it so a long email keeps the full width of the card.
+- **7.5:** The card also shows `Member since`, built from `createdAt`, which the issue had not listed. Four values read thin for a whole route, and this one is already in the query the page makes. It is read in UTC, unlike a task's due date, which 5.45 deliberately reduces to the viewer's own calendar day so that `Today` means today for them: a joining month names a moment in the account's history rather than a day in the reader's, and formatting it locally would move an account opened near a month boundary into the neighbouring month depending on who was looking. Reading it in the stored timezone also makes the assertion hold wherever the suite runs. An unparseable value leaves the row out rather than printing `Invalid Date`.
+- **7.2:** The `Position` wording lives beside `UserType` as `userTypeLabels`, the way task labels live beside their enums (5.20), so no view spells `ADMIN` its own way. The API answers an enum and the challenge asks for a Position, and that translation belongs in one place.
+- **7.3:** `Avatar` gains a `large` size that sets its own type scale. The existing two are markers beside something else; here the avatar is the subject of the page, and the shared initials size was scaled for the small ones. This teaches the primitive a measurement, not a feature, in the same spirit as 5.28.
+- **7.4:** Settings is read-only, and that is the API's shape rather than a choice: schema introspection during the previous phase confirmed the only mutations are `createTask`, `updateTask` and `deleteTask`. The page therefore offers nothing to submit, and says nothing about editing that it cannot honour.
 
 ### 6. Task Editing and Deletion
 
