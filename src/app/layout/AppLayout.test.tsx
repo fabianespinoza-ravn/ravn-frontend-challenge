@@ -515,3 +515,55 @@ describe('AppLayout task deletion and the cache', () => {
     expect(screen.queryByRole('button', { name: 'Retry' })).not.toBeInTheDocument()
   })
 })
+
+describe('AppLayout task editing and the cache', () => {
+  const renamed = 'Renamed task'
+
+  /*
+   * One GET_TASKS mock again, so a refetch would leave the board in its error
+   * state. The card carrying the new title is the proof that the mutation's own
+   * answer reached the board through the cache, with no second request.
+   */
+  it('shows an edited title on the board without asking for the list again', async () => {
+    const user = userEvent.setup()
+
+    renderLayout(
+      <DashboardPage />,
+      [
+        {
+          request: {
+            query: UPDATE_TASK,
+            variables: {
+              input: {
+                assigneeId: null,
+                dueDate: toApiDueDate(toDueDateValue(new Date(mockCreatedTask.dueDate))),
+                id: mockCreatedTask.id,
+                name: renamed,
+                pointEstimate: mockCreatedTask.pointEstimate,
+                status: mockCreatedTask.status,
+                tags: mockCreatedTask.tags,
+              },
+            },
+          },
+          result: { data: { updateTask: { ...mockCreatedTask, name: renamed } } },
+        },
+      ],
+      [mockCreatedTask],
+    )
+
+    expect(await screen.findByRole('article', { name: mockCreatedTask.name })).toBeInTheDocument()
+
+    await user.click(
+      screen.getByRole('button', { name: `More options for ${mockCreatedTask.name}` }),
+    )
+    await user.click(screen.getByRole('menuitem', { name: 'Edit' }))
+
+    const title = screen.getByLabelText('Task Title')
+    await user.clear(title)
+    await user.type(title, renamed)
+    await user.click(screen.getByRole('button', { name: 'Save' }))
+
+    expect(await screen.findByRole('article', { name: renamed })).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Retry' })).not.toBeInTheDocument()
+  })
+})

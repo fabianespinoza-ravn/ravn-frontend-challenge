@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Plus } from 'lucide-react'
 import { Outlet } from 'react-router-dom'
+import { GET_TASKS } from '@/entities/task/api/taskOperations'
 import type { Task } from '@/entities/task/model/task'
 import { TaskActionsContext } from '@/features/task-actions/model/taskActionsContext'
 import { useDeleteTask } from '@/features/task-actions/model/useDeleteTask'
@@ -118,7 +119,20 @@ export function AppLayout() {
     try {
       // `id` belongs to the update input alone, so it narrows the two apart.
       if ('id' in input) {
-        await updateTask({ variables: { input } })
+        /*
+         * The mutation answers with the whole task, and the cache stores it
+         * under its id, so every view showing it updates without being asked
+         * again. The one thing that cannot follow from a value is membership
+         * of a list the server filters: My Tasks asks for one assignee's
+         * tasks, so a reassignment has to move the task in or out of it, and
+         * only the server can say so. Every other field is a value alone.
+         */
+        const hasAssigneeChanged = (editingTask?.assignee?.id ?? '') !== taskForm.values.assigneeId
+
+        await updateTask({
+          variables: { input },
+          ...(hasAssigneeChanged ? { refetchQueries: [GET_TASKS] } : {}),
+        })
       } else {
         await createTask({ variables: { input } })
       }

@@ -1,5 +1,5 @@
 import { useMutation } from '@apollo/client/react'
-import { GET_TASKS, UPDATE_TASK } from '@/entities/task/api/taskOperations'
+import { UPDATE_TASK } from '@/entities/task/api/taskOperations'
 import type { ApiTask } from '@/entities/task/model/apiTask'
 
 export type UpdateTaskData = {
@@ -7,14 +7,19 @@ export type UpdateTaskData = {
 }
 
 /**
- * Saves the edited task and brings the views that list tasks back in step, for
- * the same reason creation does: an edit can move a task to another status or
- * hand it to somebody else, so it can enter or leave a filter the server owns.
- * Refetching `GET_TASKS` by document lets the server answer that instead of
- * this feature guessing which cached filters the task now belongs to.
+ * Saves the edited task and lets the cache carry the result.
+ *
+ * The mutation answers with the whole task under the id it already had, so
+ * every cached result holding that entity re-reads it and the board and My
+ * Tasks change together, without a request whose answer is already in hand.
+ *
+ * There is no blanket refetch here because only one field can do more than
+ * change a value: reassigning a task moves it in or out of the list My Tasks
+ * asks the server to filter. `AppLayout` asks for a refetch in that one case,
+ * where it can see the assignee the task had and the one it is being given.
+ * Status is not such a case, since the board reads every task and groups the
+ * columns itself.
  */
 export function useUpdateTask() {
-  return useMutation<UpdateTaskData>(UPDATE_TASK, {
-    refetchQueries: [GET_TASKS],
-  })
+  return useMutation<UpdateTaskData>(UPDATE_TASK)
 }
