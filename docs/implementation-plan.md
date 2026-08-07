@@ -1,13 +1,13 @@
 # Implementation Plan and Decision Log
 
-> **Status:** Settings is merged; a follow-up scopes the task search to the routes that have tasks.
+> **Status:** Search and filtering is implemented and in review.
 > **Last updated:** 2026-08-07
 > **Phase closure:** Initial Setup was merged through [PR #3](https://github.com/fabianespinoza-ravn/ravn-frontend-challenge/pull/3); Issue #1 is closed.
 > **Phase closure:** Dashboard UI was merged through [PR #5](https://github.com/fabianespinoza-ravn/ravn-frontend-challenge/pull/5); Issue #4 is closed.
 > **Phase closure:** GraphQL Data and Creation was merged through [PR #7](https://github.com/fabianespinoza-ravn/ravn-frontend-challenge/pull/7); Issue #6 is closed.
 > **Phase closure:** Task Editing and Deletion was merged through [PR #9](https://github.com/fabianespinoza-ravn/ravn-frontend-challenge/pull/9); Issue #8 is closed.
 > **Phase closure:** Settings was merged through [PR #11](https://github.com/fabianespinoza-ravn/ravn-frontend-challenge/pull/11); Issue #10 is closed.
-> **Current work:** [Issue #12](https://github.com/fabianespinoza-ravn/ravn-frontend-challenge/issues/12) on `fix/task-search-scope`.
+> **Current work:** [Issue #12](https://github.com/fabianespinoza-ravn/ravn-frontend-challenge/issues/12) on `fix/task-search-scope`, in review through [PR #13](https://github.com/fabianespinoza-ravn/ravn-frontend-challenge/pull/13).
 
 ## Documentation Rule
 
@@ -29,7 +29,7 @@ This file is the repository's source of truth for confirmed product decisions, i
 - Issue [#6 GraphQL Data and Creation](https://github.com/fabianespinoza-ravn/ravn-frontend-challenge/issues/6) is closed, was merged through [PR #7](https://github.com/fabianespinoza-ravn/ravn-frontend-challenge/pull/7), and is in `Done` in the GitHub Project.
 - Issue [#8 Task Editing and Deletion](https://github.com/fabianespinoza-ravn/ravn-frontend-challenge/issues/8) is closed, was merged through [PR #9](https://github.com/fabianespinoza-ravn/ravn-frontend-challenge/pull/9), and is in `Done` in the GitHub Project.
 - Issue [#10 Settings](https://github.com/fabianespinoza-ravn/ravn-frontend-challenge/issues/10) is closed, was merged through [PR #11](https://github.com/fabianespinoza-ravn/ravn-frontend-challenge/pull/11), and is in `Done` in the GitHub Project.
-- Issue [#12](https://github.com/fabianespinoza-ravn/ravn-frontend-challenge/issues/12) is the active work, on `fix/task-search-scope`. It follows the Settings phase rather than opening a new one.
+- Issue [#12 Search and Filter](https://github.com/fabianespinoza-ravn/ravn-frontend-challenge/issues/12) is the active work, on `fix/task-search-scope`, in review through [PR #13](https://github.com/fabianespinoza-ravn/ravn-frontend-challenge/pull/13). It follows the Settings phase rather than opening a new one.
 
 ## Confirmed Folder Structure
 
