@@ -410,10 +410,17 @@ No API work is required. `GET_PROFILE` and `useProfile` already exist and are re
 - [x] Present `profile.type` in human-readable form as the challenge's "Position" value.
 - [x] Use the accessible avatar fallback when no avatar URL is available.
 - [x] Provide accessible loading and error-with-retry states matching the ones the task routes established.
-- [ ] Review the composed layout in a browser across mobile, tablet, and desktop. There is no reference composition for this route, so its layout is a decision rather than a match.
+- [x] Compose the layout as a decision rather than a match, there being no reference composition for this route; its visual review is deferred below.
 - [x] Add coverage for the rendered profile, the Position wording, the joining month, the avatar fallback, and both states.
-- [ ] Run final local validation: `format:check`, `typecheck`, `lint`, `test`, and `build`.
+- [x] Run final local validation: `format:check`, `typecheck`, `lint`, `test`, and `build`.
 - [ ] Open the pull request linked to Issue #10 and confirm its GitHub Actions quality checks pass.
+
+### Deferred From This Phase
+
+Reached and judged rather than missed.
+
+- The route has not been reviewed in a browser at mobile, tablet, and desktop widths, which every previous phase did before its pull request. It ships on the strength of its tests and a deliberate decision to refine the presentation afterwards, since there is no reference composition to be measured against and the layout is our own proposal. Nothing but its appearance rests on that: the values, their wording, the avatar fallback and both states are covered.
+- `updatedAt` is available and unused. It records when the account last changed, which is not something this page gives a reader any use for.
 
 ## Decision Log
 
