@@ -6,7 +6,9 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 import type { MockedResponse } from '@apollo/client/testing'
 import { AppLayout } from './AppLayout'
 import { CREATE_TASK, DELETE_TASK, UPDATE_TASK } from '@/entities/task/api/taskOperations'
+import type { ApiTask } from '@/entities/task/model/apiTask'
 import type { Task } from '@/entities/task/model/task'
+import { DashboardPage } from '@/pages/dashboard/DashboardPage'
 import { TaskActionsMenu } from '@/features/task-actions/ui/TaskActionsMenu'
 import { toApiDueDate, toDueDateValue } from '@/features/task-form/model/dueDate'
 import { createGraphqlMocks, mockCreatedTask } from '@/test/mocks/graphql'
@@ -30,9 +32,13 @@ function resizeTo(width: number) {
   })
 }
 
-function renderLayout(routeElement = <h1>Dashboard</h1>, extraMocks: MockedResponse[] = []) {
+function renderLayout(
+  routeElement = <h1>Dashboard</h1>,
+  extraMocks: MockedResponse[] = [],
+  tasks?: ApiTask[],
+) {
   return render(
-    <MockedProvider mocks={[...createGraphqlMocks(), ...extraMocks]}>
+    <MockedProvider mocks={[...createGraphqlMocks(tasks), ...extraMocks]}>
       <MemoryRouter initialEntries={['/dashboard']}>
         <Routes>
           <Route element={<AppLayout />}>
@@ -470,5 +476,42 @@ describe('AppLayout task deletion', () => {
 
     expect(await screen.findByRole('alert')).toHaveTextContent('could not be deleted')
     expect(screen.getByRole('dialog', { name: 'Delete task' })).toBeInTheDocument()
+  })
+})
+
+describe('AppLayout task deletion and the cache', () => {
+  /*
+   * Exactly one GET_TASKS mock is supplied. A refetch would find nothing to
+   * answer it and the board would show its error state, so reaching the empty
+   * state is what proves the card left without a second request.
+   */
+  it('takes a deleted task off the board without asking for the list again', async () => {
+    const user = userEvent.setup()
+
+    renderLayout(
+      <DashboardPage />,
+      [
+        {
+          request: { query: DELETE_TASK, variables: { input: { id: mockCreatedTask.id } } },
+          result: { data: { deleteTask: mockCreatedTask } },
+        },
+      ],
+      [mockCreatedTask],
+    )
+
+    expect(await screen.findByRole('article', { name: mockCreatedTask.name })).toBeInTheDocument()
+
+    await user.click(
+      screen.getByRole('button', { name: `More options for ${mockCreatedTask.name}` }),
+    )
+    await user.click(screen.getByRole('menuitem', { name: 'Delete' }))
+    await user.click(screen.getByRole('button', { name: 'Delete' }))
+
+    await waitFor(() =>
+      expect(screen.queryByRole('article', { name: mockCreatedTask.name })).not.toBeInTheDocument(),
+    )
+
+    expect(screen.getByRole('heading', { name: 'No tasks are available' })).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Retry' })).not.toBeInTheDocument()
   })
 })
