@@ -1,4 +1,4 @@
-import { getUserInitials, userTypeLabels } from '@/entities/user/model/user'
+import { formatMemberSince, getUserInitials, userTypeLabels } from '@/entities/user/model/user'
 import { useProfile } from '@/entities/user/model/useProfile'
 import { Avatar } from '@/shared/ui/avatar/Avatar'
 import { Button } from '@/shared/ui/button/Button'
@@ -16,6 +16,7 @@ const profileHeadingId = 'settings-profile-name'
 export function SettingsPage() {
   const { data, error, loading, refetch } = useProfile()
   const profile = data?.profile
+  const memberSince = profile ? formatMemberSince(profile.createdAt) : null
 
   return (
     <section className={styles.root}>
@@ -62,6 +63,13 @@ export function SettingsPage() {
               <dt>Position</dt>
               <dd>{userTypeLabels[profile.type]}</dd>
             </div>
+            {/* Only when the stored value is a date we can actually name. */}
+            {memberSince ? (
+              <div className={styles.detail}>
+                <dt>Member since</dt>
+                <dd>{memberSince}</dd>
+              </div>
+            ) : null}
           </dl>
         </article>
       ) : null}

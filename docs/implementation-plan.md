@@ -406,12 +406,12 @@ No API work is required. `GET_PROFILE` and `useProfile` already exist and are re
 
 ### Implementation Progress
 
-- [x] Replace the Settings placeholder with the authenticated profile: full name, email, avatar, and Position.
+- [x] Replace the Settings placeholder with the authenticated profile: full name, email, avatar, Position, and the month the account was opened.
 - [x] Present `profile.type` in human-readable form as the challenge's "Position" value.
 - [x] Use the accessible avatar fallback when no avatar URL is available.
 - [x] Provide accessible loading and error-with-retry states matching the ones the task routes established.
 - [ ] Review the composed layout in a browser across mobile, tablet, and desktop. There is no reference composition for this route, so its layout is a decision rather than a match.
-- [x] Add coverage for the rendered profile, the Position wording, the avatar fallback, and both states.
+- [x] Add coverage for the rendered profile, the Position wording, the joining month, the avatar fallback, and both states.
 - [ ] Run final local validation: `format:check`, `typecheck`, `lint`, `test`, and `build`.
 - [ ] Open the pull request linked to Issue #10 and confirm its GitHub Actions quality checks pass.
 
@@ -517,6 +517,7 @@ Task creation decisions:
 ### 7. Settings
 
 - **7.1:** The design files carry no Settings composition, so this route's layout is a decision taken here rather than a match to a reference, and the plan says so instead of implying a source that does not exist. It is a single card, centred and capped at `26rem`: there are four values to read, and a card spanning a desktop would leave every label a long way from what it labels. Each value sits under its own label in a description list, so assistive technology announces the pair rather than two loose strings, and the label sits above the value rather than beside it so a long email keeps the full width of the card.
+- **7.5:** The card also shows `Member since`, built from `createdAt`, which the issue had not listed. Four values read thin for a whole route, and this one is already in the query the page makes. It is read in UTC, unlike a task's due date, which 5.45 deliberately reduces to the viewer's own calendar day so that `Today` means today for them: a joining month names a moment in the account's history rather than a day in the reader's, and formatting it locally would move an account opened near a month boundary into the neighbouring month depending on who was looking. Reading it in the stored timezone also makes the assertion hold wherever the suite runs. An unparseable value leaves the row out rather than printing `Invalid Date`.
 - **7.2:** The `Position` wording lives beside `UserType` as `userTypeLabels`, the way task labels live beside their enums (5.20), so no view spells `ADMIN` its own way. The API answers an enum and the challenge asks for a Position, and that translation belongs in one place.
 - **7.3:** `Avatar` gains a `large` size that sets its own type scale. The existing two are markers beside something else; here the avatar is the subject of the page, and the shared initials size was scaled for the small ones. This teaches the primitive a measurement, not a feature, in the same spirit as 5.28.
 - **7.4:** Settings is read-only, and that is the API's shape rather than a choice: schema introspection during the previous phase confirmed the only mutations are `createTask`, `updateTask` and `deleteTask`. The page therefore offers nothing to submit, and says nothing about editing that it cannot honour.

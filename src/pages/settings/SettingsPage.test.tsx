@@ -36,6 +36,26 @@ describe('SettingsPage', () => {
     expect(screen.getByText('Position')).toBeInTheDocument()
   })
 
+  /*
+   * `mockProfile` was created on 2026-08-04T00:00:00.000Z. Read locally, every
+   * timezone west of UTC would call that August 3rd and a boundary date would
+   * change month, so the value is read in UTC and this assertion holds wherever
+   * the suite runs.
+   */
+  it('names the month the account was opened', async () => {
+    renderSettings([profileMock()])
+
+    expect(await screen.findByText('Member since')).toBeInTheDocument()
+    expect(screen.getByText('August 2026')).toBeInTheDocument()
+  })
+
+  it('leaves out the joining month when the stored value is not a date', async () => {
+    renderSettings([profileMock({ ...mockProfile, createdAt: 'not-a-date' })])
+
+    expect(await screen.findByText('Position')).toBeInTheDocument()
+    expect(screen.queryByText('Member since')).not.toBeInTheDocument()
+  })
+
   /* The API answers an enum; the page owes the reader a word. */
   it('spells each user type the way the challenge asks for it', async () => {
     renderSettings([profileMock()])
