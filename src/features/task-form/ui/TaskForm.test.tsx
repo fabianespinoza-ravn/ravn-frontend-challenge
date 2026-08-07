@@ -6,7 +6,7 @@ import { mockProfile } from '@/test/mocks/graphql'
 import { formatDueDateLabel, longMonthNames, toDueDateValue } from '../model/dueDate'
 import { taskFormId } from '../model/taskForm'
 import { useTaskFormState } from '../model/useTaskFormState'
-import fieldStyles from './fields/FieldDropdown.module.css'
+import fieldStyles from '@/shared/ui/field-dropdown/FieldDropdown.module.css'
 import { TaskForm } from './TaskForm'
 
 /* jsdom carries no mobile user agent, so the default keeps the iOS presentation. */

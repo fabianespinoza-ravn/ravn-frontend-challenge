@@ -1,8 +1,9 @@
 import { Circle } from 'lucide-react'
 import { taskStatuses } from '@/entities/task/model/task'
+import { taskFormStatusId } from '../../model/taskForm'
 import type { TaskFormState } from '../../model/useTaskFormState'
-import { FieldDropdown, type FieldVariant } from './FieldDropdown'
-import styles from './FieldDropdown.module.css'
+import { FieldDropdown, type FieldVariant } from '@/shared/ui/field-dropdown/FieldDropdown'
+import styles from '@/shared/ui/field-dropdown/FieldDropdown.module.css'
 
 type StatusFieldProps = {
   form: TaskFormState
@@ -17,6 +18,7 @@ export function StatusField({ form, isInvalid, variant }: StatusFieldProps) {
   return (
     <FieldDropdown
       isFilled={Boolean(selectedStatus)}
+      describedBy={isInvalid ? taskFormStatusId : undefined}
       isInvalid={isInvalid}
       label="Status"
       panelTitle="Status"
