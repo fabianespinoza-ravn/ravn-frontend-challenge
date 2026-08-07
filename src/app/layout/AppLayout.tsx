@@ -7,7 +7,7 @@ import { TaskActionsContext } from '@/features/task-actions/model/taskActionsCon
 import { useDeleteTask } from '@/features/task-actions/model/useDeleteTask'
 import { DeleteTaskDialog } from '@/features/task-actions/ui/DeleteTaskDialog'
 import { TaskFormContext } from '@/features/task-form/model/taskFormContext'
-import { TaskSearchContext } from '@/features/task-search/model/taskSearchContext'
+import { TaskFiltersContext } from '@/features/task-filters/model/taskFiltersContext'
 import {
   toCreateTaskInput,
   toTaskFormValues,
@@ -207,7 +207,7 @@ export function AppLayout() {
   return (
     <TaskFormContext value={taskFormContext}>
       <TaskActionsContext value={taskActionsContext}>
-        <TaskSearchContext value={taskSearchContext}>
+        <TaskFiltersContext value={taskSearchContext}>
           <div
             className={
               isFullPageTaskFormOpen ? `${styles.root} ${styles.isTaskFormOpen}` : styles.root
@@ -277,7 +277,7 @@ export function AppLayout() {
               />
             ) : null}
           </div>
-        </TaskSearchContext>
+        </TaskFiltersContext>
       </TaskActionsContext>
     </TaskFormContext>
   )

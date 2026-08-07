@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react'
-import { TaskSearchContext } from '@/features/task-search/model/taskSearchContext'
+import { TaskFiltersContext } from '@/features/task-filters/model/taskFiltersContext'
 
-type TaskSearchTestProviderProps = {
+type TaskFiltersTestProviderProps = {
   /** What a query would filter by; defaults to searching for nothing. */
   appliedTerm?: string
   children: ReactNode
@@ -14,11 +14,11 @@ type TaskSearchTestProviderProps = {
  * a unit test of the header or either task view does not need the complete
  * application shell.
  */
-export function TaskSearchTestProvider({
+export function TaskFiltersTestProvider({
   appliedTerm = '',
   children,
   setTerm = () => {},
   term = '',
-}: TaskSearchTestProviderProps) {
-  return <TaskSearchContext value={{ appliedTerm, setTerm, term }}>{children}</TaskSearchContext>
+}: TaskFiltersTestProviderProps) {
+  return <TaskFiltersContext value={{ appliedTerm, setTerm, term }}>{children}</TaskFiltersContext>
 }

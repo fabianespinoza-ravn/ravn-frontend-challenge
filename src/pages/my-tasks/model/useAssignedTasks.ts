@@ -4,7 +4,7 @@ import { GET_TASKS } from '@/entities/task/api/taskOperations'
 import type { ApiTask, TaskFilterInput } from '@/entities/task/model/apiTask'
 import { mapApiTaskToTask } from '@/entities/task/model/taskMapper'
 import { useProfile } from '@/entities/user/model/useProfile'
-import { useTaskSearch } from '@/features/task-search/model/useTaskSearch'
+import { useTaskFilters } from '@/features/task-filters/model/useTaskFilters'
 
 type TasksQueryData = {
   tasks: ApiTask[]
@@ -21,7 +21,7 @@ function sortTasksByDueDate(firstTask: ApiTask, secondTask: ApiTask) {
 export function useAssignedTasks() {
   const profileQuery = useProfile()
   const profileId = profileQuery.data?.profile.id
-  const { appliedTerm } = useTaskSearch()
+  const { appliedTerm } = useTaskFilters()
   /*
    * Both fields in one input. Contract 5.10 confirmed that different filter
    * fields combine with AND, so searching here stays inside what is assigned to

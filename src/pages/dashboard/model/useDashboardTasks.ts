@@ -3,7 +3,7 @@ import { useCallback, useMemo } from 'react'
 import { GET_TASKS } from '@/entities/task/api/taskOperations'
 import type { ApiTask } from '@/entities/task/model/apiTask'
 import { mapApiTaskToTask } from '@/entities/task/model/taskMapper'
-import { useTaskSearch } from '@/features/task-search/model/useTaskSearch'
+import { useTaskFilters } from '@/features/task-filters/model/useTaskFilters'
 
 type TasksQueryData = {
   tasks: ApiTask[]
@@ -14,7 +14,7 @@ function sortTasksByDueDate(firstTask: ApiTask, secondTask: ApiTask) {
 }
 
 export function useDashboardTasks() {
-  const { appliedTerm } = useTaskSearch()
+  const { appliedTerm } = useTaskFilters()
   /*
    * The server filters, not the client: it owns what a match is, and filtering
    * here would only ever search what happened to be loaded. An empty term sends

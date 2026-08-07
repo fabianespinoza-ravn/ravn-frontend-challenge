@@ -8,7 +8,7 @@ import type { ApiTask } from '@/entities/task/model/apiTask'
 import { GET_PROFILE } from '@/entities/user/api/userOperations'
 import { mockProfile } from '@/test/mocks/graphql'
 import { TaskActionsTestProvider } from '@/test/taskActions'
-import { TaskSearchTestProvider } from '@/test/taskSearch'
+import { TaskFiltersTestProvider } from '@/test/taskFilters'
 import { TaskFormTestProvider } from '@/test/taskForm'
 import { MyTasksPage } from './MyTasksPage'
 
@@ -51,9 +51,9 @@ function renderMyTasks(mocks: MockedResponse[], appliedTerm = '') {
     <MockedProvider mocks={mocks}>
       <TaskFormTestProvider>
         <TaskActionsTestProvider>
-          <TaskSearchTestProvider appliedTerm={appliedTerm}>
+          <TaskFiltersTestProvider appliedTerm={appliedTerm}>
             <MyTasksPage />
-          </TaskSearchTestProvider>
+          </TaskFiltersTestProvider>
         </TaskActionsTestProvider>
       </TaskFormTestProvider>
     </MockedProvider>,

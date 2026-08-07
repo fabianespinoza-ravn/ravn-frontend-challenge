@@ -6,7 +6,7 @@ import { GET_TASKS } from '@/entities/task/api/taskOperations'
 import type { ApiTask } from '@/entities/task/model/apiTask'
 import { mockProfile } from '@/test/mocks/graphql'
 import { TaskActionsTestProvider } from '@/test/taskActions'
-import { TaskSearchTestProvider } from '@/test/taskSearch'
+import { TaskFiltersTestProvider } from '@/test/taskFilters'
 import { TaskFormTestProvider } from '@/test/taskForm'
 import { DashboardPage } from './DashboardPage'
 
@@ -45,9 +45,9 @@ function renderDashboard(
     <MockedProvider mocks={mocks}>
       <TaskFormTestProvider>
         <TaskActionsTestProvider>
-          <TaskSearchTestProvider appliedTerm={appliedTerm}>
+          <TaskFiltersTestProvider appliedTerm={appliedTerm}>
             <DashboardPage />
-          </TaskSearchTestProvider>
+          </TaskFiltersTestProvider>
         </TaskActionsTestProvider>
       </TaskFormTestProvider>
     </MockedProvider>,

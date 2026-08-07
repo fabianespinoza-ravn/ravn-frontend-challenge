@@ -1,6 +1,6 @@
 import { CalendarCheck } from 'lucide-react'
 import { getMobilePlatform } from '@/shared/lib/platform/getMobilePlatform'
-import { formatDueDateLabel } from '../../model/dueDate'
+import { formatDueDateLabel } from '@/shared/lib/date/dueDate'
 import { taskFormStatusId } from '../../model/taskForm'
 import type { TaskFormState } from '../../model/useTaskFormState'
 import { DatePicker } from './DatePicker'

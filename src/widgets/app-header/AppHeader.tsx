@@ -4,7 +4,7 @@ import { Avatar } from '@/shared/ui/avatar/Avatar'
 import { IconButton } from '@/shared/ui/icon-button/IconButton'
 import { getUserInitials } from '@/entities/user/model/user'
 import { useProfile } from '@/entities/user/model/useProfile'
-import { useTaskSearch } from '@/features/task-search/model/useTaskSearch'
+import { useTaskFilters } from '@/features/task-filters/model/useTaskFilters'
 import styles from './AppHeader.module.css'
 
 type AppHeaderProps = {
@@ -20,7 +20,7 @@ type AppHeaderProps = {
 
 export function AppHeader({ hasTaskSearch = true, isAndroid = false }: AppHeaderProps) {
   const { data } = useProfile()
-  const { setTerm, term } = useTaskSearch()
+  const { setTerm, term } = useTaskFilters()
   const profile = data?.profile
   const initials = profile ? getUserInitials(profile.fullName) : 'FE'
 

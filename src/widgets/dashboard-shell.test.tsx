@@ -3,7 +3,7 @@ import { MockedProvider } from '@apollo/client/testing/react'
 import { MemoryRouter } from 'react-router-dom'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { AppHeader } from './app-header/AppHeader'
-import { TaskSearchTestProvider } from '@/test/taskSearch'
+import { TaskFiltersTestProvider } from '@/test/taskFilters'
 import { AppSidebar } from './app-sidebar/AppSidebar'
 import sidebarStyles from './app-sidebar/AppSidebar.module.css'
 import { TaskToolbar } from './task-toolbar/TaskToolbar'
@@ -43,9 +43,9 @@ describe('Dashboard shell', () => {
     render(
       <MockedProvider mocks={createGraphqlMocks()}>
         <MemoryRouter>
-          <TaskSearchTestProvider>
+          <TaskFiltersTestProvider>
             <AppHeader />
-          </TaskSearchTestProvider>
+          </TaskFiltersTestProvider>
         </MemoryRouter>
       </MockedProvider>,
     )
@@ -99,9 +99,9 @@ describe('Dashboard shell', () => {
     render(
       <MockedProvider mocks={createGraphqlMocks()}>
         <MemoryRouter>
-          <TaskSearchTestProvider>
+          <TaskFiltersTestProvider>
             <AppHeader isAndroid />
-          </TaskSearchTestProvider>
+          </TaskFiltersTestProvider>
         </MemoryRouter>
       </MockedProvider>,
     )

@@ -1,6 +1,6 @@
 import { act, cleanup, fireEvent, render, screen, within } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { longMonthNames } from '../../model/dueDate'
+import { longMonthNames } from '@/shared/lib/date/dueDate'
 import { DateWheelPicker } from './DateWheelPicker'
 import styles from './DateWheelPicker.module.css'
 

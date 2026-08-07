@@ -1,7 +1,7 @@
 import { cleanup, render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { formatFullDateLabel } from '../../model/dueDate'
+import { formatFullDateLabel } from '@/shared/lib/date/dueDate'
 import { MaterialDatePicker } from './MaterialDatePicker'
 
 /** 2026-03-10 is a Tuesday, and 2026-03-01 falls on a Sunday. */

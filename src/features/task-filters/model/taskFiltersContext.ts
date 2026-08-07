@@ -1,6 +1,6 @@
 import { createContext } from 'react'
 
-export type TaskSearchContextValue = {
+export type TaskFiltersContextValue = {
   /** What the query filters by. Trails the field, so typing is not a request. */
   appliedTerm: string
   setTerm: (term: string) => void
@@ -13,4 +13,4 @@ export type TaskSearchContextValue = {
  * queries live in the pages beneath it, so neither can own the term; the layout
  * does, and both read it here, the way the task-form trigger works (5.13).
  */
-export const TaskSearchContext = createContext<TaskSearchContextValue | null>(null)
+export const TaskFiltersContext = createContext<TaskFiltersContextValue | null>(null)
