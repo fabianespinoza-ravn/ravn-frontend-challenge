@@ -1,7 +1,7 @@
 import type { FormEvent } from 'react'
 import type { User } from '@/entities/user/model/user'
-import { taskCreationStatusId } from '../model/taskCreationForm'
-import type { TaskCreationForm } from '../model/useTaskCreationForm'
+import { taskFormStatusId } from '../model/taskForm'
+import type { TaskFormState } from '../model/useTaskFormState'
 import { AssigneeField } from './fields/AssigneeField'
 import { DueDateField } from './fields/DueDateField'
 import { EstimateField } from './fields/EstimateField'
@@ -11,7 +11,7 @@ import styles from './TaskMetadataForm.module.css'
 
 type TaskMetadataFormProps = {
   assignees?: User[]
-  form: TaskCreationForm
+  form: TaskFormState
   id: string
   onSubmit?: () => void
 }
@@ -36,7 +36,7 @@ export function TaskMetadataForm({ assignees = [], form, id, onSubmit }: TaskMet
   return (
     <form className={styles.root} id={id} noValidate onSubmit={handleSubmit}>
       <input
-        aria-describedby={missingFields.includes('name') ? taskCreationStatusId : undefined}
+        aria-describedby={missingFields.includes('name') ? taskFormStatusId : undefined}
         aria-invalid={missingFields.includes('name') || undefined}
         aria-label="Task Title"
         autoComplete="off"

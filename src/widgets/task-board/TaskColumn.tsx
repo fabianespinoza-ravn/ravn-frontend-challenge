@@ -1,5 +1,6 @@
 import type { Task } from '@/entities/task/model/task'
 import { TaskCard } from '@/entities/task/ui/TaskCard'
+import { TaskActionsMenu } from '@/features/task-actions/ui/TaskActionsMenu'
 import styles from './TaskColumn.module.css'
 
 type TaskColumnProps = {
@@ -25,7 +26,7 @@ export function TaskColumn({ color, name, tasks }: TaskColumnProps) {
       <ol className={styles.cards}>
         {tasks.map((task) => (
           <li key={task.id}>
-            <TaskCard task={task} />
+            <TaskCard actions={<TaskActionsMenu task={task} />} task={task} />
           </li>
         ))}
       </ol>

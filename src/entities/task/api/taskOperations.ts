@@ -44,3 +44,22 @@ export const CREATE_TASK = gql`
   }
   ${TASK_FIELDS}
 `
+
+export const UPDATE_TASK = gql`
+  mutation UpdateTask($input: UpdateTaskInput!) {
+    updateTask(input: $input) {
+      ...TaskFields
+    }
+  }
+  ${TASK_FIELDS}
+`
+
+/* `deleteTask` returns the task it removed, so it selects the same fields. */
+export const DELETE_TASK = gql`
+  mutation DeleteTask($input: DeleteTaskInput!) {
+    deleteTask(input: $input) {
+      ...TaskFields
+    }
+  }
+  ${TASK_FIELDS}
+`

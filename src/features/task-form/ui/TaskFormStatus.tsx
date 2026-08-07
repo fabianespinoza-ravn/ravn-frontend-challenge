@@ -1,11 +1,7 @@
-import {
-  requiredFieldLabels,
-  taskCreationStatusId,
-  type RequiredField,
-} from '../model/taskCreationForm'
-import styles from './TaskCreationStatus.module.css'
+import { requiredFieldLabels, taskFormStatusId, type RequiredField } from '../model/taskForm'
+import styles from './TaskFormStatus.module.css'
 
-type TaskCreationStatusProps = {
+type TaskFormStatusProps = {
   /** Spacing belongs to the container, which knows where the message sits. */
   className?: string
   hasFailed: boolean
@@ -27,16 +23,12 @@ function formatFieldList(fields: RequiredField[]) {
  * Validation wins when both apply, because a draft that cannot be sent is the
  * more actionable complaint of the two.
  */
-export function TaskCreationStatus({
-  className,
-  hasFailed,
-  missingFields,
-}: TaskCreationStatusProps) {
+export function TaskFormStatus({ className, hasFailed, missingFields }: TaskFormStatusProps) {
   const paragraphClassName = [styles.root, className].filter(Boolean).join(' ')
 
   if (missingFields.length > 0) {
     return (
-      <p className={paragraphClassName} id={taskCreationStatusId} role="alert">
+      <p className={paragraphClassName} id={taskFormStatusId} role="alert">
         {`Add ${formatFieldList(missingFields)} before creating this task.`}
       </p>
     )
@@ -44,7 +36,7 @@ export function TaskCreationStatus({
 
   if (hasFailed) {
     return (
-      <p className={paragraphClassName} id={taskCreationStatusId} role="alert">
+      <p className={paragraphClassName} id={taskFormStatusId} role="alert">
         The task could not be created. Your draft is still here, so you can try again.
       </p>
     )

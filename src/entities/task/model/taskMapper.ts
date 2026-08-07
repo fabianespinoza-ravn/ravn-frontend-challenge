@@ -1,6 +1,5 @@
 import type { ApiTask } from './apiTask'
 import type { Task } from './task'
-import { pointEstimateValues, tagLabels } from './taskLabels'
 import { getUserInitials } from '@/entities/user/model/user'
 
 const millisecondsPerDay = 86_400_000
@@ -92,9 +91,9 @@ export function mapApiTaskToTask(apiTask: ApiTask): Task {
     dueDateLabel: getDueDateLabel(dueDate, dayOffset),
     dueDateTone,
     id: apiTask.id,
-    points: pointEstimateValues[apiTask.pointEstimate],
+    pointEstimate: apiTask.pointEstimate,
     status: apiTask.status,
-    tags: apiTask.tags.map((tag) => tagLabels[tag]),
+    tags: apiTask.tags,
     title: apiTask.name,
   }
 }

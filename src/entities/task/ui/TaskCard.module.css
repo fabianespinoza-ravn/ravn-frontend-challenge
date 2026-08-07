@@ -13,16 +13,20 @@
   gap: var(--space-2);
 }
 
+/*
+ * The title takes the free space so whatever fills the actions slot is pushed
+ * to the right edge, and `flex-start` above keeps it at the top one. Pushing
+ * the control itself with `margin-left: auto` only worked while the slot was a
+ * bare button; the menu wraps it, so the margin landed inside a container that
+ * was already the width of its content.
+ */
 .header h3 {
+  flex: 1;
   margin: var(--space-1) 0 0;
   color: var(--color-text-primary);
   font-size: var(--font-size-sm);
   font-weight: var(--font-weight-semibold);
   line-height: var(--line-height-heading);
-}
-
-.header button {
-  margin-left: auto;
 }
 
 .taskDetails {

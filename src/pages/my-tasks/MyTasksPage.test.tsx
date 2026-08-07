@@ -7,7 +7,8 @@ import { GET_TASKS } from '@/entities/task/api/taskOperations'
 import type { ApiTask } from '@/entities/task/model/apiTask'
 import { GET_PROFILE } from '@/entities/user/api/userOperations'
 import { mockProfile } from '@/test/mocks/graphql'
-import { TaskCreationTestProvider } from '@/test/taskCreation'
+import { TaskActionsTestProvider } from '@/test/taskActions'
+import { TaskFormTestProvider } from '@/test/taskForm'
 import { MyTasksPage } from './MyTasksPage'
 
 type ApolloApiTask = ApiTask & {
@@ -47,9 +48,11 @@ function tasksMock(tasks: ApolloApiTask[]): MockedResponse {
 function renderMyTasks(mocks: MockedResponse[]) {
   return render(
     <MockedProvider mocks={mocks}>
-      <TaskCreationTestProvider>
-        <MyTasksPage />
-      </TaskCreationTestProvider>
+      <TaskFormTestProvider>
+        <TaskActionsTestProvider>
+          <MyTasksPage />
+        </TaskActionsTestProvider>
+      </TaskFormTestProvider>
     </MockedProvider>,
   )
 }

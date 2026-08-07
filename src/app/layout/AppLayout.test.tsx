@@ -5,7 +5,12 @@ import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import type { MockedResponse } from '@apollo/client/testing'
 import { AppLayout } from './AppLayout'
-import { CREATE_TASK } from '@/entities/task/api/taskOperations'
+import { CREATE_TASK, DELETE_TASK, UPDATE_TASK } from '@/entities/task/api/taskOperations'
+import type { ApiTask } from '@/entities/task/model/apiTask'
+import type { Task } from '@/entities/task/model/task'
+import { DashboardPage } from '@/pages/dashboard/DashboardPage'
+import { TaskActionsMenu } from '@/features/task-actions/ui/TaskActionsMenu'
+import { toApiDueDate, toDueDateValue } from '@/features/task-form/model/dueDate'
 import { createGraphqlMocks, mockCreatedTask } from '@/test/mocks/graphql'
 import sidebarStyles from '@/widgets/app-sidebar/AppSidebar.module.css'
 import { TaskToolbar } from '@/widgets/task-toolbar/TaskToolbar'
@@ -27,9 +32,13 @@ function resizeTo(width: number) {
   })
 }
 
-function renderLayout(routeElement = <h1>Dashboard</h1>, extraMocks: MockedResponse[] = []) {
+function renderLayout(
+  routeElement = <h1>Dashboard</h1>,
+  extraMocks: MockedResponse[] = [],
+  tasks?: ApiTask[],
+) {
   return render(
-    <MockedProvider mocks={[...createGraphqlMocks(), ...extraMocks]}>
+    <MockedProvider mocks={[...createGraphqlMocks(tasks), ...extraMocks]}>
       <MemoryRouter initialEntries={['/dashboard']}>
         <Routes>
           <Route element={<AppLayout />}>
@@ -238,7 +247,10 @@ describe('AppLayout task creation', () => {
     // is the API's rather than the profile the header already holds.
     await user.click(await within(panel).findByRole('button', { name: 'Ada Lovelace' }))
 
-    expect(screen.getByRole('button', { name: 'Assignee: Ada Lovelace' })).toBeInTheDocument()
+    /* The name resolves from the users query, so it arrives after the dialog. */
+    expect(
+      await screen.findByRole('button', { name: 'Assignee: Ada Lovelace' }),
+    ).toBeInTheDocument()
   })
 
   it('names the missing fields instead of sending an incomplete draft', async () => {
@@ -301,5 +313,257 @@ describe('AppLayout task creation', () => {
     expect(await screen.findByRole('alert')).toHaveTextContent('The task could not be created')
     expect(screen.getByRole('dialog')).toBeInTheDocument()
     expect(screen.getByLabelText('Task Title')).toHaveValue(draftTitle)
+  })
+})
+
+const assignedTask: Task = {
+  assignee: { id: 'user-2', initials: 'AL', name: 'Ada Lovelace' },
+  attachmentCount: 0,
+  checklistCount: 0,
+  commentCount: 0,
+  dueDate: '2026-08-10T12:00:00.000Z',
+  dueDateLabel: '10 Aug, 2026',
+  dueDateTone: 'future',
+  id: 'task-1',
+  pointEstimate: 'FOUR',
+  status: 'TODO',
+  tags: ['REACT'],
+  title: draftTitle,
+}
+
+/*
+ * Built through the same round trip the draft makes rather than written out, so
+ * the expectation does not become the date-line case 5.45 accepts.
+ */
+function expectedUpdateInput(assigneeId: string | null) {
+  return {
+    assigneeId,
+    dueDate: toApiDueDate(toDueDateValue(new Date(assignedTask.dueDate))),
+    id: assignedTask.id,
+    name: draftTitle,
+    pointEstimate: 'FOUR',
+    status: 'TODO',
+    tags: ['REACT'],
+  }
+}
+
+describe('AppLayout task editing', () => {
+  it('opens the composition already filled with the task its menu belongs to', async () => {
+    const user = userEvent.setup()
+
+    renderLayout(<TaskActionsMenu task={assignedTask} />)
+
+    await user.click(screen.getByRole('button', { name: `More options for ${draftTitle}` }))
+    await user.click(screen.getByRole('menuitem', { name: 'Edit' }))
+
+    expect(screen.getByRole('dialog', { name: 'Edit Task' })).toBeInTheDocument()
+    expect(screen.getByLabelText('Task Title')).toHaveValue(draftTitle)
+    expect(screen.getByRole('button', { name: 'Save' })).toBeInTheDocument()
+
+    /*
+     * The assignee control resolves a name by looking the id up in the users
+     * query, so it can only say who this is once that query answers. The draft
+     * has carried the id since the dialog opened either way, which is why the
+     * request in the next test does not wait for this.
+     */
+    await waitFor(() =>
+      expect(screen.getByRole('button', { name: 'Assignee: Ada Lovelace' })).toBeInTheDocument(),
+    )
+  })
+
+  /*
+   * The mock answers one exact set of variables, so the dialog closing is what
+   * proves the cleared assignee left as an explicit null. Had it been omitted,
+   * the way creation omits it, nothing would have matched and the composition
+   * would still be open — which is the quiet failure 6.1 exists to prevent.
+   */
+  it('clears an assignee by sending an explicit null', async () => {
+    const user = userEvent.setup()
+
+    renderLayout(<TaskActionsMenu task={assignedTask} />, [
+      {
+        request: { query: UPDATE_TASK, variables: { input: expectedUpdateInput(null) } },
+        result: { data: { updateTask: mockCreatedTask } },
+      },
+    ])
+
+    await user.click(screen.getByRole('button', { name: `More options for ${draftTitle}` }))
+    await user.click(screen.getByRole('menuitem', { name: 'Edit' }))
+
+    await user.click(await screen.findByRole('button', { name: 'Assignee: Ada Lovelace' }))
+    await user.click(screen.getByRole('button', { name: 'Unassigned' }))
+
+    await user.click(screen.getByRole('button', { name: 'Save' }))
+
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument())
+  })
+})
+
+describe('AppLayout task deletion', () => {
+  async function openDeleteConfirmation(
+    user: ReturnType<typeof userEvent.setup>,
+    extraMocks: MockedResponse[] = [],
+  ) {
+    renderLayout(<TaskActionsMenu task={assignedTask} />, extraMocks)
+
+    await user.click(screen.getByRole('button', { name: `More options for ${draftTitle}` }))
+    await user.click(screen.getByRole('menuitem', { name: 'Delete' }))
+  }
+
+  /*
+   * The menu is closed by the time this is read, so the dialog has to name the
+   * task itself rather than rely on what was under the pointer.
+   */
+  it('confirms before deleting, naming the task and warning that it is final', async () => {
+    const user = userEvent.setup()
+
+    await openDeleteConfirmation(user)
+
+    const dialog = screen.getByRole('dialog', { name: 'Delete task' })
+
+    expect(within(dialog).getByText(`Delete “${draftTitle}”?`)).toBeInTheDocument()
+    expect(within(dialog).getByText('This cannot be undone.')).toBeInTheDocument()
+  })
+
+  /* Enter on an unread dialog must back out, not destroy the task. */
+  it('places focus on Cancel rather than on the destructive action', async () => {
+    const user = userEvent.setup()
+
+    await openDeleteConfirmation(user)
+
+    expect(screen.getByRole('button', { name: 'Cancel' })).toHaveFocus()
+  })
+
+  it('leaves the task alone when the confirmation is cancelled', async () => {
+    const user = userEvent.setup()
+
+    await openDeleteConfirmation(user)
+    await user.click(screen.getByRole('button', { name: 'Cancel' }))
+
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+  })
+
+  /*
+   * The mock answers one exact id, so the dialog closing is what proves the
+   * confirmed task is the one that was sent.
+   */
+  it('deletes the confirmed task', async () => {
+    const user = userEvent.setup()
+
+    await openDeleteConfirmation(user, [
+      {
+        request: { query: DELETE_TASK, variables: { input: { id: assignedTask.id } } },
+        result: { data: { deleteTask: mockCreatedTask } },
+      },
+    ])
+
+    await user.click(screen.getByRole('button', { name: 'Delete' }))
+
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument())
+  })
+
+  it('keeps the confirmation open and reports a failed deletion', async () => {
+    const user = userEvent.setup()
+
+    await openDeleteConfirmation(user, [
+      {
+        request: { query: DELETE_TASK, variables: { input: { id: assignedTask.id } } },
+        error: new Error('Deletion failed'),
+      },
+    ])
+
+    await user.click(screen.getByRole('button', { name: 'Delete' }))
+
+    expect(await screen.findByRole('alert')).toHaveTextContent('could not be deleted')
+    expect(screen.getByRole('dialog', { name: 'Delete task' })).toBeInTheDocument()
+  })
+})
+
+describe('AppLayout task deletion and the cache', () => {
+  /*
+   * Exactly one GET_TASKS mock is supplied. A refetch would find nothing to
+   * answer it and the board would show its error state, so reaching the empty
+   * state is what proves the card left without a second request.
+   */
+  it('takes a deleted task off the board without asking for the list again', async () => {
+    const user = userEvent.setup()
+
+    renderLayout(
+      <DashboardPage />,
+      [
+        {
+          request: { query: DELETE_TASK, variables: { input: { id: mockCreatedTask.id } } },
+          result: { data: { deleteTask: mockCreatedTask } },
+        },
+      ],
+      [mockCreatedTask],
+    )
+
+    expect(await screen.findByRole('article', { name: mockCreatedTask.name })).toBeInTheDocument()
+
+    await user.click(
+      screen.getByRole('button', { name: `More options for ${mockCreatedTask.name}` }),
+    )
+    await user.click(screen.getByRole('menuitem', { name: 'Delete' }))
+    await user.click(screen.getByRole('button', { name: 'Delete' }))
+
+    await waitFor(() =>
+      expect(screen.queryByRole('article', { name: mockCreatedTask.name })).not.toBeInTheDocument(),
+    )
+
+    expect(screen.getByRole('heading', { name: 'No tasks are available' })).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Retry' })).not.toBeInTheDocument()
+  })
+})
+
+describe('AppLayout task editing and the cache', () => {
+  const renamed = 'Renamed task'
+
+  /*
+   * One GET_TASKS mock again, so a refetch would leave the board in its error
+   * state. The card carrying the new title is the proof that the mutation's own
+   * answer reached the board through the cache, with no second request.
+   */
+  it('shows an edited title on the board without asking for the list again', async () => {
+    const user = userEvent.setup()
+
+    renderLayout(
+      <DashboardPage />,
+      [
+        {
+          request: {
+            query: UPDATE_TASK,
+            variables: {
+              input: {
+                assigneeId: null,
+                dueDate: toApiDueDate(toDueDateValue(new Date(mockCreatedTask.dueDate))),
+                id: mockCreatedTask.id,
+                name: renamed,
+                pointEstimate: mockCreatedTask.pointEstimate,
+                status: mockCreatedTask.status,
+                tags: mockCreatedTask.tags,
+              },
+            },
+          },
+          result: { data: { updateTask: { ...mockCreatedTask, name: renamed } } },
+        },
+      ],
+      [mockCreatedTask],
+    )
+
+    expect(await screen.findByRole('article', { name: mockCreatedTask.name })).toBeInTheDocument()
+
+    await user.click(
+      screen.getByRole('button', { name: `More options for ${mockCreatedTask.name}` }),
+    )
+    await user.click(screen.getByRole('menuitem', { name: 'Edit' }))
+
+    const title = screen.getByLabelText('Task Title')
+    await user.clear(title)
+    await user.type(title, renamed)
+    await user.click(screen.getByRole('button', { name: 'Save' }))
+
+    expect(await screen.findByRole('article', { name: renamed })).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Retry' })).not.toBeInTheDocument()
   })
 })

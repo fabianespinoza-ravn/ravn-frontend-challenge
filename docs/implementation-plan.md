@@ -1,10 +1,11 @@
 # Implementation Plan and Decision Log
 
-> **Status:** GraphQL Data and Creation is implemented and awaiting its pull request.
-> **Last updated:** 2026-08-06
+> **Status:** Task Editing and Deletion is implemented and in review.
+> **Last updated:** 2026-08-07
 > **Phase closure:** Initial Setup was merged through [PR #3](https://github.com/fabianespinoza-ravn/ravn-frontend-challenge/pull/3); Issue #1 is closed.
 > **Phase closure:** Dashboard UI was merged through [PR #5](https://github.com/fabianespinoza-ravn/ravn-frontend-challenge/pull/5); Issue #4 is closed.
-> **Current phase:** GraphQL Data and Creation is tracked through [Issue #6](https://github.com/fabianespinoza-ravn/ravn-frontend-challenge/issues/6) on `feat/graphql-task-data`.
+> **Phase closure:** GraphQL Data and Creation was merged through [PR #7](https://github.com/fabianespinoza-ravn/ravn-frontend-challenge/pull/7); Issue #6 is closed.
+> **Current phase:** Task Editing and Deletion is tracked through [Issue #8](https://github.com/fabianespinoza-ravn/ravn-frontend-challenge/issues/8) on `feat/task-edit-delete`.
 
 ## Documentation Rule
 
@@ -23,7 +24,8 @@ This file is the repository's source of truth for confirmed product decisions, i
 - Project workflow: `Backlog` → `Ready` → `In progress` → `In review` → `Done`.
 - Issue [#1 Initial Setup](https://github.com/fabianespinoza-ravn/ravn-frontend-challenge/issues/1) is closed, was merged through [PR #3](https://github.com/fabianespinoza-ravn/ravn-frontend-challenge/pull/3), and is in `Done` in the GitHub Project.
 - Issue [#4 Dashboard UI](https://github.com/fabianespinoza-ravn/ravn-frontend-challenge/issues/4) is closed, was merged through [PR #5](https://github.com/fabianespinoza-ravn/ravn-frontend-challenge/pull/5), and is in `Done` in the GitHub Project.
-- Issue [#6 GraphQL Data and Creation](https://github.com/fabianespinoza-ravn/ravn-frontend-challenge/issues/6) is the active implementation issue. Its branch is `feat/graphql-task-data`.
+- Issue [#6 GraphQL Data and Creation](https://github.com/fabianespinoza-ravn/ravn-frontend-challenge/issues/6) is closed, was merged through [PR #7](https://github.com/fabianespinoza-ravn/ravn-frontend-challenge/pull/7), and is in `Done` in the GitHub Project.
+- Issue [#8 Task Editing and Deletion](https://github.com/fabianespinoza-ravn/ravn-frontend-challenge/issues/8) is the active implementation issue. Its branch is `feat/task-edit-delete`, and it is in review through [PR #9](https://github.com/fabianespinoza-ravn/ravn-frontend-challenge/pull/9).
 
 ## Confirmed Folder Structure
 
@@ -72,7 +74,7 @@ shared/
 
 - No generic `components` directory is used.
 - New folders are created only when they have an active responsibility; empty placeholder folders are avoided.
-- `features/` became active during the GraphQL phase with `features/task-creation`, which owns the task-creation draft state, its context, and the shared form and modal UI.
+- `features/` became active during the GraphQL phase with `features/task-creation`, which owned the draft state, its context, and the shared form and modal UI. The editing phase renamed it to `features/task-form`, because creation and editing share all of it. The task-card options menu, and deletion after it, live in `features/task-actions`; the two never import each other, because the layout that owns the draft is what the menu asks to open it.
 - Shared UI primitives belong in `shared/ui`; task- and user-specific UI belongs in `entities`.
 - Each feature owns its interaction logic and API mutation/query coordination.
 
@@ -322,7 +324,7 @@ The following items are required before product functionality is implemented:
 
 ## GraphQL Data and Creation: Current Scope
 
-**Implementation status:** Complete; the pull request is still to be opened.
+**Implementation status:** Complete.
 **Tracking:** [Issue #6](https://github.com/fabianespinoza-ravn/ravn-frontend-challenge/issues/6) on `feat/graphql-task-data`.
 
 ### Verified API Contracts
@@ -359,6 +361,7 @@ The following items are required before product functionality is implemented:
 - [x] Load users with `GET_USERS` and pass them to the assignee control, which already renders and selects from a supplied list.
 - [x] Connect creation to the confirmed create-task mutation.
 - [x] Add GraphQL operation and state coverage.
+- [x] Open [PR #7](https://github.com/fabianespinoza-ravn/ravn-frontend-challenge/pull/7) linked to Issue #6; its GitHub Actions quality checks passed after a rerun, the first attempt having been cancelled by a GitHub Actions incident that never acquired a runner.
 
 ### Deferred From This Phase
 
@@ -368,6 +371,29 @@ Each of these was reached, judged, and left on purpose rather than missed.
 - The desktop tag control stacks its selected tags downwards, so it grows taller than the four controls beside it now that the row cannot wrap (5.42).
 - A due date is stored as an instant, so a reader across the date line sees the neighbouring calendar day. This is the limit of the representation rather than a defect in the arithmetic (5.45).
 - The design system has no error colour; the accent carries invalid controls and failure messages until it gains one (5.44).
+
+## Task Editing and Deletion: Current Scope
+
+**Implementation status:** In progress.
+**Tracking:** [Issue #8](https://github.com/fabianespinoza-ravn/ravn-frontend-challenge/issues/8) on `feat/task-edit-delete`.
+
+No behavioral API verification is required before implementation. Every contract this phase needs was confirmed during the previous one and is recorded above: 5.12 for the fields `updateTask` accepts and for clearing an assignee with an explicit `null`, 5.13 for the `position` limitation that keeps reordering out of scope, and 5.14 for deletion.
+
+The input shapes were read from the schema rather than inferred, through unauthenticated introspection, which the endpoint allows even though its queries require a token. `UpdateTaskInput` takes a required `String!` id and leaves every other field optional, with `assigneeId` nullable, so the explicit `null` that 5.12 observed is what the schema is built to accept rather than an accident of the resolver. `DeleteTaskInput` takes only that id. `position` exists on the update input as a `Float`, which is why 5.13 is a rule this codebase has to keep rather than one the schema keeps for it.
+
+### Implementation Progress
+
+- [x] Rename `features/task-creation` to `features/task-form`, since creation and editing share all of it.
+- [x] Keep the API estimate and tags on the presentation model and derive their wording at render, so an edit can send back what the board is showing.
+- [x] Add `features/task-actions` for the task-card options menu, so no feature imports a sibling.
+- [x] Add `toUpdateTaskInput` beside `toCreateTaskInput`, translating an empty assignee to an explicit `null` instead of omitting it.
+- [x] Open task actions from the existing task-card options control.
+- [x] Prefill the shared responsive composition from the selected task and connect it to `updateTask`.
+- [x] Connect deletion to `deleteTask` behind an accessible confirmation step.
+- [x] Keep Dashboard and My Tasks consistent after a successful mutation.
+- [x] Add coverage for edit prefill, a successful update, a cleared assignee, a successful deletion, and failure states.
+- [x] Run final local validation: `format:check`, `typecheck`, `lint`, `test`, and `build`.
+- [x] Open [PR #9](https://github.com/fabianespinoza-ravn/ravn-frontend-challenge/pull/9) linked to Issue #8; its GitHub Actions quality checks passed.
 
 ## Decision Log
 
@@ -467,3 +493,14 @@ Task creation decisions:
 | 5.6 | Fetch Dashboard tasks with Apollo `useQuery` and derive mapped, chronological presentation data with `useMemo`; do not use `useEffect` or component state for remote fetching. | Apollo owns request, cache, loading, error, and refetch lifecycles, while the component retains only render responsibility.         |
 | 5.7 | Make `TaskBoard` receive presentation tasks through props instead of importing fixtures.                                                                                       | Removes its data-source coupling and allows the static visual component to render API, test, or future filtered data.               |
 | 5.8 | Keep profile retrieval in the shared header and preserve initials fallback until profile data is available or if the query fails.                                              | The authenticated identity is relevant throughout the app and should not block task-board rendering.                                |
+
+### 6. Task Editing and Deletion
+
+- **6.1:** An empty assignee means different things to the two mutations, so each operation gets its own translation from the draft: `toCreateTaskInput` omits `assigneeId` when it is empty, per contract 5.8, and `toUpdateTaskInput` sends an explicit `null`, per contract 5.12. Reusing the creation mapper for an update would let a user clear an assignee, receive a successful response, and find the assignment intact, with nothing anywhere to explain it; the request succeeds, and only the arguments it carried reveal the mistake, which is why the tests assert those arguments rather than that a mutation was called. Two alternatives were rejected. Widening the draft's `assigneeId` to `string | null | undefined` models `updateTask` fully, but it adds a "leave this field alone" state that the composition can never produce, because it edits a complete task rather than a patch; it would touch every field component and the verified creation path in order to represent a case that does not exist. Diffing the current values against the prefilled original computes what changed in order to infer what the API should do, when the draft already states how the task should end up; it cannot diff blindly either, since `position` has to be excluded per 5.13, and it would add a second piece of state that must survive the container swap in 5.14 alongside the draft it is meant to describe. Keeping the difference in the mappers leaves the form, its fields, and the creation path untouched, and puts each rule beside the contract that causes it. **This assumes the composition always submits every field.** A later partial update, such as changing status straight from the task-card menu without opening the form, would break that assumption and reopen the rejected tri-state.
+- **6.8:** Editing drops its blanket refetch as well, and `AppLayout` asks for one only when the assignee changed. `updateTask` answers with the whole task under the id it already had, so the normalized cache re-reads it and every view showing that task changes at once; refetching asked the server for an answer already in hand. This is a genuine refinement of 5.43 rather than an exception to it, because 5.43's concern was list membership under a filter the server owns, and exactly one field can still change that: My Tasks asks for one assignee's tasks, so a reassignment moves the task in or out of it. Status does not, since the board reads every task and groups the columns in the client. The condition is decided from information the client already holds, the assignee the task had against the one it is being given, rather than by guessing a server rule — but it is a condition to maintain, and it would need revisiting if My Tasks ever filtered on something else. Five of the six editable fields now reach the board with no request at all. The test supplies one `GET_TASKS` mock and asserts the renamed card appears, and was confirmed to fail against the previous implementation.
+- **6.7:** Deletion updates the cache instead of refetching `GET_TASKS`. Its `update` evicts the deleted entity and collects it, and Apollo drops the dangling references from every cached result, so the card leaves the board and My Tasks at once rather than after a round trip the user waits through. This does not overturn 5.43, which refetches because only the server can say whether a _new_ task belongs in a filter it owns; deletion asks no such question, since a task that no longer exists belongs in no list under any filter, so the eviction is exact rather than a guess at a server rule. The test supplies exactly one `GET_TASKS` mock, so a refetch would leave the board in its error state; reaching the empty state is what proves the card left without a second request, and the test was confirmed to fail against the previous implementation.
+- **6.6:** Deleting is confirmed rather than performed from the menu, because the API offers no way back. The confirmation names the task, since the menu that was pointed at it has closed by the time the dialog is read, and `Cancel` comes first in the markup, which is where the shared `Modal` puts initial focus, so Enter on an unread dialog backs out instead of destroying the task. The task awaiting confirmation is held by the layout rather than by the menu: a successful deletion refetches the board, which unmounts the card the menu belongs to, and a dialog owned by that card would go with it mid-request. A failure keeps the dialog open and says so, matching the error policy the form already follows. The destructive action borrows the accent colour, as 5.44 does for invalid controls, until the design system has one of its own.
+- **6.4:** The assignee control gains an `Unassigned` option. It listed teammates only, which was enough while the field started empty and creation could simply leave it alone, but it meant an assigned task could never be handed back: nothing in the interface could return the draft to the empty value, so the explicit `null` of 6.1 was correct and unreachable at the same time. Wiring the edit flow is what surfaced it — the integration test could not clear an assignee because no control could. The option is offered to creation as well, where it undoes a mis-click, and it reports its own state through `aria-pressed` like every other option in the panel.
+- **6.5:** The menu lives in `features/task-actions` and reads what its actions do from a context the layout provides, rather than receiving them through the board, its columns and the card. `TaskCard` takes an `actions` slot instead, so an entity never reaches for a feature above it, and the widget that composes the card is what puts the menu in it. This is 5.13's arrangement applied again: the layout already owns the single task-form state, and the menu is another control that asks it to open. Both containers then say `Edit Task` and `Save` rather than `Create`, since one composition now serves two mutations.
+- **6.3:** The presentation `Task` carries `pointEstimate` and `tags` exactly as the API spells them, and `TaskCard` and `TaskList` derive their wording through `taskLabels` when they render. The mapper used to convert them on the way in, which suited a board that only had to display them but leaves editing unable to prefill: `4` and `Node.js` cannot name `FOUR` and `NODE_JS` again without an inverse table, and a table read backwards breaks the moment a label is reworded, silently and in the direction that writes to the API. This extends 5.20, which had already made the form and the board read one source for those labels, by making them read one source for the values as well. The loss was not only theoretical — two fixtures carried estimates of `3` and `5`, which no `PointEstimate` can express, and the model had accepted them. The mapper's test asserted the conversion, so the assertions move to a new `TaskCard` test rather than disappearing with it.
+- **6.2:** `features/task-creation` becomes `features/task-form`, which serves creation and editing alike, and deletion goes to a new `features/task-actions` with the task-card options menu. Naming the whole folder for the form would have misdescribed deletion, which has no form at all. The folder structure already describes `features/` as "user actions such as creating, editing, filtering, and moving tasks", so both belong there as siblings. Neither imports the other: the options menu reports that an edit was requested and `AppLayout` opens the composition, extending the ownership 5.13 already gave it over the single creation state. The rename lands in its own `refactor:` commit before any behavior changes, so the feature diff can be read without import churn; only five files outside the folder refer to it, because everything inside it imports relatively.

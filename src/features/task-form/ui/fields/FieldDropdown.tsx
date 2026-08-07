@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react'
-import { taskCreationStatusId } from '../../model/taskCreationForm'
+import { taskFormStatusId } from '../../model/taskForm'
 import styles from './FieldDropdown.module.css'
 
 /**
@@ -119,7 +119,7 @@ export function FieldDropdown({
   return (
     <div className={isRow ? `${styles.root} ${styles.rowRoot}` : styles.root} ref={containerRef}>
       <button
-        aria-describedby={isInvalid ? taskCreationStatusId : undefined}
+        aria-describedby={isInvalid ? taskFormStatusId : undefined}
         aria-expanded={isOpen}
         aria-haspopup="true"
         aria-label={value ? `${label}: ${value}` : label}
