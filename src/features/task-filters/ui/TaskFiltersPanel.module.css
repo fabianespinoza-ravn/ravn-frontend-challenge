@@ -46,14 +46,15 @@
 }
 
 /*
- * Anchored to the right of its trigger, which sits at the right of the toolbar,
- * so the panel opens inwards rather than past the edge.
+ * Anchored to the left of its trigger, so it opens rightward across the board
+ * rather than back over the view toggle beside it. The trigger is not at the
+ * toolbar's right edge — the add-task control is — so there is room that way.
  */
 .panel {
   position: absolute;
   z-index: 2;
   top: calc(100% + var(--space-2));
-  right: 0;
+  left: 0;
   display: grid;
   gap: var(--space-3);
   padding: var(--space-3);

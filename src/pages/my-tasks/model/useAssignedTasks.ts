@@ -51,13 +51,16 @@ export function useAssignedTasks() {
     variables: taskVariables,
   })
 
+  // Keeps the list mounted while a narrowed filter is answered; see 7.x.
+  const apiTasks = tasksQuery.data?.tasks ?? tasksQuery.previousData?.tasks
+
   const tasks = useMemo(
     () =>
       applyClientFilters(
-        [...(tasksQuery.data?.tasks ?? [])].sort(sortTasksByDueDate).map(mapApiTaskToTask),
+        [...(apiTasks ?? [])].sort(sortTasksByDueDate).map(mapApiTaskToTask),
         appliedFilters,
       ),
-    [appliedFilters, tasksQuery.data?.tasks],
+    [apiTasks, appliedFilters],
   )
 
   const retry = useCallback(() => {
@@ -72,7 +75,8 @@ export function useAssignedTasks() {
     error: profileQuery.error ?? tasksQuery.error,
     /* Lets the view say "nothing matches" rather than "nothing is assigned". */
     isFiltered: hasActiveFilters(appliedFilters),
-    isLoading: profileQuery.loading || tasksQuery.loading,
+    isLoading: (profileQuery.loading || tasksQuery.loading) && !tasksQuery.previousData,
+    isRefreshing: tasksQuery.loading && Boolean(tasksQuery.previousData),
     retry,
     tasks,
   }

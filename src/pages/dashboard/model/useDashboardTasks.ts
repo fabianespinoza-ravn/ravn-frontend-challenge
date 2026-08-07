@@ -26,15 +26,24 @@ export function useDashboardTasks() {
    * no `name` at all rather than an empty one.
    */
   const variables = useMemo(() => ({ input: toTaskFilterInput(appliedFilters) }), [appliedFilters])
-  const { data, error, loading, refetch } = useQuery<TasksQueryData>(GET_TASKS, { variables })
+  const { data, error, loading, previousData, refetch } = useQuery<TasksQueryData>(GET_TASKS, {
+    variables,
+  })
+  /*
+   * Narrowing a filter changes the variables, which empties `data` while the
+   * next answer is in flight. Falling back to the previous one keeps the board
+   * mounted: without it every filter change unmounted the whole board, threw
+   * away every card and menu, and replaced them with a loading panel.
+   */
+  const apiTasks = data?.tasks ?? previousData?.tasks
 
   const tasks = useMemo(
     () =>
       applyClientFilters(
-        [...(data?.tasks ?? [])].sort(sortTasksByDueDate).map(mapApiTaskToTask),
+        [...(apiTasks ?? [])].sort(sortTasksByDueDate).map(mapApiTaskToTask),
         appliedFilters,
       ),
-    [appliedFilters, data?.tasks],
+    [apiTasks, appliedFilters],
   )
 
   const retry = useCallback(() => {
@@ -45,7 +54,10 @@ export function useDashboardTasks() {
     error,
     /* Lets the view say "nothing matches" rather than "there are no tasks". */
     isFiltered: hasActiveFilters(appliedFilters),
-    isLoading: loading,
+    /* Only the first answer is worth blanking the view for. */
+    isLoading: loading && !previousData,
+    /* A later one is a refresh, which the board reports without leaving. */
+    isRefreshing: loading && Boolean(previousData),
     retry,
     tasks,
   }

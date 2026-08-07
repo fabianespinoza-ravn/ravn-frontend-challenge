@@ -7,7 +7,7 @@ import { useDashboardTasks } from './model/useDashboardTasks'
 import styles from './DashboardPage.module.css'
 
 export function DashboardPage() {
-  const { error, isFiltered, isLoading, retry, tasks } = useDashboardTasks()
+  const { error, isFiltered, isLoading, isRefreshing, retry, tasks } = useDashboardTasks()
   const { appliedFilters } = useTaskFilters()
 
   return (
@@ -50,7 +50,11 @@ export function DashboardPage() {
           )}
         </section>
       ) : null}
-      {!isLoading && !error && tasks.length > 0 ? <TaskBoard tasks={tasks} /> : null}
+      {!isLoading && !error && tasks.length > 0 ? (
+        <div aria-busy={isRefreshing} className={isRefreshing ? styles.isRefreshing : undefined}>
+          <TaskBoard tasks={tasks} />
+        </div>
+      ) : null}
     </section>
   )
 }
