@@ -174,3 +174,13 @@ describe('MyTasksPage view toggle', () => {
     expect(screen.getByRole('article', { name: assignedTask.name })).toBeInTheDocument()
   })
 })
+
+describe('MyTasksPage assignee column', () => {
+  /* Every row here is already the reader's own, so naming them would repeat. */
+  it('leaves the assignee column out of a list that is entirely one person', async () => {
+    renderMyTasks([profileMock(), tasksMock([assignedTask])])
+
+    expect(await screen.findByRole('heading', { name: 'My Tasks' })).toBeInTheDocument()
+    expect(screen.queryByText('Assignee')).not.toBeInTheDocument()
+  })
+})

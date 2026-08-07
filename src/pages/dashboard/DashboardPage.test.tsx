@@ -4,7 +4,7 @@ import userEvent from '@testing-library/user-event'
 import { afterEach, describe, expect, it } from 'vitest'
 import { GET_TASKS } from '@/entities/task/api/taskOperations'
 import type { ApiTask } from '@/entities/task/model/apiTask'
-import { mockProfile } from '@/test/mocks/graphql'
+import { mockProfile, mockTeammate } from '@/test/mocks/graphql'
 import { TaskActionsTestProvider } from '@/test/taskActions'
 import { emptyTaskFilters } from '@/features/task-filters/model/taskFilters'
 import { TaskFiltersTestProvider } from '@/test/taskFilters'
@@ -206,5 +206,46 @@ describe('DashboardPage view toggle', () => {
       'aria-pressed',
       'false',
     )
+  })
+})
+
+describe('DashboardPage assignee column', () => {
+  const assignedTask: ApolloApiTask = {
+    ...laterTask,
+    assignee: { ...mockTeammate },
+    id: 'task-assigned',
+    name: 'Assigned task',
+  }
+
+  function renderListView(tasks: ApolloApiTask[]) {
+    renderDashboard([
+      { request: { query: GET_TASKS, variables: { input: {} } }, result: { data: { tasks } } },
+    ])
+  }
+
+  /*
+   * The board already shows who holds a task through the avatar on its card.
+   * The list had no such column, because it was built for a route where every
+   * row is the reader's own; here rows can belong to anybody.
+   */
+  it('names who holds each task, with their avatar', async () => {
+    const user = userEvent.setup()
+
+    renderListView([assignedTask])
+    await screen.findByRole('region', { name: 'Task board' })
+    await user.click(screen.getByRole('button', { name: 'Task view' }))
+
+    expect(screen.getByText('Assignee')).toBeInTheDocument()
+    expect(screen.getByText(mockTeammate.fullName)).toBeInTheDocument()
+  })
+
+  it('says so when nobody holds it, rather than leaving the cell blank', async () => {
+    const user = userEvent.setup()
+
+    renderListView([laterTask])
+    await screen.findByRole('region', { name: 'Task board' })
+    await user.click(screen.getByRole('button', { name: 'Task view' }))
+
+    expect(screen.getByText('Unassigned')).toBeInTheDocument()
   })
 })

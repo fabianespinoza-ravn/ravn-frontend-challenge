@@ -3,15 +3,22 @@ import type { Task } from '@/entities/task/model/task'
 import { taskStatuses } from '@/entities/task/model/task'
 import { pointEstimateValues, tagLabels } from '@/entities/task/model/taskLabels'
 import { TaskActionsMenu } from '@/features/task-actions/ui/TaskActionsMenu'
+import { Avatar } from '@/shared/ui/avatar/Avatar'
 import styles from './TaskList.module.css'
 
 type TaskListProps = {
+  /*
+   * Only where rows can belong to different people. My Tasks leaves it out
+   * because every row there is already the reader's own, which is the same
+   * reason the static phase never gave that route the column.
+   */
+  hasAssigneeColumn?: boolean
   tasks: Task[]
   /* It renders on both task routes now, so it is told what it is listing. */
   title?: string
 }
 
-export function TaskList({ tasks, title = 'My Tasks' }: TaskListProps) {
+export function TaskList({ hasAssigneeColumn = false, tasks, title = 'My Tasks' }: TaskListProps) {
   const taskCountLabel = `${tasks.length} ${tasks.length === 1 ? 'task' : 'tasks'}`
 
   return (
@@ -21,12 +28,17 @@ export function TaskList({ tasks, title = 'My Tasks' }: TaskListProps) {
         <span>{taskCountLabel}</span>
       </header>
       <div aria-label="Task table" className={styles.tableViewport}>
-        <div className={styles.table}>
+        <div
+          className={
+            hasAssigneeColumn ? `${styles.table} ${styles.hasAssigneeColumn}` : styles.table
+          }
+        >
           <div aria-hidden="true" className={styles.columnHeaders}>
             <span>#</span>
             <span>Task Name</span>
             <span>Task Tags</span>
             <span>Estimate</span>
+            {hasAssigneeColumn ? <span>Assignee</span> : null}
             <span>Due Date</span>
           </div>
           <div className={styles.categories}>
@@ -80,6 +92,16 @@ export function TaskList({ tasks, title = 'My Tasks' }: TaskListProps) {
                             <span className={styles.points}>
                               {pointEstimateValues[task.pointEstimate]} points
                             </span>
+                            {hasAssigneeColumn ? (
+                              task.assignee ? (
+                                <span className={styles.assignee}>
+                                  <Avatar alt="" initials={task.assignee.initials} size="small" />
+                                  <span className={styles.assigneeName}>{task.assignee.name}</span>
+                                </span>
+                              ) : (
+                                <span className={styles.unassigned}>Unassigned</span>
+                              )
+                            ) : null}
                             <span className={styles.dueDate}>{task.dueDateLabel}</span>
                             <TaskActionsMenu task={task} />
                           </article>

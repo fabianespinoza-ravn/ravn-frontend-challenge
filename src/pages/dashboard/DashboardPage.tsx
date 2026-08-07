@@ -62,7 +62,7 @@ export function DashboardPage() {
           {view === 'board' ? (
             <TaskBoard tasks={tasks} />
           ) : (
-            <TaskList tasks={tasks} title="Tasks" />
+            <TaskList hasAssigneeColumn tasks={tasks} title="Tasks" />
           )}
         </div>
       ) : null}
