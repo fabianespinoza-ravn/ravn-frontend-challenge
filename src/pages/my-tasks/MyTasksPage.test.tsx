@@ -150,3 +150,37 @@ describe('MyTasksPage search', () => {
     ).toBeInTheDocument()
   })
 })
+
+describe('MyTasksPage view toggle', () => {
+  it('opens as a list, which is the presentation this route was designed around', async () => {
+    renderMyTasks([profileMock(), tasksMock([assignedTask])])
+
+    expect(await screen.findByRole('heading', { name: 'My Tasks' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Task view' })).toHaveAttribute(
+      'aria-pressed',
+      'true',
+    )
+  })
+
+  it('shows the same assigned tasks as a board once the control is pressed', async () => {
+    const user = userEvent.setup()
+
+    renderMyTasks([profileMock(), tasksMock([assignedTask])])
+    await screen.findByRole('heading', { name: 'My Tasks' })
+
+    await user.click(screen.getByRole('button', { name: 'Dashboard view' }))
+
+    expect(screen.getByRole('region', { name: 'Task board' })).toBeInTheDocument()
+    expect(screen.getByRole('article', { name: assignedTask.name })).toBeInTheDocument()
+  })
+})
+
+describe('MyTasksPage assignee column', () => {
+  /* Every row here is already the reader's own, so naming them would repeat. */
+  it('leaves the assignee column out of a list that is entirely one person', async () => {
+    renderMyTasks([profileMock(), tasksMock([assignedTask])])
+
+    expect(await screen.findByRole('heading', { name: 'My Tasks' })).toBeInTheDocument()
+    expect(screen.queryByText('Assignee')).not.toBeInTheDocument()
+  })
+})

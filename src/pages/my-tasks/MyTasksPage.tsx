@@ -1,6 +1,8 @@
 import { Button } from '@/shared/ui/button/Button'
 import { TaskList } from '@/widgets/task-list/TaskList'
-import { TaskToolbar } from '@/widgets/task-toolbar/TaskToolbar'
+import { useState } from 'react'
+import { TaskBoard } from '@/widgets/task-board/TaskBoard'
+import { TaskToolbar, type TaskView } from '@/widgets/task-toolbar/TaskToolbar'
 import { emptyResultsHint } from '@/features/task-filters/model/taskFilters'
 import { useTaskFilters } from '@/features/task-filters/model/useTaskFilters'
 import { useAssignedTasks } from './model/useAssignedTasks'
@@ -9,13 +11,14 @@ import styles from './MyTasksPage.module.css'
 export function MyTasksPage() {
   const { error, isFiltered, isLoading, retry, tasks } = useAssignedTasks()
   const { appliedFilters } = useTaskFilters()
+  const [view, setView] = useState<TaskView>('list')
   // The list keeps its own empty categories; only a search that found
   // nothing replaces it, since empty rows would not explain themselves.
   const hasNoMatches = isFiltered && tasks.length === 0
 
   return (
     <section className={styles.root}>
-      <TaskToolbar activeView="list" />
+      <TaskToolbar activeView={view} onSelectView={setView} />
       {isLoading ? (
         <section aria-live="polite" className={styles.state} role="status">
           <h1>Loading assigned tasks</h1>
@@ -37,7 +40,13 @@ export function MyTasksPage() {
           <p>{emptyResultsHint(appliedFilters)}</p>
         </section>
       ) : null}
-      {!isLoading && !error && !hasNoMatches ? <TaskList tasks={tasks} /> : null}
+      {!isLoading && !error && !hasNoMatches ? (
+        view === 'list' ? (
+          <TaskList tasks={tasks} />
+        ) : (
+          <TaskBoard tasks={tasks} />
+        )
+      ) : null}
     </section>
   )
 }

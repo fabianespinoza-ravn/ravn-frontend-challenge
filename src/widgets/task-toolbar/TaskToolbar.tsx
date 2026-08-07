@@ -5,13 +5,24 @@ import { Button } from '@/shared/ui/button/Button'
 import { IconButton } from '@/shared/ui/icon-button/IconButton'
 import styles from './TaskToolbar.module.css'
 
+export type TaskView = 'board' | 'list'
+
 type TaskToolbarProps = {
-  activeView?: 'board' | 'list'
+  activeView?: TaskView
   /* Only the board offers it; My Tasks already is the assignee filter. */
   hasAssigneeFilter?: boolean
+  /*
+   * Absent on a surface that shows one presentation only, where the controls
+   * stay as the reference draws them but report that they lead nowhere.
+   */
+  onSelectView?: (view: TaskView) => void
 }
 
-export function TaskToolbar({ activeView = 'board', hasAssigneeFilter }: TaskToolbarProps) {
+export function TaskToolbar({
+  activeView = 'board',
+  hasAssigneeFilter,
+  onSelectView,
+}: TaskToolbarProps) {
   const { openTaskForm } = useTaskFormContext()
 
   return (
@@ -21,6 +32,8 @@ export function TaskToolbar({ activeView = 'board', hasAssigneeFilter }: TaskToo
           aria-label="Task view"
           aria-pressed={activeView === 'list'}
           className={styles.listButton}
+          disabled={!onSelectView}
+          onClick={() => onSelectView?.('list')}
           size="small"
         >
           <List aria-hidden="true" size={18} />
@@ -30,6 +43,8 @@ export function TaskToolbar({ activeView = 'board', hasAssigneeFilter }: TaskToo
           aria-label="Dashboard view"
           aria-pressed={activeView === 'board'}
           className={styles.boardButton}
+          disabled={!onSelectView}
+          onClick={() => onSelectView?.('board')}
           size="small"
         >
           <Grid2X2 aria-hidden="true" size={18} />
