@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Plus } from 'lucide-react'
-import { Outlet } from 'react-router-dom'
+import { Outlet, useLocation } from 'react-router-dom'
 import { GET_TASKS } from '@/entities/task/api/taskOperations'
 import type { Task } from '@/entities/task/model/task'
 import { TaskActionsContext } from '@/features/task-actions/model/taskActionsContext'
@@ -31,6 +31,13 @@ import styles from './AppLayout.module.css'
  * both open the full-page composition.
  */
 const taskFormModalBreakpoint = 768
+
+/*
+ * Named positively rather than as everything except Settings, so a route added
+ * later has to ask for the task search instead of inheriting one it may have no
+ * tasks for. Not Found is already such a route.
+ */
+const taskRoutes = ['/dashboard', '/my-tasks']
 
 export function AppLayout() {
   const [isNavigationOpen, setIsNavigationOpen] = useState(false)
@@ -64,6 +71,7 @@ export function AppLayout() {
     useDeleteTask()
   const mobilePlatform = getMobilePlatform()
   const isAndroid = mobilePlatform === 'android'
+  const hasTaskSearch = taskRoutes.includes(useLocation().pathname)
 
   useEffect(() => {
     function syncViewport() {
@@ -203,7 +211,9 @@ export function AppLayout() {
             onRequestOpen={() => setIsNavigationOpen(true)}
           />
           <div className={styles.workspace}>
-            {isFullPageTaskFormOpen ? null : <AppHeader isAndroid={isAndroid} />}
+            {isFullPageTaskFormOpen ? null : (
+              <AppHeader hasTaskSearch={hasTaskSearch} isAndroid={isAndroid} />
+            )}
             <main className={isFullPageTaskFormOpen ? styles.addProjectContent : styles.content}>
               {isFullPageTaskFormOpen ? (
                 <AddProjectPage

@@ -44,6 +44,16 @@
   outline: 0;
 }
 
+/*
+ * Takes the width the search would have taken on a route that has no tasks to
+ * search, so the notification and profile controls stay at the right edge
+ * instead of sliding across to meet the left one.
+ */
+.searchSpacer {
+  flex: 1;
+  min-width: 0;
+}
+
 .actions {
   display: flex;
   flex: 0 0 auto;

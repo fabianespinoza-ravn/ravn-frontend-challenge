@@ -1,12 +1,13 @@
 # Implementation Plan and Decision Log
 
-> **Status:** Settings is implemented and in review.
+> **Status:** Settings is merged; a follow-up scopes the task search to the routes that have tasks.
 > **Last updated:** 2026-08-07
 > **Phase closure:** Initial Setup was merged through [PR #3](https://github.com/fabianespinoza-ravn/ravn-frontend-challenge/pull/3); Issue #1 is closed.
 > **Phase closure:** Dashboard UI was merged through [PR #5](https://github.com/fabianespinoza-ravn/ravn-frontend-challenge/pull/5); Issue #4 is closed.
 > **Phase closure:** GraphQL Data and Creation was merged through [PR #7](https://github.com/fabianespinoza-ravn/ravn-frontend-challenge/pull/7); Issue #6 is closed.
 > **Phase closure:** Task Editing and Deletion was merged through [PR #9](https://github.com/fabianespinoza-ravn/ravn-frontend-challenge/pull/9); Issue #8 is closed.
-> **Current phase:** Settings is tracked through [Issue #10](https://github.com/fabianespinoza-ravn/ravn-frontend-challenge/issues/10) on `feat/settings-route`.
+> **Phase closure:** Settings was merged through [PR #11](https://github.com/fabianespinoza-ravn/ravn-frontend-challenge/pull/11); Issue #10 is closed.
+> **Current work:** [Issue #12](https://github.com/fabianespinoza-ravn/ravn-frontend-challenge/issues/12) on `fix/task-search-scope`.
 
 ## Documentation Rule
 
@@ -27,7 +28,8 @@ This file is the repository's source of truth for confirmed product decisions, i
 - Issue [#4 Dashboard UI](https://github.com/fabianespinoza-ravn/ravn-frontend-challenge/issues/4) is closed, was merged through [PR #5](https://github.com/fabianespinoza-ravn/ravn-frontend-challenge/pull/5), and is in `Done` in the GitHub Project.
 - Issue [#6 GraphQL Data and Creation](https://github.com/fabianespinoza-ravn/ravn-frontend-challenge/issues/6) is closed, was merged through [PR #7](https://github.com/fabianespinoza-ravn/ravn-frontend-challenge/pull/7), and is in `Done` in the GitHub Project.
 - Issue [#8 Task Editing and Deletion](https://github.com/fabianespinoza-ravn/ravn-frontend-challenge/issues/8) is closed, was merged through [PR #9](https://github.com/fabianespinoza-ravn/ravn-frontend-challenge/pull/9), and is in `Done` in the GitHub Project.
-- Issue [#10 Settings](https://github.com/fabianespinoza-ravn/ravn-frontend-challenge/issues/10) is the active implementation issue. Its branch is `feat/settings-route`, and it is in review through [PR #11](https://github.com/fabianespinoza-ravn/ravn-frontend-challenge/pull/11).
+- Issue [#10 Settings](https://github.com/fabianespinoza-ravn/ravn-frontend-challenge/issues/10) is closed, was merged through [PR #11](https://github.com/fabianespinoza-ravn/ravn-frontend-challenge/pull/11), and is in `Done` in the GitHub Project.
+- Issue [#12](https://github.com/fabianespinoza-ravn/ravn-frontend-challenge/issues/12) is the active work, on `fix/task-search-scope`. It follows the Settings phase rather than opening a new one.
 
 ## Confirmed Folder Structure
 
@@ -524,6 +526,7 @@ Task creation decisions:
 ### 7. Settings
 
 - **7.1:** The design files carry no Settings composition, so this route's layout is a decision taken here rather than a match to a reference, and the plan says so instead of implying a source that does not exist. It is a single card, centred and capped at `26rem`: there are four values to read, and a card spanning a desktop would leave every label a long way from what it labels. Each value sits under its own label in a description list, so assistive technology announces the pair rather than two loose strings, and the label sits above the value rather than beside it so a long email keeps the full width of the card.
+- **7.6:** The task search is offered only on the routes that list tasks. It lives in the shared header, which the layout renders everywhere, so Settings and Not Found were both showing a field labelled `Search tasks` on a page that has none. The layout decides it, since it is the one that knows which route is showing, and the routes are named positively rather than as everything except Settings, so a route added later has to ask for the search instead of inheriting one it may have nothing to search. A spacer keeps the width the field had, so the notification and profile controls stay at the right edge instead of sliding across. This does not make the search work; wiring it to the API `name` filter recorded in 5.10 is still its own piece of work.
 - **7.5:** The card also shows `Member since`, built from `createdAt`, which the issue had not listed. Four values read thin for a whole route, and this one is already in the query the page makes. It is read in UTC, unlike a task's due date, which 5.45 deliberately reduces to the viewer's own calendar day so that `Today` means today for them: a joining month names a moment in the account's history rather than a day in the reader's, and formatting it locally would move an account opened near a month boundary into the neighbouring month depending on who was looking. Reading it in the stored timezone also makes the assertion hold wherever the suite runs. An unparseable value leaves the row out rather than printing `Invalid Date`.
 - **7.2:** The `Position` wording lives beside `UserType` as `userTypeLabels`, the way task labels live beside their enums (5.20), so no view spells `ADMIN` its own way. The API answers an enum and the challenge asks for a Position, and that translation belongs in one place.
 - **7.3:** `Avatar` gains a `large` size that sets its own type scale. The existing two are markers beside something else; here the avatar is the subject of the page, and the shared initials size was scaled for the small ones. This teaches the primitive a measurement, not a feature, in the same spirit as 5.28.

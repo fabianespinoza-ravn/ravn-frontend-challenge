@@ -567,3 +567,44 @@ describe('AppLayout task editing and the cache', () => {
     expect(screen.queryByRole('button', { name: 'Retry' })).not.toBeInTheDocument()
   })
 })
+
+describe('AppLayout task search', () => {
+  function renderLayoutAt(pathname: string) {
+    return render(
+      <MockedProvider mocks={createGraphqlMocks()}>
+        <MemoryRouter initialEntries={[pathname]}>
+          <Routes>
+            <Route element={<AppLayout />}>
+              <Route path="/dashboard" element={<h1>Dashboard</h1>} />
+              <Route path="/settings" element={<h1>Settings</h1>} />
+              <Route path="*" element={<h1>Not found</h1>} />
+            </Route>
+          </Routes>
+        </MemoryRouter>
+      </MockedProvider>,
+    )
+  }
+
+  it('offers the task search on a route that lists tasks', () => {
+    renderLayoutAt('/dashboard')
+
+    expect(screen.getByRole('searchbox', { name: 'Search tasks' })).toBeInTheDocument()
+  })
+
+  /*
+   * The field names what it searches, so a route with no tasks would be
+   * offering something it cannot do.
+   */
+  it('leaves the task search out of settings', () => {
+    renderLayoutAt('/settings')
+
+    expect(screen.queryByRole('searchbox')).not.toBeInTheDocument()
+  })
+
+  /* Named positively, so a route nobody thought about does not inherit one. */
+  it('leaves the task search out of an unknown route', () => {
+    renderLayoutAt('/somewhere-else')
+
+    expect(screen.queryByRole('searchbox')).not.toBeInTheDocument()
+  })
+})

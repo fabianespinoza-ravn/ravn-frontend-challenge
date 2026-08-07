@@ -7,10 +7,17 @@ import { useProfile } from '@/entities/user/model/useProfile'
 import styles from './AppHeader.module.css'
 
 type AppHeaderProps = {
+  /*
+   * The field says what it searches, and it is tasks, so a route without any
+   * has no use for it. The layout decides that, since it is the one that knows
+   * which route is showing; the header defaults to the task views it was built
+   * for.
+   */
+  hasTaskSearch?: boolean
   isAndroid?: boolean
 }
 
-export function AppHeader({ isAndroid = false }: AppHeaderProps) {
+export function AppHeader({ hasTaskSearch = true, isAndroid = false }: AppHeaderProps) {
   const { data } = useProfile()
   const profile = data?.profile
   const initials = profile ? getUserInitials(profile.fullName) : 'FE'
@@ -22,10 +29,15 @@ export function AppHeader({ isAndroid = false }: AppHeaderProps) {
           <Avatar alt="Profile" initials={initials} src={profile?.avatar} />
         </NavLink>
       ) : null}
-      <div className={styles.search}>
-        <Search aria-hidden="true" size={19} />
-        <input aria-label="Search tasks" placeholder="Search" type="search" />
-      </div>
+      {hasTaskSearch ? (
+        <div className={styles.search}>
+          <Search aria-hidden="true" size={19} />
+          <input aria-label="Search tasks" placeholder="Search" type="search" />
+        </div>
+      ) : (
+        /* Holds the space the search left, so the actions stay at the edge. */
+        <span className={styles.searchSpacer} />
+      )}
       <div className={styles.actions}>
         <IconButton aria-label="View notifications" title="View notifications">
           <Bell aria-hidden="true" size={20} />
