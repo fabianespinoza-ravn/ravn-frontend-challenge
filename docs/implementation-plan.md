@@ -1,6 +1,6 @@
 # Implementation Plan and Decision Log
 
-> **Status:** The board and list view toggle is in progress.
+> **Status:** The board and list view toggle is implemented and in review.
 > **Last updated:** 2026-08-07
 > **Phase closure:** Initial Setup was merged through [PR #3](https://github.com/fabianespinoza-ravn/ravn-frontend-challenge/pull/3); Issue #1 is closed.
 > **Phase closure:** Dashboard UI was merged through [PR #5](https://github.com/fabianespinoza-ravn/ravn-frontend-challenge/pull/5); Issue #4 is closed.
@@ -8,7 +8,7 @@
 > **Phase closure:** Task Editing and Deletion was merged through [PR #9](https://github.com/fabianespinoza-ravn/ravn-frontend-challenge/pull/9); Issue #8 is closed.
 > **Phase closure:** Settings was merged through [PR #11](https://github.com/fabianespinoza-ravn/ravn-frontend-challenge/pull/11); Issue #10 is closed.
 > **Phase closure:** Search and Filter was merged through [PR #13](https://github.com/fabianespinoza-ravn/ravn-frontend-challenge/pull/13); Issue #12 is closed.
-> **Current work:** [Issue #14](https://github.com/fabianespinoza-ravn/ravn-frontend-challenge/issues/14) on `feat/view-toggle`.
+> **Current work:** [Issue #14](https://github.com/fabianespinoza-ravn/ravn-frontend-challenge/issues/14) on `feat/view-toggle`, in review through [PR #15](https://github.com/fabianespinoza-ravn/ravn-frontend-challenge/pull/15).
 
 ## Documentation Rule
 
@@ -31,7 +31,7 @@ This file is the repository's source of truth for confirmed product decisions, i
 - Issue [#8 Task Editing and Deletion](https://github.com/fabianespinoza-ravn/ravn-frontend-challenge/issues/8) is closed, was merged through [PR #9](https://github.com/fabianespinoza-ravn/ravn-frontend-challenge/pull/9), and is in `Done` in the GitHub Project.
 - Issue [#10 Settings](https://github.com/fabianespinoza-ravn/ravn-frontend-challenge/issues/10) is closed, was merged through [PR #11](https://github.com/fabianespinoza-ravn/ravn-frontend-challenge/pull/11), and is in `Done` in the GitHub Project.
 - Issue [#12 Search and Filter](https://github.com/fabianespinoza-ravn/ravn-frontend-challenge/issues/12) is closed, was merged through [PR #13](https://github.com/fabianespinoza-ravn/ravn-frontend-challenge/pull/13), and is in `Done` in the GitHub Project.
-- Issue [#14 Board and list views](https://github.com/fabianespinoza-ravn/ravn-frontend-challenge/issues/14) is the active work, on `feat/view-toggle`.
+- Issue [#14 Board and list views](https://github.com/fabianespinoza-ravn/ravn-frontend-challenge/issues/14) is the active work, on `feat/view-toggle`, in review through [PR #15](https://github.com/fabianespinoza-ravn/ravn-frontend-challenge/pull/15).
 
 ## Confirmed Folder Structure
 
