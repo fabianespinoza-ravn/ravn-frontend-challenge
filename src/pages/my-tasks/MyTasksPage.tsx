@@ -5,7 +5,10 @@ import { useAssignedTasks } from './model/useAssignedTasks'
 import styles from './MyTasksPage.module.css'
 
 export function MyTasksPage() {
-  const { error, isLoading, retry, tasks } = useAssignedTasks()
+  const { error, isFiltered, isLoading, retry, tasks } = useAssignedTasks()
+  // The list keeps its own empty categories; only a search that found
+  // nothing replaces it, since empty rows would not explain themselves.
+  const hasNoMatches = isFiltered && tasks.length === 0
 
   return (
     <section className={styles.root}>
@@ -25,7 +28,13 @@ export function MyTasksPage() {
           </Button>
         </section>
       ) : null}
-      {!isLoading && !error ? <TaskList tasks={tasks} /> : null}
+      {!isLoading && !error && hasNoMatches ? (
+        <section className={styles.state}>
+          <h1>No assigned tasks match your search</h1>
+          <p>Search matches the task name exactly as typed, including its capitals.</p>
+        </section>
+      ) : null}
+      {!isLoading && !error && !hasNoMatches ? <TaskList tasks={tasks} /> : null}
     </section>
   )
 }

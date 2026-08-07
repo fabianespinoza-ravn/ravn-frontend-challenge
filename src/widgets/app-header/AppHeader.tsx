@@ -4,6 +4,7 @@ import { Avatar } from '@/shared/ui/avatar/Avatar'
 import { IconButton } from '@/shared/ui/icon-button/IconButton'
 import { getUserInitials } from '@/entities/user/model/user'
 import { useProfile } from '@/entities/user/model/useProfile'
+import { useTaskSearch } from '@/features/task-search/model/useTaskSearch'
 import styles from './AppHeader.module.css'
 
 type AppHeaderProps = {
@@ -19,6 +20,7 @@ type AppHeaderProps = {
 
 export function AppHeader({ hasTaskSearch = true, isAndroid = false }: AppHeaderProps) {
   const { data } = useProfile()
+  const { setTerm, term } = useTaskSearch()
   const profile = data?.profile
   const initials = profile ? getUserInitials(profile.fullName) : 'FE'
 
@@ -32,7 +34,13 @@ export function AppHeader({ hasTaskSearch = true, isAndroid = false }: AppHeader
       {hasTaskSearch ? (
         <div className={styles.search}>
           <Search aria-hidden="true" size={19} />
-          <input aria-label="Search tasks" placeholder="Search" type="search" />
+          <input
+            aria-label="Search tasks"
+            onChange={(event) => setTerm(event.target.value)}
+            placeholder="Search"
+            type="search"
+            value={term}
+          />
         </div>
       ) : (
         /* Holds the space the search left, so the actions stay at the edge. */

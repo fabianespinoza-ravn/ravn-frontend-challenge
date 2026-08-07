@@ -8,6 +8,7 @@ import type { ApiTask } from '@/entities/task/model/apiTask'
 import { GET_PROFILE } from '@/entities/user/api/userOperations'
 import { mockProfile } from '@/test/mocks/graphql'
 import { TaskActionsTestProvider } from '@/test/taskActions'
+import { TaskSearchTestProvider } from '@/test/taskSearch'
 import { TaskFormTestProvider } from '@/test/taskForm'
 import { MyTasksPage } from './MyTasksPage'
 
@@ -45,12 +46,14 @@ function tasksMock(tasks: ApolloApiTask[]): MockedResponse {
   }
 }
 
-function renderMyTasks(mocks: MockedResponse[]) {
+function renderMyTasks(mocks: MockedResponse[], appliedTerm = '') {
   return render(
     <MockedProvider mocks={mocks}>
       <TaskFormTestProvider>
         <TaskActionsTestProvider>
-          <MyTasksPage />
+          <TaskSearchTestProvider appliedTerm={appliedTerm}>
+            <MyTasksPage />
+          </TaskSearchTestProvider>
         </TaskActionsTestProvider>
       </TaskFormTestProvider>
     </MockedProvider>,
@@ -98,5 +101,51 @@ describe('MyTasksPage', () => {
     await user.click(screen.getByRole('button', { name: 'Retry' }))
 
     expect(await screen.findByRole('article', { name: 'Assigned API task' })).toBeInTheDocument()
+  })
+})
+
+describe('MyTasksPage search', () => {
+  /*
+   * Contract 5.10 confirmed that filter fields combine with AND, so the mock
+   * carries both. Matching it is the proof that searching here stays inside
+   * what is assigned to the authenticated user instead of escaping into
+   * everyone's tasks.
+   */
+  it('searches within the assigned tasks rather than across all of them', async () => {
+    renderMyTasks(
+      [
+        profileMock(),
+        {
+          request: {
+            query: GET_TASKS,
+            variables: { input: { assigneeId: mockProfile.id, name: 'Assigned' } },
+          },
+          result: { data: { tasks: [assignedTask] } },
+        },
+      ],
+      'Assigned',
+    )
+
+    expect(await screen.findByText(assignedTask.name)).toBeInTheDocument()
+  })
+
+  it('tells a fruitless search apart from an empty assignment list', async () => {
+    renderMyTasks(
+      [
+        profileMock(),
+        {
+          request: {
+            query: GET_TASKS,
+            variables: { input: { assigneeId: mockProfile.id, name: 'Nothing' } },
+          },
+          result: { data: { tasks: [] } },
+        },
+      ],
+      'Nothing',
+    )
+
+    expect(
+      await screen.findByRole('heading', { name: 'No assigned tasks match your search' }),
+    ).toBeInTheDocument()
   })
 })

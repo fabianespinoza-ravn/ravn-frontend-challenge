@@ -4,6 +4,7 @@ import { GET_TASKS } from '@/entities/task/api/taskOperations'
 import type { ApiTask, TaskFilterInput } from '@/entities/task/model/apiTask'
 import { mapApiTaskToTask } from '@/entities/task/model/taskMapper'
 import { useProfile } from '@/entities/user/model/useProfile'
+import { useTaskSearch } from '@/features/task-search/model/useTaskSearch'
 
 type TasksQueryData = {
   tasks: ApiTask[]
@@ -20,9 +21,20 @@ function sortTasksByDueDate(firstTask: ApiTask, secondTask: ApiTask) {
 export function useAssignedTasks() {
   const profileQuery = useProfile()
   const profileId = profileQuery.data?.profile.id
+  const { appliedTerm } = useTaskSearch()
+  /*
+   * Both fields in one input. Contract 5.10 confirmed that different filter
+   * fields combine with AND, so searching here stays inside what is assigned to
+   * the authenticated user rather than escaping into everyone's tasks.
+   */
   const taskVariables = useMemo(
-    () => ({ input: profileId ? { assigneeId: profileId } : {} }),
-    [profileId],
+    () => ({
+      input: {
+        ...(profileId ? { assigneeId: profileId } : {}),
+        ...(appliedTerm ? { name: appliedTerm } : {}),
+      },
+    }),
+    [appliedTerm, profileId],
   )
   const tasksQuery = useQuery<TasksQueryData, TasksQueryVariables>(GET_TASKS, {
     skip: !profileId,
@@ -44,6 +56,8 @@ export function useAssignedTasks() {
 
   return {
     error: profileQuery.error ?? tasksQuery.error,
+    /* Lets the view say "nothing matches" rather than "nothing is assigned". */
+    isFiltered: appliedTerm !== '',
     isLoading: profileQuery.loading || tasksQuery.loading,
     retry,
     tasks,
