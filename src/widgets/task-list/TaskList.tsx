@@ -1,6 +1,7 @@
 import { ChevronDown, MoreHorizontal } from 'lucide-react'
 import type { Task } from '@/entities/task/model/task'
 import { taskStatuses } from '@/entities/task/model/task'
+import { pointEstimateValues, tagLabels } from '@/entities/task/model/taskLabels'
 import { IconButton } from '@/shared/ui/icon-button/IconButton'
 import styles from './TaskList.module.css'
 
@@ -64,17 +65,19 @@ export function TaskList({ tasks }: TaskListProps) {
                               {task.tags.map((tag) => (
                                 <span
                                   className={
-                                    tag === 'Android'
+                                    tag === 'ANDROID'
                                       ? `${styles.tag} ${styles.isAndroid}`
                                       : styles.tag
                                   }
                                   key={tag}
                                 >
-                                  {tag}
+                                  {tagLabels[tag]}
                                 </span>
                               ))}
                             </div>
-                            <span className={styles.points}>{task.points} points</span>
+                            <span className={styles.points}>
+                              {pointEstimateValues[task.pointEstimate]} points
+                            </span>
                             <span className={styles.dueDate}>{task.dueDateLabel}</span>
                             <IconButton aria-label={`More options for ${task.title}`} size="small">
                               <MoreHorizontal aria-hidden="true" size={18} />

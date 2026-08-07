@@ -1,5 +1,6 @@
 import { CalendarClock, CheckSquare2, MessageCircle, MoreHorizontal, Paperclip } from 'lucide-react'
 import type { Task } from '@/entities/task/model/task'
+import { pointEstimateValues, tagLabels } from '@/entities/task/model/taskLabels'
 import { Avatar } from '@/shared/ui/avatar/Avatar'
 import { IconButton } from '@/shared/ui/icon-button/IconButton'
 import styles from './TaskCard.module.css'
@@ -19,7 +20,7 @@ export function TaskCard({ task }: TaskCardProps) {
       </header>
 
       <div className={styles.taskDetails}>
-        <span>{task.points} points</span>
+        <span>{pointEstimateValues[task.pointEstimate]} points</span>
         <span
           className={
             task.dueDateTone === 'past' ? `${styles.dueDate} ${styles.isOverdue}` : styles.dueDate
@@ -33,10 +34,10 @@ export function TaskCard({ task }: TaskCardProps) {
       <div className={styles.tags}>
         {task.tags.map((tag) => (
           <span
-            className={tag === 'Android' ? `${styles.tag} ${styles.isAndroid}` : styles.tag}
+            className={tag === 'ANDROID' ? `${styles.tag} ${styles.isAndroid}` : styles.tag}
             key={tag}
           >
-            {tag}
+            {tagLabels[tag]}
           </span>
         ))}
       </div>

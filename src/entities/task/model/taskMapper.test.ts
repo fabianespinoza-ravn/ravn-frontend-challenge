@@ -32,12 +32,17 @@ const apiTask: ApiTask = {
 }
 
 describe('mapApiTaskToTask', () => {
-  it('maps API enums and assignee data to the dashboard model', () => {
+  /*
+   * The estimate and the tags travel unchanged now. Converting them here used
+   * to leave the board unable to say what it was showing in the words the API
+   * would accept back, which is what editing has to send.
+   */
+  it('carries the API enums through and shapes the assignee for the board', () => {
     expect(mapApiTaskToTask(apiTask)).toMatchObject({
       assignee: { id: 'user-1', initials: 'LE', name: 'Lena Evans' },
-      points: 4,
+      pointEstimate: 'FOUR',
       status: 'TODO',
-      tags: ['Node.js', 'React'],
+      tags: ['NODE_JS', 'REACT'],
       title: 'GraphQL task',
     })
   })
