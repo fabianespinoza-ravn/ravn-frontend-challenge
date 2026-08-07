@@ -1,12 +1,12 @@
 import { Check, Diamond, Tag } from 'lucide-react'
 import { taskTags } from '@/entities/task/model/apiTask'
 import { tagLabels } from '@/entities/task/model/taskLabels'
-import type { TaskCreationForm } from '../../model/useTaskCreationForm'
+import type { TaskFormState } from '../../model/useTaskFormState'
 import { FieldDropdown, type FieldVariant } from './FieldDropdown'
 import styles from './FieldDropdown.module.css'
 
 type LabelFieldProps = {
-  form: TaskCreationForm
+  form: TaskFormState
   isInvalid?: boolean
   variant?: FieldVariant
 }

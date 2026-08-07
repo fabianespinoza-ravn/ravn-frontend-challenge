@@ -1,7 +1,7 @@
 import { CalendarCheck } from 'lucide-react'
 import { getMobilePlatform } from '@/shared/lib/platform/getMobilePlatform'
 import { formatDueDateLabel } from '../../model/dueDate'
-import type { TaskCreationForm } from '../../model/useTaskCreationForm'
+import type { TaskFormState } from '../../model/useTaskFormState'
 import { DatePicker } from './DatePicker'
 import { DateWheelPicker } from './DateWheelPicker'
 import { MaterialDatePicker } from './MaterialDatePicker'
@@ -9,7 +9,7 @@ import { FieldDropdown, type FieldVariant } from './FieldDropdown'
 import styles from './FieldDropdown.module.css'
 
 type DueDateFieldProps = {
-  form: TaskCreationForm
+  form: TaskFormState
   isInvalid?: boolean
   variant?: FieldVariant
 }

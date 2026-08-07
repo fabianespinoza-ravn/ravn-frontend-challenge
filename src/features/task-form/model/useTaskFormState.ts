@@ -1,22 +1,22 @@
 import { useCallback, useMemo, useState } from 'react'
 import type { TaskTag } from '@/entities/task/model/apiTask'
 import {
-  emptyTaskCreationFormValues,
+  emptyTaskFormValues,
   getMissingFields,
   type RequiredField,
-  type TaskCreationFormValues,
-} from './taskCreationForm'
+  type TaskFormValues,
+} from './taskForm'
 
-export type TaskCreationForm = {
+export type TaskFormState = {
   markSubmitAttempted: () => void
   missingFields: RequiredField[]
   reset: () => void
-  setFieldValue: <TField extends keyof TaskCreationFormValues>(
+  setFieldValue: <TField extends keyof TaskFormValues>(
     field: TField,
-    value: TaskCreationFormValues[TField],
+    value: TaskFormValues[TField],
   ) => void
   toggleTag: (tag: TaskTag) => void
-  values: TaskCreationFormValues
+  values: TaskFormValues
 }
 
 /**
@@ -24,15 +24,12 @@ export type TaskCreationForm = {
  * than by the form itself so the draft survives the responsive container swap
  * between the desktop modal and the mobile full-page composition.
  */
-export function useTaskCreationForm(): TaskCreationForm {
-  const [values, setValues] = useState<TaskCreationFormValues>(emptyTaskCreationFormValues)
+export function useTaskFormState(): TaskFormState {
+  const [values, setValues] = useState<TaskFormValues>(emptyTaskFormValues)
   const [hasAttemptedSubmit, setHasAttemptedSubmit] = useState(false)
 
   const setFieldValue = useCallback(
-    <TField extends keyof TaskCreationFormValues>(
-      field: TField,
-      value: TaskCreationFormValues[TField],
-    ) => {
+    <TField extends keyof TaskFormValues>(field: TField, value: TaskFormValues[TField]) => {
       setValues((currentValues) => ({ ...currentValues, [field]: value }))
     },
     [],
@@ -50,7 +47,7 @@ export function useTaskCreationForm(): TaskCreationForm {
   const markSubmitAttempted = useCallback(() => setHasAttemptedSubmit(true), [])
 
   const reset = useCallback(() => {
-    setValues(emptyTaskCreationFormValues)
+    setValues(emptyTaskFormValues)
     setHasAttemptedSubmit(false)
   }, [])
 

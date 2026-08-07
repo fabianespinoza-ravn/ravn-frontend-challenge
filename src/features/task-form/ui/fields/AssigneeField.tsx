@@ -1,13 +1,13 @@
 import { UserRound } from 'lucide-react'
 import { getUserInitials, type User } from '@/entities/user/model/user'
 import { Avatar } from '@/shared/ui/avatar/Avatar'
-import type { TaskCreationForm } from '../../model/useTaskCreationForm'
+import type { TaskFormState } from '../../model/useTaskFormState'
 import { FieldDropdown, type FieldVariant } from './FieldDropdown'
 import styles from './FieldDropdown.module.css'
 
 type AssigneeFieldProps = {
   assignees: User[]
-  form: TaskCreationForm
+  form: TaskFormState
   variant?: FieldVariant
 }
 

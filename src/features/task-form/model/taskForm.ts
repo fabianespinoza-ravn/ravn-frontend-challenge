@@ -6,12 +6,12 @@ import { toApiDueDate } from './dueDate'
  * Shared identifiers so a container can render its own submit control outside
  * the form element and still target it through the HTML `form` attribute.
  */
-export const taskCreationFormId = 'task-creation-form'
-export const taskCreationTitleId = 'task-creation-title'
+export const taskFormId = 'task-form'
+export const taskFormTitleId = 'task-form-title'
 /** Every control the draft is short of points here, so focusing one reads why. */
-export const taskCreationStatusId = 'task-creation-status'
+export const taskFormStatusId = 'task-form-status'
 
-export type TaskCreationFormValues = {
+export type TaskFormValues = {
   assigneeId: string
   dueDate: string
   name: string
@@ -20,7 +20,7 @@ export type TaskCreationFormValues = {
   tags: TaskTag[]
 }
 
-export const emptyTaskCreationFormValues: TaskCreationFormValues = {
+export const emptyTaskFormValues: TaskFormValues = {
   assigneeId: '',
   dueDate: '',
   name: '',
@@ -43,7 +43,7 @@ export const requiredFieldLabels: Record<RequiredField, string> = {
 }
 
 /** Listed in the order the user meets them, so the summary reads top to bottom. */
-export function getMissingFields(values: TaskCreationFormValues): RequiredField[] {
+export function getMissingFields(values: TaskFormValues): RequiredField[] {
   return requiredFields.filter((field) => {
     if (field === 'name') {
       return values.name.trim() === ''
@@ -64,7 +64,7 @@ export function getMissingFields(values: TaskCreationFormValues): RequiredField[
  * This and `getMissingFields` share one rule, so what the form reports missing
  * and what the request refuses to send can never drift apart.
  */
-export function toCreateTaskInput(values: TaskCreationFormValues): CreateTaskInput | null {
+export function toCreateTaskInput(values: TaskFormValues): CreateTaskInput | null {
   const dueDate = toApiDueDate(values.dueDate)
 
   if (getMissingFields(values).length > 0 || !dueDate) {
@@ -75,8 +75,8 @@ export function toCreateTaskInput(values: TaskCreationFormValues): CreateTaskInp
     ...(values.assigneeId ? { assigneeId: values.assigneeId } : {}),
     dueDate,
     name: values.name.trim(),
-    pointEstimate: values.pointEstimate as Exclude<TaskCreationFormValues['pointEstimate'], ''>,
-    status: values.status as Exclude<TaskCreationFormValues['status'], ''>,
+    pointEstimate: values.pointEstimate as Exclude<TaskFormValues['pointEstimate'], ''>,
+    status: values.status as Exclude<TaskFormValues['status'], ''>,
     tags: values.tags,
   }
 }

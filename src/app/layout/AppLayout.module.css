@@ -12,7 +12,7 @@
  * because only this element spans the viewport: painted lower, the page colour
  * would still show through the content padding and below the last field.
  */
-.isTaskCreationOpen {
+.isTaskFormOpen {
   background: #1c1c1e;
 }
 

@@ -4,8 +4,8 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 import type { User } from '@/entities/user/model/user'
 import { mockProfile } from '@/test/mocks/graphql'
 import { formatDueDateLabel, longMonthNames, toDueDateValue } from '../model/dueDate'
-import { taskCreationFormId } from '../model/taskCreationForm'
-import { useTaskCreationForm } from '../model/useTaskCreationForm'
+import { taskFormId } from '../model/taskForm'
+import { useTaskFormState } from '../model/useTaskFormState'
 import fieldStyles from './fields/FieldDropdown.module.css'
 import { TaskForm } from './TaskForm'
 
@@ -19,9 +19,9 @@ vi.mock('@/shared/lib/platform/getMobilePlatform', () => ({
 const teammates: User[] = [{ ...mockProfile, fullName: 'Jerome Bell', id: 'user-jerome' }]
 
 function TaskFormHarness({ assignees }: { assignees?: User[] }) {
-  const form = useTaskCreationForm()
+  const form = useTaskFormState()
 
-  return <TaskForm assignees={assignees} form={form} id={taskCreationFormId} />
+  return <TaskForm assignees={assignees} form={form} id={taskFormId} />
 }
 
 afterEach(() => {

@@ -3,9 +3,9 @@ import userEvent from '@testing-library/user-event'
 import { afterEach, describe, expect, it } from 'vitest'
 import type { User } from '@/entities/user/model/user'
 import { mockProfile } from '@/test/mocks/graphql'
-import { taskCreationFormId } from '../model/taskCreationForm'
+import { taskFormId } from '../model/taskForm'
 import { formatDueDateLabel, formatFullDateLabel, toDueDateValue } from '../model/dueDate'
-import { useTaskCreationForm } from '../model/useTaskCreationForm'
+import { useTaskFormState } from '../model/useTaskFormState'
 import fieldStyles from './fields/FieldDropdown.module.css'
 import { TaskMetadataForm } from './TaskMetadataForm'
 
@@ -20,9 +20,9 @@ const teammates: User[] = [
 ]
 
 function TaskMetadataFormHarness({ assignees }: { assignees?: User[] }) {
-  const form = useTaskCreationForm()
+  const form = useTaskFormState()
 
-  return <TaskMetadataForm assignees={assignees} form={form} id={taskCreationFormId} />
+  return <TaskMetadataForm assignees={assignees} form={form} id={taskFormId} />
 }
 
 afterEach(cleanup)

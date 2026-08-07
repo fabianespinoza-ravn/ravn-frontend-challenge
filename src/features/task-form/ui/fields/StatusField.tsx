@@ -1,11 +1,11 @@
 import { Circle } from 'lucide-react'
 import { taskStatuses } from '@/entities/task/model/task'
-import type { TaskCreationForm } from '../../model/useTaskCreationForm'
+import type { TaskFormState } from '../../model/useTaskFormState'
 import { FieldDropdown, type FieldVariant } from './FieldDropdown'
 import styles from './FieldDropdown.module.css'
 
 type StatusFieldProps = {
-  form: TaskCreationForm
+  form: TaskFormState
   isInvalid?: boolean
   variant?: FieldVariant
 }

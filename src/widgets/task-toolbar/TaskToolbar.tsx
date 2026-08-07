@@ -1,5 +1,5 @@
 import { Grid2X2, List, Plus } from 'lucide-react'
-import { useTaskCreation } from '@/features/task-creation/model/useTaskCreation'
+import { useTaskFormContext } from '@/features/task-form/model/useTaskFormContext'
 import { Button } from '@/shared/ui/button/Button'
 import { IconButton } from '@/shared/ui/icon-button/IconButton'
 import styles from './TaskToolbar.module.css'
@@ -9,7 +9,7 @@ type TaskToolbarProps = {
 }
 
 export function TaskToolbar({ activeView = 'board' }: TaskToolbarProps) {
-  const { openTaskCreation } = useTaskCreation()
+  const { openTaskForm } = useTaskFormContext()
 
   return (
     <div className={styles.root}>
@@ -36,7 +36,7 @@ export function TaskToolbar({ activeView = 'board' }: TaskToolbarProps) {
       <Button
         aria-label="Add task"
         className={styles.addTaskButton}
-        onClick={openTaskCreation}
+        onClick={openTaskForm}
         type="button"
       >
         <Plus aria-hidden="true" size={19} />

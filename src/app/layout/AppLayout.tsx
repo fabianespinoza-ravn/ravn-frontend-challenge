@@ -1,11 +1,11 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Plus } from 'lucide-react'
 import { Outlet } from 'react-router-dom'
-import { TaskCreationContext } from '@/features/task-creation/model/taskCreationContext'
-import { toCreateTaskInput } from '@/features/task-creation/model/taskCreationForm'
-import { useCreateTask } from '@/features/task-creation/model/useCreateTask'
-import { useTaskCreationForm } from '@/features/task-creation/model/useTaskCreationForm'
-import { TaskCreationModal } from '@/features/task-creation/ui/TaskCreationModal'
+import { TaskFormContext } from '@/features/task-form/model/taskFormContext'
+import { toCreateTaskInput } from '@/features/task-form/model/taskForm'
+import { useCreateTask } from '@/features/task-form/model/useCreateTask'
+import { useTaskFormState } from '@/features/task-form/model/useTaskFormState'
+import { TaskFormModal } from '@/features/task-form/ui/TaskFormModal'
 import { useUsers } from '@/entities/user/model/useUsers'
 import { getMobilePlatform } from '@/shared/lib/platform/getMobilePlatform'
 import { AddProjectPage } from '@/pages/add-project/AddProjectPage'
@@ -20,19 +20,19 @@ import styles from './AppLayout.module.css'
  * creation entry points are Add Project and the Android action button, which
  * both open the full-page composition.
  */
-const taskCreationModalBreakpoint = 768
+const taskFormModalBreakpoint = 768
 
 export function AppLayout() {
   const [isNavigationOpen, setIsNavigationOpen] = useState(false)
-  const [isTaskCreationOpen, setIsTaskCreationOpen] = useState(false)
-  const [supportsTaskCreationModal, setSupportsTaskCreationModal] = useState(
-    () => window.innerWidth >= taskCreationModalBreakpoint,
+  const [isTaskFormOpen, setIsTaskFormOpen] = useState(false)
+  const [supportsTaskFormModal, setSupportsTaskFormModal] = useState(
+    () => window.innerWidth >= taskFormModalBreakpoint,
   )
-  const taskCreationForm = useTaskCreationForm()
-  const resetTaskCreationForm = taskCreationForm.reset
+  const taskForm = useTaskFormState()
+  const resetTaskFormState = taskForm.reset
   // Both containers assign from the same list, so the layout that owns the
   // draft also fetches it, and only once a draft exists to assign.
-  const { data: usersData } = useUsers({ skip: !isTaskCreationOpen })
+  const { data: usersData } = useUsers({ skip: !isTaskFormOpen })
   const [createTask, { error: creationError, loading: isCreatingTask, reset: resetCreation }] =
     useCreateTask()
   const mobilePlatform = getMobilePlatform()
@@ -40,7 +40,7 @@ export function AppLayout() {
 
   useEffect(() => {
     function syncViewport() {
-      setSupportsTaskCreationModal(window.innerWidth >= taskCreationModalBreakpoint)
+      setSupportsTaskFormModal(window.innerWidth >= taskFormModalBreakpoint)
     }
 
     window.addEventListener('resize', syncViewport)
@@ -48,12 +48,12 @@ export function AppLayout() {
     return () => window.removeEventListener('resize', syncViewport)
   }, [])
 
-  const closeTaskCreation = useCallback(() => {
-    setIsTaskCreationOpen(false)
-    resetTaskCreationForm()
+  const closeTaskForm = useCallback(() => {
+    setIsTaskFormOpen(false)
+    resetTaskFormState()
     // Otherwise a failure from this draft would greet the next one.
     resetCreation()
-  }, [resetCreation, resetTaskCreationForm])
+  }, [resetCreation, resetTaskFormState])
 
   /*
    * An incomplete draft never reaches the API: the form has already recorded the
@@ -61,8 +61,8 @@ export function AppLayout() {
    * into field messages instead of a request. A failure leaves the draft open,
    * and the mutation's own error state is what the containers render.
    */
-  const submitTaskCreation = useCallback(async () => {
-    const input = toCreateTaskInput(taskCreationForm.values)
+  const submitTaskForm = useCallback(async () => {
+    const input = toCreateTaskInput(taskForm.values)
 
     if (!input) {
       return
@@ -70,77 +70,75 @@ export function AppLayout() {
 
     try {
       await createTask({ variables: { input } })
-      closeTaskCreation()
+      closeTaskForm()
     } catch {
       // Reported through `creationError`; the draft stays exactly as it was.
     }
-  }, [closeTaskCreation, createTask, taskCreationForm.values])
+  }, [closeTaskForm, createTask, taskForm.values])
 
-  const taskCreation = useMemo(() => ({ openTaskCreation: () => setIsTaskCreationOpen(true) }), [])
+  const taskFormContext = useMemo(() => ({ openTaskForm: () => setIsTaskFormOpen(true) }), [])
 
-  const isFullPageTaskCreationOpen = isTaskCreationOpen && !supportsTaskCreationModal
-  const isModalTaskCreationOpen = isTaskCreationOpen && supportsTaskCreationModal
+  const isFullPageTaskFormOpen = isTaskFormOpen && !supportsTaskFormModal
+  const isModalTaskFormOpen = isTaskFormOpen && supportsTaskFormModal
   // Only the full-page composition hides the current route, so only it takes
   // the active navigation state away from that route.
 
   return (
-    <TaskCreationContext value={taskCreation}>
+    <TaskFormContext value={taskFormContext}>
       <div
-        className={
-          isFullPageTaskCreationOpen ? `${styles.root} ${styles.isTaskCreationOpen}` : styles.root
-        }
+        className={isFullPageTaskFormOpen ? `${styles.root} ${styles.isTaskFormOpen}` : styles.root}
         data-mobile-navigation={isAndroid ? 'drawer' : 'bottom'}
         data-mobile-platform={mobilePlatform}
       >
         <AppSidebar
           isAndroid={isAndroid}
-          isAddProjectOpen={isFullPageTaskCreationOpen}
+          isAddProjectOpen={isFullPageTaskFormOpen}
           isDrawerOpen={isNavigationOpen}
           onNavigate={() => {
             setIsNavigationOpen(false)
-            closeTaskCreation()
+            closeTaskForm()
           }}
-          onRequestAddProject={taskCreation.openTaskCreation}
+          onRequestAddProject={taskFormContext.openTaskForm}
           onRequestClose={() => setIsNavigationOpen(false)}
           onRequestOpen={() => setIsNavigationOpen(true)}
         />
         <div className={styles.workspace}>
-          {isFullPageTaskCreationOpen ? null : <AppHeader isAndroid={isAndroid} />}
-          <main className={isFullPageTaskCreationOpen ? styles.addProjectContent : styles.content}>
-            {isFullPageTaskCreationOpen ? (
+          {isFullPageTaskFormOpen ? null : <AppHeader isAndroid={isAndroid} />}
+          <main className={isFullPageTaskFormOpen ? styles.addProjectContent : styles.content}>
+            {isFullPageTaskFormOpen ? (
               <AddProjectPage
                 assignees={usersData?.users}
-                form={taskCreationForm}
+                form={taskForm}
                 hasFailed={Boolean(creationError)}
                 isSubmitting={isCreatingTask}
-                onClose={closeTaskCreation}
-                onSubmit={submitTaskCreation}
+                onClose={closeTaskForm}
+                onSubmit={submitTaskForm}
               />
             ) : (
               <Outlet />
             )}
           </main>
-          {isAndroid && !isFullPageTaskCreationOpen ? (
+          {isAndroid && !isFullPageTaskFormOpen ? (
             <IconButton
               aria-label="Add Project"
               className={styles.androidAddTaskButton}
-              onClick={taskCreation.openTaskCreation}
+              onClick={taskFormContext.openTaskForm}
             >
               <Plus aria-hidden="true" size={24} />
             </IconButton>
           ) : null}
         </div>
-        {isModalTaskCreationOpen ? (
-          <TaskCreationModal
+        {isModalTaskFormOpen ? (
+          <TaskFormModal
             assignees={usersData?.users}
-            form={taskCreationForm}
+            form={taskForm}
             hasFailed={Boolean(creationError)}
             isSubmitting={isCreatingTask}
-            onClose={closeTaskCreation}
-            onSubmit={submitTaskCreation}
+            onClose={closeTaskForm}
+            onSubmit={submitTaskForm}
           />
         ) : null}
       </div>
-    </TaskCreationContext>
+    </TaskFormContext>
   )
 }

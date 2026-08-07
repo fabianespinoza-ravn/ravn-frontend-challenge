@@ -1,13 +1,13 @@
 import { cleanup, render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { taskCreationFormId } from '@/features/task-creation/model/taskCreationForm'
-import { useTaskCreationForm } from '@/features/task-creation/model/useTaskCreationForm'
+import { taskFormId } from '@/features/task-form/model/taskForm'
+import { useTaskFormState } from '@/features/task-form/model/useTaskFormState'
 import { AddProjectPage } from './AddProjectPage'
 import styles from './AddProjectPage.module.css'
 
 function AddProjectHarness({ onClose }: { onClose: () => void }) {
-  const form = useTaskCreationForm()
+  const form = useTaskFormState()
 
   return <AddProjectPage form={form} onClose={onClose} />
 }
@@ -30,10 +30,7 @@ describe('AddProjectPage', () => {
   it('submits through the form even though its Create control sits outside it', () => {
     render(<AddProjectHarness onClose={vi.fn()} />)
 
-    expect(screen.getByRole('button', { name: 'Create' })).toHaveAttribute(
-      'form',
-      taskCreationFormId,
-    )
+    expect(screen.getByRole('button', { name: 'Create' })).toHaveAttribute('form', taskFormId)
   })
 
   it('highlights Create only once every required field carries a value', async () => {

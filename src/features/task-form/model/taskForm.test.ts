@@ -1,12 +1,12 @@
 import { describe, expect, it } from 'vitest'
 import {
-  emptyTaskCreationFormValues,
+  emptyTaskFormValues,
   getMissingFields,
   toCreateTaskInput,
-  type TaskCreationFormValues,
-} from './taskCreationForm'
+  type TaskFormValues,
+} from './taskForm'
 
-const completeValues: TaskCreationFormValues = {
+const completeValues: TaskFormValues = {
   assigneeId: '',
   dueDate: '2026-03-17',
   name: '  Ship the mutation  ',
@@ -17,7 +17,7 @@ const completeValues: TaskCreationFormValues = {
 
 describe('getMissingFields', () => {
   it('names every required field of an untouched draft, in the order they are met', () => {
-    expect(getMissingFields(emptyTaskCreationFormValues)).toEqual([
+    expect(getMissingFields(emptyTaskFormValues)).toEqual([
       'name',
       'status',
       'pointEstimate',

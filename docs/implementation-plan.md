@@ -73,7 +73,7 @@ shared/
 
 - No generic `components` directory is used.
 - New folders are created only when they have an active responsibility; empty placeholder folders are avoided.
-- `features/` became active during the GraphQL phase with `features/task-creation`, which owns the task-creation draft state, its context, and the shared form and modal UI.
+- `features/` became active during the GraphQL phase with `features/task-creation`, which owned the draft state, its context, and the shared form and modal UI. The editing phase renamed it to `features/task-form`, because creation and editing share all of it. Deletion and the task-card options menu will get their own `features/task-actions`, created with the commit that gives it a responsibility rather than ahead of it.
 - Shared UI primitives belong in `shared/ui`; task- and user-specific UI belongs in `entities`.
 - Each feature owns its interaction logic and API mutation/query coordination.
 
@@ -380,7 +380,8 @@ No API verification is required before implementation. Every contract this phase
 
 ### Implementation Progress
 
-- [ ] Rename `features/task-creation` to `features/task-form` and add `features/task-actions`, so no feature has to import a sibling.
+- [x] Rename `features/task-creation` to `features/task-form`, since creation and editing share all of it.
+- [ ] Add `features/task-actions` for the task-card options menu and deletion, so no feature imports a sibling.
 - [ ] Add `toUpdateTaskInput` beside `toCreateTaskInput`, translating an empty assignee to an explicit `null` instead of omitting it.
 - [ ] Open task actions from the existing task-card options control.
 - [ ] Prefill the shared responsive composition from the selected task and connect it to `updateTask`.

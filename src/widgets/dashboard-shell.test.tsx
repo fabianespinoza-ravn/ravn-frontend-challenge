@@ -7,7 +7,7 @@ import { AppSidebar } from './app-sidebar/AppSidebar'
 import sidebarStyles from './app-sidebar/AppSidebar.module.css'
 import { TaskToolbar } from './task-toolbar/TaskToolbar'
 import { createGraphqlMocks } from '@/test/mocks/graphql'
-import { TaskCreationTestProvider } from '@/test/taskCreation'
+import { TaskFormTestProvider } from '@/test/taskForm'
 
 afterEach(cleanup)
 
@@ -107,12 +107,12 @@ describe('Dashboard shell', () => {
   })
 
   it('renders board view controls and requests task creation from the add-task action', () => {
-    const openTaskCreation = vi.fn()
+    const openTaskForm = vi.fn()
 
     render(
-      <TaskCreationTestProvider openTaskCreation={openTaskCreation}>
+      <TaskFormTestProvider openTaskForm={openTaskForm}>
         <TaskToolbar />
-      </TaskCreationTestProvider>,
+      </TaskFormTestProvider>,
     )
 
     expect(screen.getByRole('button', { name: 'Task view' })).toBeInTheDocument()
@@ -123,6 +123,6 @@ describe('Dashboard shell', () => {
 
     fireEvent.click(screen.getByRole('button', { name: 'Add task' }))
 
-    expect(openTaskCreation).toHaveBeenCalledOnce()
+    expect(openTaskForm).toHaveBeenCalledOnce()
   })
 })
