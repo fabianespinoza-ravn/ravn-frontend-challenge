@@ -7,15 +7,17 @@ import styles from './TaskList.module.css'
 
 type TaskListProps = {
   tasks: Task[]
+  /* It renders on both task routes now, so it is told what it is listing. */
+  title?: string
 }
 
-export function TaskList({ tasks }: TaskListProps) {
+export function TaskList({ tasks, title = 'My Tasks' }: TaskListProps) {
   const taskCountLabel = `${tasks.length} ${tasks.length === 1 ? 'task' : 'tasks'}`
 
   return (
     <section className={styles.root}>
       <header className={styles.header}>
-        <h1>My Tasks</h1>
+        <h1>{title}</h1>
         <span>{taskCountLabel}</span>
       </header>
       <div aria-label="Task table" className={styles.tableViewport}>

@@ -155,3 +155,56 @@ describe('DashboardPage search', () => {
     ).not.toBeInTheDocument()
   })
 })
+
+describe('DashboardPage view toggle', () => {
+  const boardMock = {
+    request: { query: GET_TASKS, variables: { input: {} } },
+    result: { data: { tasks: [laterTask] } },
+  }
+
+  it('opens as a board, which is the presentation it was designed around', async () => {
+    renderDashboard([boardMock])
+
+    expect(await screen.findByRole('region', { name: 'Task board' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Dashboard view' })).toHaveAttribute(
+      'aria-pressed',
+      'true',
+    )
+  })
+
+  /*
+   * The same tasks, told a different way. Both presentations take the same
+   * prop, so nothing about what is shown changes — only how.
+   */
+  it('shows the same tasks as a list once the control is pressed', async () => {
+    const user = userEvent.setup()
+
+    renderDashboard([boardMock])
+
+    expect(await screen.findByRole('region', { name: 'Task board' })).toBeInTheDocument()
+
+    await user.click(screen.getByRole('button', { name: 'Task view' }))
+
+    expect(screen.queryByRole('region', { name: 'Task board' })).not.toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Tasks' })).toBeInTheDocument()
+    expect(screen.getByText(laterTask.name)).toBeInTheDocument()
+  })
+
+  it('reports exactly one active view at a time', async () => {
+    const user = userEvent.setup()
+
+    renderDashboard([boardMock])
+    await screen.findByRole('region', { name: 'Task board' })
+
+    await user.click(screen.getByRole('button', { name: 'Task view' }))
+
+    expect(screen.getByRole('button', { name: 'Task view' })).toHaveAttribute(
+      'aria-pressed',
+      'true',
+    )
+    expect(screen.getByRole('button', { name: 'Dashboard view' })).toHaveAttribute(
+      'aria-pressed',
+      'false',
+    )
+  })
+})

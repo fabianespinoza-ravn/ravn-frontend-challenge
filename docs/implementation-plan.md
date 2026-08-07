@@ -1,13 +1,14 @@
 # Implementation Plan and Decision Log
 
-> **Status:** Search and filtering is implemented and in review.
+> **Status:** The board and list view toggle is in progress.
 > **Last updated:** 2026-08-07
 > **Phase closure:** Initial Setup was merged through [PR #3](https://github.com/fabianespinoza-ravn/ravn-frontend-challenge/pull/3); Issue #1 is closed.
 > **Phase closure:** Dashboard UI was merged through [PR #5](https://github.com/fabianespinoza-ravn/ravn-frontend-challenge/pull/5); Issue #4 is closed.
 > **Phase closure:** GraphQL Data and Creation was merged through [PR #7](https://github.com/fabianespinoza-ravn/ravn-frontend-challenge/pull/7); Issue #6 is closed.
 > **Phase closure:** Task Editing and Deletion was merged through [PR #9](https://github.com/fabianespinoza-ravn/ravn-frontend-challenge/pull/9); Issue #8 is closed.
 > **Phase closure:** Settings was merged through [PR #11](https://github.com/fabianespinoza-ravn/ravn-frontend-challenge/pull/11); Issue #10 is closed.
-> **Current work:** [Issue #12](https://github.com/fabianespinoza-ravn/ravn-frontend-challenge/issues/12) on `fix/task-search-scope`, in review through [PR #13](https://github.com/fabianespinoza-ravn/ravn-frontend-challenge/pull/13).
+> **Phase closure:** Search and Filter was merged through [PR #13](https://github.com/fabianespinoza-ravn/ravn-frontend-challenge/pull/13); Issue #12 is closed.
+> **Current work:** [Issue #14](https://github.com/fabianespinoza-ravn/ravn-frontend-challenge/issues/14) on `feat/view-toggle`.
 
 ## Documentation Rule
 
@@ -29,7 +30,8 @@ This file is the repository's source of truth for confirmed product decisions, i
 - Issue [#6 GraphQL Data and Creation](https://github.com/fabianespinoza-ravn/ravn-frontend-challenge/issues/6) is closed, was merged through [PR #7](https://github.com/fabianespinoza-ravn/ravn-frontend-challenge/pull/7), and is in `Done` in the GitHub Project.
 - Issue [#8 Task Editing and Deletion](https://github.com/fabianespinoza-ravn/ravn-frontend-challenge/issues/8) is closed, was merged through [PR #9](https://github.com/fabianespinoza-ravn/ravn-frontend-challenge/pull/9), and is in `Done` in the GitHub Project.
 - Issue [#10 Settings](https://github.com/fabianespinoza-ravn/ravn-frontend-challenge/issues/10) is closed, was merged through [PR #11](https://github.com/fabianespinoza-ravn/ravn-frontend-challenge/pull/11), and is in `Done` in the GitHub Project.
-- Issue [#12 Search and Filter](https://github.com/fabianespinoza-ravn/ravn-frontend-challenge/issues/12) is the active work, on `fix/task-search-scope`, in review through [PR #13](https://github.com/fabianespinoza-ravn/ravn-frontend-challenge/pull/13). It follows the Settings phase rather than opening a new one.
+- Issue [#12 Search and Filter](https://github.com/fabianespinoza-ravn/ravn-frontend-challenge/issues/12) is closed, was merged through [PR #13](https://github.com/fabianespinoza-ravn/ravn-frontend-challenge/pull/13), and is in `Done` in the GitHub Project.
+- Issue [#14 Board and list views](https://github.com/fabianespinoza-ravn/ravn-frontend-challenge/issues/14) is the active work, on `feat/view-toggle`.
 
 ## Confirmed Folder Structure
 
@@ -527,6 +529,7 @@ Task creation decisions:
 
 - **7.1:** The design files carry no Settings composition, so this route's layout is a decision taken here rather than a match to a reference, and the plan says so instead of implying a source that does not exist. It is a single card, centred and capped at `26rem`: there are four values to read, and a card spanning a desktop would leave every label a long way from what it labels. Each value sits under its own label in a description list, so assistive technology announces the pair rather than two loose strings, and the label sits above the value rather than beside it so a long email keeps the full width of the card.
 - **7.12:** Narrowing a filter keeps the board and the list on screen instead of replacing them with a loading panel. Changing a filter changes the query variables, which empties Apollo's `data` while the next answer travels, and rendering the loading state then unmounted the whole board and mounted it again, throwing away every card and its menu. The views fall back to `previousData`, so only the very first answer is worth blanking for; a later one is a refresh, reported through `aria-busy` and a dimmed board rather than by leaving. A test selects a status against a delayed mock and asserts the card is still there mid-flight, and it was run against the previous implementation to confirm it fails.
+- **7.15:** The view controls switch how a route presents its tasks rather than which tasks it shows. `TaskBoard` and `TaskList` already took the same prop, so they were interchangeable once the list stopped hardcoding `My Tasks` as its heading. Each route keeps its own choice with its own default — the board on Dashboard, the list on My Tasks — instead of one shared preference, so switching one does not rearrange the other behind the reader; that also lets the state stay in the page that renders the toolbar, with no context needed. The controls are disabled where no handler is supplied, so a surface offering one presentation says so rather than looking pressable and doing nothing, which is the same standard `ownerId` was held to (7.10).
 - **7.14:** The status marker moves to `entities/task/ui/StatusDot`. The form already coloured its trigger with the status a user had chosen, and the filter's did not, so the fix was to share the component rather than write a second one that would drift from it. It belongs in `entities` because both the form feature and the filters feature show it and neither may reach into the other, which is the same rule that sent the dropdown to `shared/ui` (7.x) — a domain marker rather than a generic control.
 - **7.11:** The filters panel opens rightward from the left edge of its trigger. It is not the last control in the toolbar — the add-task button is — so opening that way crosses the board rather than folding back over the view toggle beside it.
 - **7.10:** The panel offers five of the six filters the requirement lists, and leaves out `ownerId`, which the API accepts and ignores: the verified account holds nine tasks by four creators, and filtering by any of them, or by a UUID belonging to nobody, returns all nine. It is absent from `TaskFilterInput` as well, so no control can be built for it by accident. Assignee stands in for the dimension `ownerId` was meant to give, since it filters properly and answers an explicit `null` with the unassigned tasks — confirmed by creating one without an assignee, finding it alone, and deleting it. Only the board offers it: My Tasks already is the assignee filter, so a second one there would contradict the route or do nothing.
