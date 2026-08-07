@@ -392,7 +392,7 @@ The input shapes were read from the schema rather than inferred, through unauthe
 - [x] Connect deletion to `deleteTask` behind an accessible confirmation step.
 - [x] Keep Dashboard and My Tasks consistent after a successful mutation.
 - [x] Add coverage for edit prefill, a successful update, a cleared assignee, a successful deletion, and failure states.
-- [ ] Run final local validation: `format:check`, `typecheck`, `lint`, `test`, and `build`.
+- [x] Run final local validation: `format:check`, `typecheck`, `lint`, `test`, and `build`.
 - [ ] Open the pull request linked to Issue #8 and confirm its GitHub Actions quality checks pass.
 
 ## Decision Log
