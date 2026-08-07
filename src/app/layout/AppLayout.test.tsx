@@ -5,12 +5,17 @@ import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import type { MockedResponse } from '@apollo/client/testing'
 import { AppLayout } from './AppLayout'
-import { CREATE_TASK, DELETE_TASK, UPDATE_TASK } from '@/entities/task/api/taskOperations'
+import {
+  CREATE_TASK,
+  DELETE_TASK,
+  GET_TASKS,
+  UPDATE_TASK,
+} from '@/entities/task/api/taskOperations'
 import type { ApiTask } from '@/entities/task/model/apiTask'
 import type { Task } from '@/entities/task/model/task'
 import { DashboardPage } from '@/pages/dashboard/DashboardPage'
 import { TaskActionsMenu } from '@/features/task-actions/ui/TaskActionsMenu'
-import { toApiDueDate, toDueDateValue } from '@/features/task-form/model/dueDate'
+import { toApiDueDate, toDueDateValue } from '@/shared/lib/date/dueDate'
 import { createGraphqlMocks, mockCreatedTask } from '@/test/mocks/graphql'
 import sidebarStyles from '@/widgets/app-sidebar/AppSidebar.module.css'
 import { TaskToolbar } from '@/widgets/task-toolbar/TaskToolbar'
@@ -565,5 +570,106 @@ describe('AppLayout task editing and the cache', () => {
 
     expect(await screen.findByRole('article', { name: renamed })).toBeInTheDocument()
     expect(screen.queryByRole('button', { name: 'Retry' })).not.toBeInTheDocument()
+  })
+})
+
+describe('AppLayout task search', () => {
+  function renderLayoutAt(pathname: string) {
+    return render(
+      <MockedProvider mocks={createGraphqlMocks()}>
+        <MemoryRouter initialEntries={[pathname]}>
+          <Routes>
+            <Route element={<AppLayout />}>
+              <Route path="/dashboard" element={<h1>Dashboard</h1>} />
+              <Route path="/settings" element={<h1>Settings</h1>} />
+              <Route path="*" element={<h1>Not found</h1>} />
+            </Route>
+          </Routes>
+        </MemoryRouter>
+      </MockedProvider>,
+    )
+  }
+
+  it('offers the task search on a route that lists tasks', () => {
+    renderLayoutAt('/dashboard')
+
+    expect(screen.getByRole('searchbox', { name: 'Search tasks' })).toBeInTheDocument()
+  })
+
+  /*
+   * The field names what it searches, so a route with no tasks would be
+   * offering something it cannot do.
+   */
+  it('leaves the task search out of settings', () => {
+    renderLayoutAt('/settings')
+
+    expect(screen.queryByRole('searchbox')).not.toBeInTheDocument()
+  })
+
+  /* Named positively, so a route nobody thought about does not inherit one. */
+  it('leaves the task search out of an unknown route', () => {
+    renderLayoutAt('/somewhere-else')
+
+    expect(screen.queryByRole('searchbox')).not.toBeInTheDocument()
+  })
+})
+
+describe('AppLayout rendering', () => {
+  /*
+   * The filter state sits above the whole shell, so holding it in the layout
+   * itself made every keystroke re-render the sidebar, the header, the board
+   * and every card and menu on it. Only what reads a filter should answer to
+   * one; the route showing beneath does not.
+   */
+  it('leaves the route alone while a filter is being typed', async () => {
+    const user = userEvent.setup()
+    const onRouteRender = vi.fn()
+
+    function CountedRoute() {
+      onRouteRender()
+
+      return <h1>Dashboard</h1>
+    }
+
+    renderLayout(<CountedRoute />)
+    const beforeTyping = onRouteRender.mock.calls.length
+
+    await user.type(screen.getByRole('searchbox', { name: 'Search tasks' }), 'abc')
+
+    expect(onRouteRender).toHaveBeenCalledTimes(beforeTyping)
+  })
+})
+
+describe('AppLayout filtering and the board', () => {
+  /*
+   * Narrowing a filter changes the query variables, which empties Apollo's data
+   * while the next answer travels. Rendering the loading panel then tore the
+   * whole board down and built it again, losing every card and menu on it. The
+   * delayed mock is what makes that moment observable.
+   */
+  it('keeps the board on screen while a narrowed filter is answered', async () => {
+    const user = userEvent.setup()
+
+    renderLayout(
+      <DashboardPage />,
+      [
+        {
+          request: { query: GET_TASKS, variables: { input: { status: 'DONE' } } },
+          result: { data: { tasks: [mockCreatedTask] } },
+          delay: 60,
+        },
+      ],
+      [mockCreatedTask],
+    )
+
+    expect(await screen.findByRole('article', { name: mockCreatedTask.name })).toBeInTheDocument()
+
+    await user.click(screen.getByRole('button', { name: 'Filters' }))
+    await user.click(screen.getByRole('button', { name: 'Status' }))
+    await user.click(screen.getByRole('button', { name: 'Done' }))
+
+    // Mid-flight: the answer has not arrived, and the board has not left.
+    expect(screen.queryByRole('status')).not.toBeInTheDocument()
+    expect(screen.getByRole('article', { name: mockCreatedTask.name })).toBeInTheDocument()
   })
 })

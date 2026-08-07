@@ -4,7 +4,7 @@ import {
   longMonthNames,
   parseDueDateValue,
   toDueDateValue,
-} from '../../model/dueDate'
+} from '@/shared/lib/date/dueDate'
 import styles from './DateWheelPicker.module.css'
 
 const yearsBefore = 2

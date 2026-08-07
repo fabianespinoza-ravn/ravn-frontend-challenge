@@ -1,9 +1,10 @@
 import { Check, Diamond, Tag } from 'lucide-react'
 import { taskTags } from '@/entities/task/model/apiTask'
 import { tagLabels } from '@/entities/task/model/taskLabels'
+import { taskFormStatusId } from '../../model/taskForm'
 import type { TaskFormState } from '../../model/useTaskFormState'
-import { FieldDropdown, type FieldVariant } from './FieldDropdown'
-import styles from './FieldDropdown.module.css'
+import { FieldDropdown, type FieldVariant } from '@/shared/ui/field-dropdown/FieldDropdown'
+import styles from '@/shared/ui/field-dropdown/FieldDropdown.module.css'
 
 type LabelFieldProps = {
   form: TaskFormState
@@ -20,6 +21,7 @@ export function LabelField({ form, isInvalid, variant }: LabelFieldProps) {
   return (
     <FieldDropdown
       isFilled={selectedLabels.length > 0}
+      describedBy={isInvalid ? taskFormStatusId : undefined}
       isInvalid={isInvalid}
       label="Label"
       panelTitle="Tag Title"

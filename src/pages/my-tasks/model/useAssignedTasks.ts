@@ -4,6 +4,12 @@ import { GET_TASKS } from '@/entities/task/api/taskOperations'
 import type { ApiTask, TaskFilterInput } from '@/entities/task/model/apiTask'
 import { mapApiTaskToTask } from '@/entities/task/model/taskMapper'
 import { useProfile } from '@/entities/user/model/useProfile'
+import {
+  applyClientFilters,
+  hasActiveFilters,
+  toTaskFilterInput,
+} from '@/features/task-filters/model/taskFilters'
+import { useTaskFilters } from '@/features/task-filters/model/useTaskFilters'
 
 type TasksQueryData = {
   tasks: ApiTask[]
@@ -20,18 +26,41 @@ function sortTasksByDueDate(firstTask: ApiTask, secondTask: ApiTask) {
 export function useAssignedTasks() {
   const profileQuery = useProfile()
   const profileId = profileQuery.data?.profile.id
+  const { appliedFilters } = useTaskFilters()
+  /*
+   * Both fields in one input. Contract 5.10 confirmed that different filter
+   * fields combine with AND, so searching here stays inside what is assigned to
+   * the authenticated user rather than escaping into everyone's tasks.
+   */
+  /*
+   * The route's own assignee wins over the panel's, which is why the panel does
+   * not offer that control here: My Tasks is the assignee filter, and a second
+   * one would either contradict it or do nothing.
+   */
   const taskVariables = useMemo(
-    () => ({ input: profileId ? { assigneeId: profileId } : {} }),
-    [profileId],
+    () => ({
+      input: {
+        ...toTaskFilterInput(appliedFilters),
+        ...(profileId ? { assigneeId: profileId } : {}),
+      },
+    }),
+    [appliedFilters, profileId],
   )
   const tasksQuery = useQuery<TasksQueryData, TasksQueryVariables>(GET_TASKS, {
     skip: !profileId,
     variables: taskVariables,
   })
 
+  // Keeps the list mounted while a narrowed filter is answered; see 7.x.
+  const apiTasks = tasksQuery.data?.tasks ?? tasksQuery.previousData?.tasks
+
   const tasks = useMemo(
-    () => [...(tasksQuery.data?.tasks ?? [])].sort(sortTasksByDueDate).map(mapApiTaskToTask),
-    [tasksQuery.data?.tasks],
+    () =>
+      applyClientFilters(
+        [...(apiTasks ?? [])].sort(sortTasksByDueDate).map(mapApiTaskToTask),
+        appliedFilters,
+      ),
+    [apiTasks, appliedFilters],
   )
 
   const retry = useCallback(() => {
@@ -44,7 +73,10 @@ export function useAssignedTasks() {
 
   return {
     error: profileQuery.error ?? tasksQuery.error,
-    isLoading: profileQuery.loading || tasksQuery.loading,
+    /* Lets the view say "nothing matches" rather than "nothing is assigned". */
+    isFiltered: hasActiveFilters(appliedFilters),
+    isLoading: (profileQuery.loading || tasksQuery.loading) && !tasksQuery.previousData,
+    isRefreshing: tasksQuery.loading && Boolean(tasksQuery.previousData),
     retry,
     tasks,
   }

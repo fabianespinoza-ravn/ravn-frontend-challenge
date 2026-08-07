@@ -1,12 +1,14 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Plus } from 'lucide-react'
-import { Outlet } from 'react-router-dom'
+import { Outlet, useLocation } from 'react-router-dom'
 import { GET_TASKS } from '@/entities/task/api/taskOperations'
 import type { Task } from '@/entities/task/model/task'
 import { TaskActionsContext } from '@/features/task-actions/model/taskActionsContext'
 import { useDeleteTask } from '@/features/task-actions/model/useDeleteTask'
 import { DeleteTaskDialog } from '@/features/task-actions/ui/DeleteTaskDialog'
 import { TaskFormContext } from '@/features/task-form/model/taskFormContext'
+import { emptyTaskFilters, type TaskFilters } from '@/features/task-filters/model/taskFilters'
+import { TaskFiltersContext } from '@/features/task-filters/model/taskFiltersContext'
 import {
   toCreateTaskInput,
   toTaskFormValues,
@@ -18,6 +20,7 @@ import { useUpdateTask } from '@/features/task-form/model/useUpdateTask'
 import { TaskFormModal } from '@/features/task-form/ui/TaskFormModal'
 import { useUsers } from '@/entities/user/model/useUsers'
 import { getMobilePlatform } from '@/shared/lib/platform/getMobilePlatform'
+import { useDebouncedValue } from '@/shared/lib/timing/useDebouncedValue'
 import { AddProjectPage } from '@/pages/add-project/AddProjectPage'
 import { IconButton } from '@/shared/ui/icon-button/IconButton'
 import { AppHeader } from '@/widgets/app-header/AppHeader'
@@ -31,6 +34,16 @@ import styles from './AppLayout.module.css'
  * both open the full-page composition.
  */
 const taskFormModalBreakpoint = 768
+
+/*
+ * Named positively rather than as everything except Settings, so a route added
+ * later has to ask for the task search instead of inheriting one it may have no
+ * tasks for. Not Found is already such a route.
+ */
+const taskRoutes = ['/dashboard', '/my-tasks']
+
+/* Long enough that a typed word is one request, short enough to feel live. */
+const searchDebounceDelay = 300
 
 export function AppLayout() {
   const [isNavigationOpen, setIsNavigationOpen] = useState(false)
@@ -64,6 +77,14 @@ export function AppLayout() {
     useDeleteTask()
   const mobilePlatform = getMobilePlatform()
   const isAndroid = mobilePlatform === 'android'
+  const hasTaskSearch = taskRoutes.includes(useLocation().pathname)
+  const [filters, setFilters] = useState<TaskFilters>(emptyTaskFilters)
+  /*
+   * Only the name waits. It is typed a character at a time, while every other
+   * control commits a whole choice at once and has nothing to settle. Trimmed,
+   * because a trailing space is a search nobody meant to run.
+   */
+  const appliedName = useDebouncedValue(filters.name.trim(), searchDebounceDelay)
 
   useEffect(() => {
     function syncViewport() {
@@ -175,6 +196,25 @@ export function AppLayout() {
 
   const taskActionsContext = useMemo(() => ({ deleteTask: setDeletingTask, editTask }), [editTask])
 
+  const setFilter = useCallback(
+    <TKey extends keyof TaskFilters>(key: TKey, value: TaskFilters[TKey]) => {
+      setFilters((currentFilters) => ({ ...currentFilters, [key]: value }))
+    },
+    [],
+  )
+
+  const clearFilters = useCallback(() => setFilters(emptyTaskFilters), [])
+
+  const taskFiltersContext = useMemo(
+    () => ({
+      appliedFilters: { ...filters, name: appliedName },
+      clearFilters,
+      filters,
+      setFilter,
+    }),
+    [appliedName, clearFilters, filters, setFilter],
+  )
+
   const isFullPageTaskFormOpen = isTaskFormOpen && !supportsTaskFormModal
   const isModalTaskFormOpen = isTaskFormOpen && supportsTaskFormModal
   // Only the full-page composition hides the current route, so only it takes
@@ -183,73 +223,77 @@ export function AppLayout() {
   return (
     <TaskFormContext value={taskFormContext}>
       <TaskActionsContext value={taskActionsContext}>
-        <div
-          className={
-            isFullPageTaskFormOpen ? `${styles.root} ${styles.isTaskFormOpen}` : styles.root
-          }
-          data-mobile-navigation={isAndroid ? 'drawer' : 'bottom'}
-          data-mobile-platform={mobilePlatform}
-        >
-          <AppSidebar
-            isAndroid={isAndroid}
-            isAddProjectOpen={isFullPageTaskFormOpen}
-            isDrawerOpen={isNavigationOpen}
-            onNavigate={() => {
-              setIsNavigationOpen(false)
-              closeTaskForm()
-            }}
-            onRequestAddProject={taskFormContext.openTaskForm}
-            onRequestClose={() => setIsNavigationOpen(false)}
-            onRequestOpen={() => setIsNavigationOpen(true)}
-          />
-          <div className={styles.workspace}>
-            {isFullPageTaskFormOpen ? null : <AppHeader isAndroid={isAndroid} />}
-            <main className={isFullPageTaskFormOpen ? styles.addProjectContent : styles.content}>
-              {isFullPageTaskFormOpen ? (
-                <AddProjectPage
-                  assignees={usersData?.users}
-                  form={taskForm}
-                  hasFailed={Boolean(creationError ?? updateError)}
-                  isEditing={Boolean(editingTask)}
-                  isSubmitting={isCreatingTask || isUpdatingTask}
-                  onClose={closeTaskForm}
-                  onSubmit={submitTaskForm}
-                />
-              ) : (
-                <Outlet />
+        <TaskFiltersContext value={taskFiltersContext}>
+          <div
+            className={
+              isFullPageTaskFormOpen ? `${styles.root} ${styles.isTaskFormOpen}` : styles.root
+            }
+            data-mobile-navigation={isAndroid ? 'drawer' : 'bottom'}
+            data-mobile-platform={mobilePlatform}
+          >
+            <AppSidebar
+              isAndroid={isAndroid}
+              isAddProjectOpen={isFullPageTaskFormOpen}
+              isDrawerOpen={isNavigationOpen}
+              onNavigate={() => {
+                setIsNavigationOpen(false)
+                closeTaskForm()
+              }}
+              onRequestAddProject={taskFormContext.openTaskForm}
+              onRequestClose={() => setIsNavigationOpen(false)}
+              onRequestOpen={() => setIsNavigationOpen(true)}
+            />
+            <div className={styles.workspace}>
+              {isFullPageTaskFormOpen ? null : (
+                <AppHeader hasTaskSearch={hasTaskSearch} isAndroid={isAndroid} />
               )}
-            </main>
-            {isAndroid && !isFullPageTaskFormOpen ? (
-              <IconButton
-                aria-label="Add Project"
-                className={styles.androidAddTaskButton}
-                onClick={taskFormContext.openTaskForm}
-              >
-                <Plus aria-hidden="true" size={24} />
-              </IconButton>
+              <main className={isFullPageTaskFormOpen ? styles.addProjectContent : styles.content}>
+                {isFullPageTaskFormOpen ? (
+                  <AddProjectPage
+                    assignees={usersData?.users}
+                    form={taskForm}
+                    hasFailed={Boolean(creationError ?? updateError)}
+                    isEditing={Boolean(editingTask)}
+                    isSubmitting={isCreatingTask || isUpdatingTask}
+                    onClose={closeTaskForm}
+                    onSubmit={submitTaskForm}
+                  />
+                ) : (
+                  <Outlet />
+                )}
+              </main>
+              {isAndroid && !isFullPageTaskFormOpen ? (
+                <IconButton
+                  aria-label="Add Project"
+                  className={styles.androidAddTaskButton}
+                  onClick={taskFormContext.openTaskForm}
+                >
+                  <Plus aria-hidden="true" size={24} />
+                </IconButton>
+              ) : null}
+            </div>
+            {isModalTaskFormOpen ? (
+              <TaskFormModal
+                assignees={usersData?.users}
+                form={taskForm}
+                hasFailed={Boolean(creationError ?? updateError)}
+                isEditing={Boolean(editingTask)}
+                isSubmitting={isCreatingTask || isUpdatingTask}
+                onClose={closeTaskForm}
+                onSubmit={submitTaskForm}
+              />
+            ) : null}
+            {deletingTask ? (
+              <DeleteTaskDialog
+                hasFailed={Boolean(deletionError)}
+                isDeleting={isDeletingTask}
+                onCancel={cancelTaskDeletion}
+                onConfirm={confirmTaskDeletion}
+                taskTitle={deletingTask.title}
+              />
             ) : null}
           </div>
-          {isModalTaskFormOpen ? (
-            <TaskFormModal
-              assignees={usersData?.users}
-              form={taskForm}
-              hasFailed={Boolean(creationError ?? updateError)}
-              isEditing={Boolean(editingTask)}
-              isSubmitting={isCreatingTask || isUpdatingTask}
-              onClose={closeTaskForm}
-              onSubmit={submitTaskForm}
-            />
-          ) : null}
-          {deletingTask ? (
-            <DeleteTaskDialog
-              hasFailed={Boolean(deletionError)}
-              isDeleting={isDeletingTask}
-              onCancel={cancelTaskDeletion}
-              onConfirm={confirmTaskDeletion}
-              taskTitle={deletingTask.title}
-            />
-          ) : null}
-        </div>
+        </TaskFiltersContext>
       </TaskActionsContext>
     </TaskFormContext>
   )

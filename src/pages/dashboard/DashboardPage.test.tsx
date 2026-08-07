@@ -6,6 +6,8 @@ import { GET_TASKS } from '@/entities/task/api/taskOperations'
 import type { ApiTask } from '@/entities/task/model/apiTask'
 import { mockProfile } from '@/test/mocks/graphql'
 import { TaskActionsTestProvider } from '@/test/taskActions'
+import { emptyTaskFilters } from '@/features/task-filters/model/taskFilters'
+import { TaskFiltersTestProvider } from '@/test/taskFilters'
 import { TaskFormTestProvider } from '@/test/taskForm'
 import { DashboardPage } from './DashboardPage'
 
@@ -36,12 +38,17 @@ const earlierTask: ApiTask = {
   position: 1,
 }
 
-function renderDashboard(mocks: ConstructorParameters<typeof MockedProvider>[0]['mocks']) {
+function renderDashboard(
+  mocks: ConstructorParameters<typeof MockedProvider>[0]['mocks'],
+  name = '',
+) {
   return render(
     <MockedProvider mocks={mocks}>
       <TaskFormTestProvider>
         <TaskActionsTestProvider>
-          <DashboardPage />
+          <TaskFiltersTestProvider filters={{ ...emptyTaskFilters, name }}>
+            <DashboardPage />
+          </TaskFiltersTestProvider>
         </TaskActionsTestProvider>
       </TaskFormTestProvider>
     </MockedProvider>,
@@ -104,5 +111,47 @@ describe('DashboardPage', () => {
     await user.click(screen.getByRole('button', { name: 'Retry' }))
 
     expect(await screen.findByRole('region', { name: 'Backlog, 1 task' })).toBeInTheDocument()
+  })
+})
+
+describe('DashboardPage search', () => {
+  /*
+   * The mock answers one exact input, so the board showing the task is the
+   * proof the term travelled as an API filter rather than being applied to
+   * whatever had already been loaded.
+   */
+  it('asks the server for the matching tasks rather than filtering what it has', async () => {
+    renderDashboard(
+      [
+        {
+          request: { query: GET_TASKS, variables: { input: { name: 'Later' } } },
+          result: { data: { tasks: [laterTask] } },
+        },
+      ],
+      'Later',
+    )
+
+    expect(await screen.findByRole('article', { name: 'Later task' })).toBeInTheDocument()
+    expect(screen.queryByRole('article', { name: 'Earlier task' })).not.toBeInTheDocument()
+  })
+
+  /* A search that found nothing is not an account with nothing in it. */
+  it('tells a fruitless search apart from an empty board', async () => {
+    renderDashboard(
+      [
+        {
+          request: { query: GET_TASKS, variables: { input: { name: 'Nothing' } } },
+          result: { data: { tasks: [] } },
+        },
+      ],
+      'Nothing',
+    )
+
+    expect(
+      await screen.findByRole('heading', { name: 'No tasks match your filters' }),
+    ).toBeInTheDocument()
+    expect(
+      screen.queryByRole('heading', { name: 'No tasks are available' }),
+    ).not.toBeInTheDocument()
   })
 })

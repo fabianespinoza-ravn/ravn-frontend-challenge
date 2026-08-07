@@ -7,7 +7,7 @@ import {
   isSameDay,
   parseDueDateValue,
   toDueDateValue,
-} from '../../model/dueDate'
+} from '@/shared/lib/date/dueDate'
 import styles from './DatePicker.module.css'
 
 const weekdayLabels = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa']

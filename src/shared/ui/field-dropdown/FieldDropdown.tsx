@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react'
-import { taskFormStatusId } from '../../model/taskForm'
 import styles from './FieldDropdown.module.css'
 
 /**
@@ -11,6 +10,12 @@ export type FieldVariant = 'compact' | 'row'
 
 type FieldDropdownProps = {
   children: (close: () => void) => ReactNode
+  /*
+   * The element that explains this control when something is wrong with it.
+   * Named by the caller rather than known here, so the primitive serves a form
+   * that validates and a filter panel that does not.
+   */
+  describedBy?: string
   disabled?: boolean
   isFilled?: boolean
   isInvalid?: boolean
@@ -62,6 +67,7 @@ function PanelContainer({
  */
 export function FieldDropdown({
   children,
+  describedBy,
   disabled = false,
   isFilled = false,
   isInvalid = false,
@@ -119,7 +125,7 @@ export function FieldDropdown({
   return (
     <div className={isRow ? `${styles.root} ${styles.rowRoot}` : styles.root} ref={containerRef}>
       <button
-        aria-describedby={isInvalid ? taskFormStatusId : undefined}
+        aria-describedby={describedBy}
         aria-expanded={isOpen}
         aria-haspopup="true"
         aria-label={value ? `${label}: ${value}` : label}

@@ -8,7 +8,7 @@ import {
   isSameDay,
   parseDueDateValue,
   toDueDateValue,
-} from '../../model/dueDate'
+} from '@/shared/lib/date/dueDate'
 import styles from './MaterialDatePicker.module.css'
 
 const weekdayInitials = ['S', 'M', 'T', 'W', 'T', 'F', 'S']

@@ -3,10 +3,10 @@ import userEvent from '@testing-library/user-event'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import type { User } from '@/entities/user/model/user'
 import { mockProfile } from '@/test/mocks/graphql'
-import { formatDueDateLabel, longMonthNames, toDueDateValue } from '../model/dueDate'
+import { formatDueDateLabel, longMonthNames, toDueDateValue } from '@/shared/lib/date/dueDate'
 import { taskFormId } from '../model/taskForm'
 import { useTaskFormState } from '../model/useTaskFormState'
-import fieldStyles from './fields/FieldDropdown.module.css'
+import fieldStyles from '@/shared/ui/field-dropdown/FieldDropdown.module.css'
 import { TaskForm } from './TaskForm'
 
 /* jsdom carries no mobile user agent, so the default keeps the iOS presentation. */

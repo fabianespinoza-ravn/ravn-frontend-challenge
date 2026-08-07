@@ -4,9 +4,9 @@ import { afterEach, describe, expect, it } from 'vitest'
 import type { User } from '@/entities/user/model/user'
 import { mockProfile } from '@/test/mocks/graphql'
 import { taskFormId } from '../model/taskForm'
-import { formatDueDateLabel, formatFullDateLabel, toDueDateValue } from '../model/dueDate'
+import { formatDueDateLabel, formatFullDateLabel, toDueDateValue } from '@/shared/lib/date/dueDate'
 import { useTaskFormState } from '../model/useTaskFormState'
-import fieldStyles from './fields/FieldDropdown.module.css'
+import fieldStyles from '@/shared/ui/field-dropdown/FieldDropdown.module.css'
 import { TaskMetadataForm } from './TaskMetadataForm'
 
 const teammates: User[] = [

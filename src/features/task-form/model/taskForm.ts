@@ -5,7 +5,7 @@ import type {
   UpdateTaskInput,
 } from '@/entities/task/model/apiTask'
 import type { Task, TaskStatus } from '@/entities/task/model/task'
-import { toApiDueDate, toDueDateValue } from './dueDate'
+import { toApiDueDate, toDueDateValue } from '@/shared/lib/date/dueDate'
 
 /**
  * Shared identifiers so a container can render its own submit control outside

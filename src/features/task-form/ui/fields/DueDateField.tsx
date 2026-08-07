@@ -1,12 +1,13 @@
 import { CalendarCheck } from 'lucide-react'
 import { getMobilePlatform } from '@/shared/lib/platform/getMobilePlatform'
-import { formatDueDateLabel } from '../../model/dueDate'
+import { formatDueDateLabel } from '@/shared/lib/date/dueDate'
+import { taskFormStatusId } from '../../model/taskForm'
 import type { TaskFormState } from '../../model/useTaskFormState'
-import { DatePicker } from './DatePicker'
+import { DatePicker } from '@/shared/ui/date-picker/DatePicker'
 import { DateWheelPicker } from './DateWheelPicker'
 import { MaterialDatePicker } from './MaterialDatePicker'
-import { FieldDropdown, type FieldVariant } from './FieldDropdown'
-import styles from './FieldDropdown.module.css'
+import { FieldDropdown, type FieldVariant } from '@/shared/ui/field-dropdown/FieldDropdown'
+import styles from '@/shared/ui/field-dropdown/FieldDropdown.module.css'
 
 type DueDateFieldProps = {
   form: TaskFormState
@@ -40,6 +41,7 @@ export function DueDateField({ form, isInvalid, variant }: DueDateFieldProps) {
   return (
     <FieldDropdown
       isFilled={Boolean(selectedLabel)}
+      describedBy={isInvalid ? taskFormStatusId : undefined}
       isInvalid={isInvalid}
       label="Due date"
       panelClassName={getPanelClassName()}
