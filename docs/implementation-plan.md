@@ -1,6 +1,6 @@
 # Implementation Plan and Decision Log
 
-> **Status:** Task Editing and Deletion is in progress.
+> **Status:** Task Editing and Deletion is implemented and in review.
 > **Last updated:** 2026-08-07
 > **Phase closure:** Initial Setup was merged through [PR #3](https://github.com/fabianespinoza-ravn/ravn-frontend-challenge/pull/3); Issue #1 is closed.
 > **Phase closure:** Dashboard UI was merged through [PR #5](https://github.com/fabianespinoza-ravn/ravn-frontend-challenge/pull/5); Issue #4 is closed.
@@ -25,7 +25,7 @@ This file is the repository's source of truth for confirmed product decisions, i
 - Issue [#1 Initial Setup](https://github.com/fabianespinoza-ravn/ravn-frontend-challenge/issues/1) is closed, was merged through [PR #3](https://github.com/fabianespinoza-ravn/ravn-frontend-challenge/pull/3), and is in `Done` in the GitHub Project.
 - Issue [#4 Dashboard UI](https://github.com/fabianespinoza-ravn/ravn-frontend-challenge/issues/4) is closed, was merged through [PR #5](https://github.com/fabianespinoza-ravn/ravn-frontend-challenge/pull/5), and is in `Done` in the GitHub Project.
 - Issue [#6 GraphQL Data and Creation](https://github.com/fabianespinoza-ravn/ravn-frontend-challenge/issues/6) is closed, was merged through [PR #7](https://github.com/fabianespinoza-ravn/ravn-frontend-challenge/pull/7), and is in `Done` in the GitHub Project.
-- Issue [#8 Task Editing and Deletion](https://github.com/fabianespinoza-ravn/ravn-frontend-challenge/issues/8) is the active implementation issue. Its branch is `feat/task-edit-delete`.
+- Issue [#8 Task Editing and Deletion](https://github.com/fabianespinoza-ravn/ravn-frontend-challenge/issues/8) is the active implementation issue. Its branch is `feat/task-edit-delete`, and it is in review through [PR #9](https://github.com/fabianespinoza-ravn/ravn-frontend-challenge/pull/9).
 
 ## Confirmed Folder Structure
 
@@ -393,7 +393,7 @@ The input shapes were read from the schema rather than inferred, through unauthe
 - [x] Keep Dashboard and My Tasks consistent after a successful mutation.
 - [x] Add coverage for edit prefill, a successful update, a cleared assignee, a successful deletion, and failure states.
 - [x] Run final local validation: `format:check`, `typecheck`, `lint`, `test`, and `build`.
-- [ ] Open the pull request linked to Issue #8 and confirm its GitHub Actions quality checks pass.
+- [x] Open [PR #9](https://github.com/fabianespinoza-ravn/ravn-frontend-challenge/pull/9) linked to Issue #8; its GitHub Actions quality checks passed.
 
 ## Decision Log
 
