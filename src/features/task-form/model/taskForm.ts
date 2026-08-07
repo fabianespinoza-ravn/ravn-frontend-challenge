@@ -1,4 +1,9 @@
-import type { CreateTaskInput, PointEstimate, TaskTag } from '@/entities/task/model/apiTask'
+import type {
+  CreateTaskInput,
+  PointEstimate,
+  TaskTag,
+  UpdateTaskInput,
+} from '@/entities/task/model/apiTask'
 import type { TaskStatus } from '@/entities/task/model/task'
 import { toApiDueDate } from './dueDate'
 
@@ -74,6 +79,39 @@ export function toCreateTaskInput(values: TaskFormValues): CreateTaskInput | nul
   return {
     ...(values.assigneeId ? { assigneeId: values.assigneeId } : {}),
     dueDate,
+    name: values.name.trim(),
+    pointEstimate: values.pointEstimate as Exclude<TaskFormValues['pointEstimate'], ''>,
+    status: values.status as Exclude<TaskFormValues['status'], ''>,
+    tags: values.tags,
+  }
+}
+
+/**
+ * The same draft in the shape `updateTask` accepts. It differs from creation in
+ * one field, and that field is the reason this function exists rather than a
+ * flag on the one above.
+ *
+ * An empty `assigneeId` leaves as an explicit `null`. Creation may omit the
+ * field because there is nothing to leave behind, but an update that omits it
+ * keeps whoever is already assigned (contract 5.12). Reusing the creation rule
+ * would let someone clear an assignee, watch the request succeed, and find the
+ * assignee still there, with nothing to explain it.
+ *
+ * This assumes the form always submits every field, which both containers do. A
+ * later partial update, such as changing status straight from the card menu,
+ * would need a way to say "leave this alone" that an empty string cannot carry.
+ */
+export function toUpdateTaskInput(id: string, values: TaskFormValues): UpdateTaskInput | null {
+  const dueDate = toApiDueDate(values.dueDate)
+
+  if (getMissingFields(values).length > 0 || !dueDate) {
+    return null
+  }
+
+  return {
+    assigneeId: values.assigneeId || null,
+    dueDate,
+    id,
     name: values.name.trim(),
     pointEstimate: values.pointEstimate as Exclude<TaskFormValues['pointEstimate'], ''>,
     status: values.status as Exclude<TaskFormValues['status'], ''>,

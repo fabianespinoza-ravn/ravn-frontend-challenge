@@ -376,13 +376,15 @@ Each of these was reached, judged, and left on purpose rather than missed.
 **Implementation status:** In progress.
 **Tracking:** [Issue #8](https://github.com/fabianespinoza-ravn/ravn-frontend-challenge/issues/8) on `feat/task-edit-delete`.
 
-No API verification is required before implementation. Every contract this phase needs was confirmed during the previous one and is recorded above: 5.12 for the fields `updateTask` accepts and for clearing an assignee with an explicit `null`, 5.13 for the `position` limitation that keeps reordering out of scope, and 5.14 for deletion.
+No behavioral API verification is required before implementation. Every contract this phase needs was confirmed during the previous one and is recorded above: 5.12 for the fields `updateTask` accepts and for clearing an assignee with an explicit `null`, 5.13 for the `position` limitation that keeps reordering out of scope, and 5.14 for deletion.
+
+The input shapes were read from the schema rather than inferred, through unauthenticated introspection, which the endpoint allows even though its queries require a token. `UpdateTaskInput` takes a required `String!` id and leaves every other field optional, with `assigneeId` nullable, so the explicit `null` that 5.12 observed is what the schema is built to accept rather than an accident of the resolver. `DeleteTaskInput` takes only that id. `position` exists on the update input as a `Float`, which is why 5.13 is a rule this codebase has to keep rather than one the schema keeps for it.
 
 ### Implementation Progress
 
 - [x] Rename `features/task-creation` to `features/task-form`, since creation and editing share all of it.
 - [ ] Add `features/task-actions` for the task-card options menu and deletion, so no feature imports a sibling.
-- [ ] Add `toUpdateTaskInput` beside `toCreateTaskInput`, translating an empty assignee to an explicit `null` instead of omitting it.
+- [x] Add `toUpdateTaskInput` beside `toCreateTaskInput`, translating an empty assignee to an explicit `null` instead of omitting it.
 - [ ] Open task actions from the existing task-card options control.
 - [ ] Prefill the shared responsive composition from the selected task and connect it to `updateTask`.
 - [ ] Connect deletion to `deleteTask` behind an accessible confirmation step.
