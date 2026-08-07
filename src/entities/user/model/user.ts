@@ -2,6 +2,16 @@ export const userTypes = ['ADMIN', 'CANDIDATE'] as const
 
 export type UserType = (typeof userTypes)[number]
 
+/**
+ * The challenge calls this the user's Position, and the API answers it as an
+ * enum. The wording lives beside the type for the same reason the task labels
+ * do (5.20): one source, so no view spells it its own way.
+ */
+export const userTypeLabels: Record<UserType, string> = {
+  ADMIN: 'Admin',
+  CANDIDATE: 'Candidate',
+}
+
 export type User = {
   avatar: string | null
   createdAt: string

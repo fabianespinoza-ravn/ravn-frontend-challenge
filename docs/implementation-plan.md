@@ -406,12 +406,12 @@ No API work is required. `GET_PROFILE` and `useProfile` already exist and are re
 
 ### Implementation Progress
 
-- [ ] Replace the Settings placeholder with the authenticated profile: full name, email, avatar, and Position.
-- [ ] Present `profile.type` in human-readable form as the challenge's "Position" value.
-- [ ] Use the accessible avatar fallback when no avatar URL is available.
-- [ ] Provide accessible loading and error-with-retry states matching the ones the task routes established.
-- [ ] Refine the route against the reference composition across mobile, tablet, and desktop.
-- [ ] Add coverage for the rendered profile, the Position wording, the avatar fallback, and both states.
+- [x] Replace the Settings placeholder with the authenticated profile: full name, email, avatar, and Position.
+- [x] Present `profile.type` in human-readable form as the challenge's "Position" value.
+- [x] Use the accessible avatar fallback when no avatar URL is available.
+- [x] Provide accessible loading and error-with-retry states matching the ones the task routes established.
+- [ ] Review the composed layout in a browser across mobile, tablet, and desktop. There is no reference composition for this route, so its layout is a decision rather than a match.
+- [x] Add coverage for the rendered profile, the Position wording, the avatar fallback, and both states.
 - [ ] Run final local validation: `format:check`, `typecheck`, `lint`, `test`, and `build`.
 - [ ] Open the pull request linked to Issue #10 and confirm its GitHub Actions quality checks pass.
 
@@ -513,6 +513,13 @@ Task creation decisions:
 | 5.6 | Fetch Dashboard tasks with Apollo `useQuery` and derive mapped, chronological presentation data with `useMemo`; do not use `useEffect` or component state for remote fetching. | Apollo owns request, cache, loading, error, and refetch lifecycles, while the component retains only render responsibility.         |
 | 5.7 | Make `TaskBoard` receive presentation tasks through props instead of importing fixtures.                                                                                       | Removes its data-source coupling and allows the static visual component to render API, test, or future filtered data.               |
 | 5.8 | Keep profile retrieval in the shared header and preserve initials fallback until profile data is available or if the query fails.                                              | The authenticated identity is relevant throughout the app and should not block task-board rendering.                                |
+
+### 7. Settings
+
+- **7.1:** The design files carry no Settings composition, so this route's layout is a decision taken here rather than a match to a reference, and the plan says so instead of implying a source that does not exist. It is a single card, centred and capped at `26rem`: there are four values to read, and a card spanning a desktop would leave every label a long way from what it labels. Each value sits under its own label in a description list, so assistive technology announces the pair rather than two loose strings, and the label sits above the value rather than beside it so a long email keeps the full width of the card.
+- **7.2:** The `Position` wording lives beside `UserType` as `userTypeLabels`, the way task labels live beside their enums (5.20), so no view spells `ADMIN` its own way. The API answers an enum and the challenge asks for a Position, and that translation belongs in one place.
+- **7.3:** `Avatar` gains a `large` size that sets its own type scale. The existing two are markers beside something else; here the avatar is the subject of the page, and the shared initials size was scaled for the small ones. This teaches the primitive a measurement, not a feature, in the same spirit as 5.28.
+- **7.4:** Settings is read-only, and that is the API's shape rather than a choice: schema introspection during the previous phase confirmed the only mutations are `createTask`, `updateTask` and `deleteTask`. The page therefore offers nothing to submit, and says nothing about editing that it cannot honour.
 
 ### 6. Task Editing and Deletion
 

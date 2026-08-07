@@ -1,0 +1,96 @@
+.root {
+  width: 100%;
+  min-width: 0;
+}
+
+/*
+ * Visible, unlike the dashboard's, which is hidden because its toolbar and
+ * board already say where you are. This route has nothing else to say it.
+ */
+.heading {
+  margin: 0 0 var(--space-6);
+  color: var(--color-text-primary);
+  font-size: var(--font-size-xl);
+}
+
+/* Shared by both states so a failure occupies the same space as a wait. */
+.state {
+  display: grid;
+  min-height: 18rem;
+  place-content: center;
+  justify-items: center;
+  gap: var(--space-3);
+  padding: var(--space-6);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+  color: var(--color-text-secondary);
+  text-align: center;
+}
+
+.state h2,
+.state p {
+  margin: 0;
+}
+
+.state h2 {
+  color: var(--color-text-primary);
+  font-size: var(--font-size-lg);
+}
+
+/*
+ * Centred and capped rather than filling the page: there are four values to
+ * read, and a card that spanned a desktop would leave each label a long way
+ * from what it labels.
+ */
+.card {
+  display: grid;
+  justify-items: center;
+  max-width: 26rem;
+  margin: 0 auto;
+  padding: var(--space-8) var(--space-6);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface-raised);
+  box-shadow: var(--shadow-md);
+  text-align: center;
+}
+
+.name {
+  margin: var(--space-4) 0 0;
+  color: var(--color-text-primary);
+  font-size: var(--font-size-lg);
+}
+
+.details {
+  display: grid;
+  gap: var(--space-4);
+  width: 100%;
+  margin: var(--space-6) 0 0;
+}
+
+/*
+ * Label above value rather than beside it, so a long email keeps the full width
+ * of the card instead of sharing it with its own label.
+ */
+.detail {
+  display: grid;
+  gap: var(--space-1);
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--color-border);
+}
+
+.detail dt {
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.detail dd {
+  margin: 0;
+  color: var(--color-text-primary);
+  font-size: var(--font-size-sm);
+  overflow-wrap: anywhere;
+}

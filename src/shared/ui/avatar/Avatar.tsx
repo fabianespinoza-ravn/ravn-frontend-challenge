@@ -4,7 +4,7 @@ import styles from './Avatar.module.css'
 type AvatarProps = {
   alt: string
   initials: string
-  size?: 'small' | 'medium'
+  size?: 'small' | 'medium' | 'large'
   src?: string | null
 }
 
