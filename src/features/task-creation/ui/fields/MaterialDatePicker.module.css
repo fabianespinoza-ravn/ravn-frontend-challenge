@@ -1,0 +1,157 @@
+/*
+ * Android's Material date dialog. Its header and footer run edge to edge, so
+ * the hosting panel drops its own padding and clips to its radius instead.
+ */
+.root {
+  display: grid;
+}
+
+.header {
+  display: grid;
+  gap: var(--space-1);
+  padding: var(--space-4);
+  background: var(--color-accent);
+  color: var(--color-on-accent);
+}
+
+.headerYear {
+  margin: 0;
+  font-size: var(--font-size-sm);
+  opacity: 0.85;
+}
+
+.headerDate {
+  margin: 0;
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-semibold);
+}
+
+.monthNavigation {
+  display: grid;
+  align-items: center;
+  padding: var(--space-2) var(--space-3);
+  grid-template-columns: auto 1fr auto;
+}
+
+.monthLabel {
+  margin: 0;
+  color: var(--field-text, var(--color-text-primary));
+  font-size: var(--font-size-sm);
+  text-align: center;
+}
+
+.navigationButton {
+  display: inline-grid;
+  width: 2rem;
+  height: 2rem;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--field-text-secondary, var(--color-text-secondary));
+  place-items: center;
+}
+
+.navigationButton:hover {
+  background: var(--field-option-hover, var(--color-surface-overlay));
+  color: var(--field-text, var(--color-text-primary));
+}
+
+.navigationButton:focus-visible {
+  outline: var(--focus-ring);
+  outline-offset: calc(var(--focus-offset) * -1);
+}
+
+.weekdays,
+.days {
+  display: grid;
+  padding: 0 var(--space-3);
+  gap: var(--space-1);
+  grid-template-columns: repeat(7, 1fr);
+}
+
+.weekdays {
+  color: var(--field-text-secondary, var(--color-text-secondary));
+  font-size: var(--font-size-xs);
+  text-align: center;
+}
+
+.blank {
+  aspect-ratio: 1;
+}
+
+.day {
+  display: inline-grid;
+  aspect-ratio: 1;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--field-text, var(--color-text-primary));
+  font-family: inherit;
+  font-size: var(--font-size-sm);
+  place-items: center;
+}
+
+.day:hover {
+  background: var(--field-option-hover, var(--color-surface-overlay));
+}
+
+.day:focus-visible {
+  outline: var(--focus-ring);
+  outline-offset: calc(var(--focus-offset) * -1);
+}
+
+/* Today is outlined rather than filled, so it never reads as the selection. */
+.isToday {
+  box-shadow: inset 0 0 0 1px var(--field-text-secondary, var(--color-text-secondary));
+}
+
+.isPending {
+  background: var(--color-accent);
+  color: var(--color-on-accent);
+  font-weight: var(--font-weight-semibold);
+}
+
+.isPending:hover {
+  background: var(--color-accent-hover);
+}
+
+.footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-2);
+  padding: var(--space-3);
+}
+
+.cancelButton,
+.confirmButton {
+  padding: var(--space-2) var(--space-4);
+  border: 0;
+  border-radius: var(--radius-sm);
+  font-family: inherit;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+}
+
+.cancelButton {
+  background: transparent;
+  color: var(--field-text, var(--color-text-primary));
+}
+
+.cancelButton:hover {
+  background: var(--field-option-hover, var(--color-surface-overlay));
+}
+
+.confirmButton {
+  background: var(--color-accent);
+  color: var(--color-on-accent);
+}
+
+.confirmButton:hover {
+  background: var(--color-accent-hover);
+}
+
+.cancelButton:focus-visible,
+.confirmButton:focus-visible {
+  outline: var(--focus-ring);
+  outline-offset: var(--focus-offset);
+}

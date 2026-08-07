@@ -1,0 +1,107 @@
+.root {
+  display: grid;
+  width: 15.5rem;
+  gap: var(--space-2);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-1);
+}
+
+.navigationButton {
+  display: inline-grid;
+  width: 1.75rem;
+  height: 1.75rem;
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--color-text-secondary);
+  place-items: center;
+}
+
+.navigationButton:hover {
+  background: var(--color-surface-overlay);
+  color: var(--color-text-primary);
+}
+
+.navigationButton:focus-visible,
+.day:focus-visible,
+.todayButton:focus-visible {
+  outline: var(--focus-ring);
+  outline-offset: var(--focus-offset);
+}
+
+.monthLabel {
+  flex: 1;
+  margin: 0;
+  color: var(--color-text-primary);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  text-align: center;
+}
+
+.weekdays,
+.days {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: var(--space-1);
+}
+
+.weekdays {
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-xs);
+  text-align: center;
+}
+
+.day {
+  display: grid;
+  min-height: 1.875rem;
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--color-text-primary);
+  font-family: inherit;
+  font-size: var(--font-size-xs);
+  place-items: center;
+}
+
+.day:hover {
+  background: var(--color-surface-overlay);
+}
+
+.isOutsideMonth {
+  color: var(--color-text-secondary);
+  opacity: 0.45;
+}
+
+.isToday {
+  font-weight: var(--font-weight-semibold);
+}
+
+.isSelected,
+.isSelected:hover {
+  background: var(--color-accent);
+  color: var(--color-on-accent);
+  font-weight: var(--font-weight-semibold);
+  opacity: 1;
+}
+
+.todayButton {
+  justify-self: center;
+  padding: var(--space-1) var(--space-3);
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--color-text-secondary);
+  font-family: inherit;
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+}
+
+.todayButton:hover {
+  background: var(--color-surface-overlay);
+  color: var(--color-text-primary);
+}

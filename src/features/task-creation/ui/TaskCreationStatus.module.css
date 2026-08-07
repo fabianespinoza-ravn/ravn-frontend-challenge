@@ -1,0 +1,9 @@
+/*
+ * The accent doubles as the error colour until the design system gains one of
+ * its own, which is also what marks the individual controls as invalid.
+ */
+.root {
+  margin: 0;
+  color: var(--color-accent);
+  font-size: var(--font-size-sm);
+}

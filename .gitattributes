@@ -1,0 +1,6 @@
+# Prettier is configured with `endOfLine: lf`, so that has to mean the same
+# thing on every machine. Git stores text as LF and checks it out as LF here,
+# regardless of a contributor's local `core.autocrlf`, which on Windows would
+# otherwise hand Prettier CRLF files and fail `format:check` for the whole
+# repository while continuous integration on Linux reported it clean.
+* text=auto eol=lf

@@ -1,6 +1,32 @@
+/*
+ * iOS creation palette, scoped to this composition. Every field, popover, and
+ * wheel reads these custom properties, so the screen restyles from here alone.
+ */
 .root {
-  min-height: calc(100dvh - 10.5rem);
+  --field-row-background: #2c2c2e;
+  --field-overlay-background: #3a3a3c;
+  --field-option-hover: #48484a;
+  --field-chip-background: #3a3a3c;
+  --field-checkbox-background: #48484a;
+  --field-text: #ffffff;
+  --field-text-secondary: #8e8e93;
+
+  /*
+   * The composition paints no surface of its own: it sits directly on the page,
+   * so the field rows are the only raised colour on the screen. This padding
+   * completes the `--space-6` top rhythm every other page starts with.
+   */
   padding-top: var(--space-2);
+  color: var(--field-text);
+}
+
+.visuallyHidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
 }
 
 .actionBar {
@@ -12,57 +38,30 @@
 }
 
 .actionBar :global(button) {
-  color: var(--color-text-secondary);
+  color: var(--field-text);
+}
+
+/* The action bar already carries the gap below itself, so this only reclaims it. */
+.status {
+  margin-bottom: var(--space-4);
 }
 
 .createButton {
   padding: var(--space-2);
   border: 0;
   background: transparent;
-  font-size: var(--font-size-xs);
+  color: var(--field-text-secondary);
+  font-family: inherit;
+  font-size: var(--font-size-sm);
   font-weight: var(--font-weight-medium);
 }
 
-.createButton:focus-visible,
-.field:focus-visible {
+/* Turns solid once every required field carries a value. */
+.isReady {
+  color: var(--field-text);
+}
+
+.createButton:focus-visible {
   outline: var(--focus-ring);
   outline-offset: var(--focus-offset);
-}
-
-.root h1 {
-  margin: 0 0 var(--space-6);
-  color: var(--color-text-secondary);
-  font-size: var(--font-size-md);
-  font-weight: var(--font-weight-semibold);
-}
-
-.fields {
-  display: grid;
-  gap: var(--space-3);
-}
-
-.field {
-  display: flex;
-  min-height: 2.25rem;
-  align-items: center;
-  gap: var(--space-2);
-  padding: 0 var(--space-3);
-  border: 0;
-  border-radius: var(--radius-sm);
-  background: var(--color-surface-raised);
-  color: var(--color-text-primary);
-  font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-semibold);
-  text-align: left;
-}
-
-.field:hover,
-.createButton:hover {
-  color: var(--color-text-primary);
-}
-
-@media (min-width: 768px) {
-  .root {
-    max-width: 30rem;
-  }
 }
