@@ -4,6 +4,7 @@ import { useUsers } from '@/entities/user/model/useUsers'
 import { useIsNarrowViewport } from '@/shared/lib/viewport/useIsNarrowViewport'
 import { countActiveFilters } from '../model/taskFilters'
 import { useTaskFilters } from '../model/useTaskFilters'
+import { EstimateChips, StatusChips, TagsChips } from './TaskFilterChips'
 import {
   AssigneeFilterField,
   DueDateFilter,
@@ -67,21 +68,39 @@ export function TaskFiltersPanel({ hasAssigneeFilter = false }: TaskFiltersPanel
   const content = (
     <>
       <div className={isNarrowViewport ? styles.sheetFields : styles.fields}>
-        <StatusFilter
-          onChange={(value) => setFilter('status', value)}
-          value={filters.status}
-          variant={fieldVariant}
-        />
-        <EstimateFilter
-          onChange={(value) => setFilter('pointEstimate', value)}
-          value={filters.pointEstimate}
-          variant={fieldVariant}
-        />
-        <TagsFilter
-          onChange={(value) => setFilter('tags', value)}
-          value={filters.tags}
-          variant={fieldVariant}
-        />
+        {/*
+         * Spike variant 2: the three closed, short option sets narrow the board
+         * in place. Due date and Assignee still open, a calendar being too large
+         * to inline and a teammate list having no fixed length.
+         */}
+        {isNarrowViewport ? (
+          <>
+            <StatusChips onChange={(value) => setFilter('status', value)} value={filters.status} />
+            <EstimateChips
+              onChange={(value) => setFilter('pointEstimate', value)}
+              value={filters.pointEstimate}
+            />
+            <TagsChips onChange={(value) => setFilter('tags', value)} value={filters.tags} />
+          </>
+        ) : (
+          <>
+            <StatusFilter
+              onChange={(value) => setFilter('status', value)}
+              value={filters.status}
+              variant={fieldVariant}
+            />
+            <EstimateFilter
+              onChange={(value) => setFilter('pointEstimate', value)}
+              value={filters.pointEstimate}
+              variant={fieldVariant}
+            />
+            <TagsFilter
+              onChange={(value) => setFilter('tags', value)}
+              value={filters.tags}
+              variant={fieldVariant}
+            />
+          </>
+        )}
         <DueDateFilter
           onChange={(value) => setFilter('dueDate', value)}
           value={filters.dueDate}
