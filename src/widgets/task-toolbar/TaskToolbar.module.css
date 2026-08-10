@@ -5,6 +5,12 @@
   align-items: center;
   gap: var(--space-3);
   border-bottom: 1px solid var(--color-border);
+  /*
+   * Spike: lets the inline filters region take a second line. Desktop is
+   * unaffected, because there the panel is absolutely positioned and so is not
+   * a flex item at all.
+   */
+  flex-wrap: wrap;
 }
 
 .viewToggle {
@@ -127,5 +133,17 @@
 
   :global([data-mobile-navigation='drawer']) .listButton {
     order: 2;
+  }
+
+  /*
+   * Spike: last, so it beats the full widths above it at equal specificity. A
+   * full width became a full line once the row could wrap, which sent the
+   * filters trigger to a second one and spent the height this presentation is
+   * meant to save. Sharing the line keeps the toolbar as it was reviewed.
+   */
+  :global([data-mobile-navigation='bottom']) .viewToggle,
+  :global([data-mobile-navigation='drawer']) .viewToggle {
+    width: auto;
+    flex: 1 1 auto;
   }
 }

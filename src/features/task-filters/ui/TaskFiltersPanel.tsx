@@ -2,7 +2,6 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { SlidersHorizontal } from 'lucide-react'
 import { useUsers } from '@/entities/user/model/useUsers'
 import { useIsNarrowViewport } from '@/shared/lib/viewport/useIsNarrowViewport'
-import { Modal } from '@/shared/ui/modal/Modal'
 import { countActiveFilters } from '../model/taskFilters'
 import { useTaskFilters } from '../model/useTaskFilters'
 import {
@@ -13,6 +12,9 @@ import {
   TagsFilter,
 } from './TaskFilterFields'
 import styles from './TaskFiltersPanel.module.css'
+
+/* Named rather than generated, since exactly one filters region exists at a time. */
+const filtersRegionId = 'task-filters-region'
 
 type TaskFiltersPanelProps = {
   /*
@@ -114,10 +116,12 @@ export function TaskFiltersPanel({ hasAssigneeFilter = false }: TaskFiltersPanel
   )
 
   return (
-    <div className={styles.root} ref={containerRef}>
+    <div className={isNarrowViewport ? styles.rootInline : styles.root} ref={containerRef}>
       <button
+        aria-controls={isNarrowViewport ? filtersRegionId : undefined}
         aria-expanded={isOpen}
-        aria-haspopup="true"
+        /* A disclosure reveals a region in place; it does not pop anything up. */
+        aria-haspopup={isNarrowViewport ? undefined : true}
         /* The count is in the name, so it is announced and not only seen. */
         aria-label={activeCount > 0 ? `Filters, ${activeCount} active` : 'Filters'}
         className={activeCount > 0 ? `${styles.trigger} ${styles.isActive}` : styles.trigger}
@@ -135,9 +139,14 @@ export function TaskFiltersPanel({ hasAssigneeFilter = false }: TaskFiltersPanel
 
       {isOpen ? (
         isNarrowViewport ? (
-          <Modal label="Task filters" onClose={close} panelClassName={styles.sheet}>
+          <div
+            aria-label="Task filters"
+            className={styles.region}
+            id={filtersRegionId}
+            role="group"
+          >
             {content}
-          </Modal>
+          </div>
         ) : (
           <div aria-label="Task filters" className={styles.panel} role="group">
             {content}
