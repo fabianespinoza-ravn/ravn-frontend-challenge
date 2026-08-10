@@ -1,117 +1,220 @@
 # Ravn Frontend Challenge — Task Management
 
-A responsive task-management web application built for the Ravn Frontend Challenge. The project is developed incrementally, with decisions and progress recorded in the [implementation plan](docs/implementation-plan.md).
+A responsive task-management application built with React, TypeScript and GraphQL. It supports task browsing, search and filters, task CRUD operations, an authenticated-user view, and platform-aware layouts for desktop, Android and iOS.
 
-## Current status
+## Highlights
 
-Initial Setup is in progress. The application foundation, routing, styling system, quality tooling, tests, and continuous integration are available. The dashboard interface and GraphQL task functionality are implemented in subsequent phases.
+- Dashboard with five task-status columns: Backlog, To Do, In Progress, Done and Cancelled.
+- Board and list presentations, switchable from the task toolbar.
+- Task counts in every board column and in each list category.
+- Search with debounce and combinable filters for status, estimate, labels, due date and assignee.
+- Create, edit and delete tasks against the GraphQL API.
+- Apollo Client normalized cache with intentional update strategies for create, update and delete.
+- My Tasks view, scoped to the authenticated user.
+- Settings page with authenticated-user information.
+- Responsive desktop, Android and iOS-oriented UI compositions.
+- Due-date feedback: green for future dates, yellow for today/tomorrow, and red for overdue tasks in the list view; overdue dates are highlighted on board cards.
+- Accessible dialogs, menus, focus management and keyboard-friendly controls.
 
-## Planned capabilities
+## Screenshots
 
-- Browse tasks grouped by status.
-- View tasks assigned to the authenticated user.
-- Create, edit, and delete tasks.
-- Search and combine task filters.
-- View authenticated-user information in Settings.
-- Use the provided GraphQL API.
+### Dashboard
 
-## Technology
+#### Desktop
 
-- React and TypeScript
+<p align="center">
+  <img src="docs/images/dashboard-desktop.png" alt="Desktop dashboard showing task columns, counts and due-date states" width="800">
+</p>
+
+#### iOS
+
+<p align="center">
+  <img src="docs/images/dashboard-ios.png" alt="iOS-oriented dashboard with bottom navigation" width="260">
+</p>
+
+#### Android
+
+<p align="center">
+  <img src="docs/images/dashboard-android.png" alt="Android dashboard with drawer-oriented navigation and floating create button" width="260">
+</p>
+
+### Create task
+
+#### Desktop
+
+<p align="center">
+  <img src="docs/images/create-task-desktop.png" alt="Desktop create-task modal" width="500">
+</p>
+
+#### Mobile
+
+<p align="center">
+  <img src="docs/images/create-tasks-mobile-modal.png" alt="Mobile create-task screen" width="260">
+</p>
+
+### Edit task
+
+#### Desktop
+
+<p align="center">
+  <img src="docs/images/edit-task-desktop.png" alt="Desktop edit-task modal" width="500">
+</p>
+
+#### Mobile
+
+<p align="center">
+  <img src="docs/images/edit-task-mobile.png" alt="Mobile edit-task screen" width="260">
+</p>
+
+### My Tasks
+
+#### Desktop
+
+<p align="center">
+  <img src="docs/images/my-tasks-desktop.png" alt="Desktop My Tasks list grouped by status" width="800">
+</p>
+
+#### iOS
+
+<p align="center">
+  <img src="docs/images/my-tasks-ios.png" alt="iOS-oriented My Tasks view" width="260">
+</p>
+
+#### Android
+
+<p align="center">
+  <img src="docs/images/my-tasks-android.png" alt="Android My Tasks view" width="260">
+</p>
+
+### Settings
+
+#### Desktop
+
+<p align="center">
+  <img src="docs/images/settings-desktop.png" alt="Desktop settings page with authenticated profile information" width="800">
+</p>
+
+#### Mobile
+
+<p align="center">
+  <img src="docs/images/settings-mobile-modal.png" alt="Mobile settings view" width="260">
+</p>
+
+## Bonus features implemented
+
+| Bonus                              | Implementation                                                                                                           |
+| ---------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| Total count of tasks by column     | Every board column computes and displays its number of tasks.                                                            |
+| Change layout from columns to list | The toolbar switches between `TaskBoard` and `TaskList` without re-fetching data.                                        |
+| Date color by deadline             | Task date state is derived from the local calendar day: future (`green`), today/tomorrow (`yellow`) and overdue (`red`). |
+
+Drag and drop between columns and entry animations for newly created tasks are not included.
+
+## Tech stack
+
+- React 19 and TypeScript
 - Vite
-- React Router
+- React Router 7
+- Apollo Client 4 and GraphQL
 - CSS Modules with global design tokens
-- ESLint and Prettier
+- Lucide icons
 - Vitest and React Testing Library
+- ESLint and Prettier
 - GitHub Actions
+
+## Architecture
+
+The repository follows a lightweight feature-sliced structure:
+
+| Folder         | Responsibility                                                                |
+| -------------- | ----------------------------------------------------------------------------- |
+| `src/app`      | Application providers, routing, layout and global styles.                     |
+| `src/pages`    | Route-level pages: Dashboard, My Tasks and Settings.                          |
+| `src/widgets`  | Composed interface sections such as sidebar, header, toolbar, board and list. |
+| `src/features` | User workflows: task form, task actions and filters.                          |
+| `src/entities` | Task and user models, GraphQL operations and entity UI.                       |
+| `src/shared`   | Reusable UI primitives, configuration, API client and utilities.              |
+| `src/test`     | Shared testing utilities and GraphQL mocks.                                   |
+
+`AppLayout` coordinates shared UI state: navigation, filters, task creation/editing, delete confirmation and the responsive form container. Apollo owns remote data and its normalized cache.
+
+## Data flow
+
+```text
+Dashboard / My Tasks
+  → page data hook
+  → Apollo useQuery(GET_TASKS)
+  → GraphQL API
+  → InMemoryCache
+  → API-to-UI mapper
+  → TaskBoard or TaskList
+```
+
+Task mutations are handled as follows:
+
+- Create: runs `CREATE_TASK` and refetches active `GET_TASKS` queries so server-side filters remain authoritative.
+- Update: `UPDATE_TASK` returns the full task; Apollo updates the normalized entity automatically. A reassignment also refetches task lists because it can change My Tasks membership.
+- Delete: `DELETE_TASK` evicts the task entity from Apollo cache and runs garbage collection, removing it from cached lists without a full refetch.
+
+## Responsive behavior
+
+The shared layout breakpoint is `768px`.
+
+- Desktop: persistent sidebar, full header and task form modal.
+- Android narrow viewport: drawer navigation, compact header, floating create button and Material-style date picker.
+- iOS/other narrow viewport: bottom navigation, full-page task form and wheel-style date picker.
+
+The form draft is owned by `AppLayout`, so entered values survive a switch between desktop modal and mobile full-page containers.
 
 ## Prerequisites
 
 - Node.js `>=22 <25`
 - npm `>=10`
 
-## Local setup
+## Getting started
 
-1. Clone the repository and enter its directory.
-2. Install dependencies:
+1. Install dependencies:
 
    ```bash
    npm install
    ```
 
-3. Create a local environment file:
-
-   ```bash
-   cp .env.example .env.local
-   ```
-
-   On PowerShell, use:
+2. Create your local environment file:
 
    ```powershell
    Copy-Item .env.example .env.local
    ```
 
-4. Add your GraphQL token to `VITE_GRAPHQL_TOKEN` in `.env.local`. Do not commit this file.
-5. Start the development server:
+3. Set the GraphQL credentials in `.env.local`:
+
+   ```env
+   VITE_GRAPHQL_ENDPOINT=...
+   VITE_GRAPHQL_TOKEN=...
+   ```
+
+4. Start the development server:
 
    ```bash
    npm run dev
    ```
 
-The application is available at the URL displayed by Vite, normally `http://localhost:5173`.
+The app is normally available at `http://localhost:5173`.
 
-`VITE_GRAPHQL_ENDPOINT` is prefilled with the challenge API endpoint in `.env.example`. GraphQL requests are introduced in the dedicated API phase; the environment file is prepared in advance and contains no secret values.
+## Scripts
 
-## Available scripts
+| Command                 | Purpose                                    |
+| ----------------------- | ------------------------------------------ |
+| `npm run dev`           | Start the development server.              |
+| `npm run build`         | Type-check and create a production build.  |
+| `npm run preview`       | Serve the production build locally.        |
+| `npm run typecheck`     | Check TypeScript without building.         |
+| `npm run lint`          | Run ESLint.                                |
+| `npm run format:check`  | Verify Prettier formatting.                |
+| `npm run test`          | Run the test suite.                        |
+| `npm run test:coverage` | Run tests and generate coverage artifacts. |
 
-| Command                 | Purpose                                            |
-| ----------------------- | -------------------------------------------------- |
-| `npm run dev`           | Start the local development server.                |
-| `npm run build`         | Type-check and build the production application.   |
-| `npm run preview`       | Preview the production build locally.              |
-| `npm run typecheck`     | Check TypeScript types without generating a build. |
-| `npm run lint`          | Run ESLint.                                        |
-| `npm run lint:fix`      | Apply ESLint fixes where safe.                     |
-| `npm run format`        | Format repository files with Prettier.             |
-| `npm run format:check`  | Verify formatting without changing files.          |
-| `npm run test`          | Run the test suite once.                           |
-| `npm run test:watch`    | Run tests in watch mode.                           |
-| `npm run test:coverage` | Generate the test coverage report.                 |
+## Quality and security
 
-## Architecture and decisions
+The project uses strict TypeScript, ESLint, Prettier, Vitest and React Testing Library. GitHub Actions verifies formatting, types, linting, tests and production build on pushes and pull requests.
 
-The codebase uses a simplified feature-sliced structure:
-
-- `src/app`: application providers, routing, shell, and global styles.
-- `src/pages`: route-level pages.
-- `src/widgets`: larger composed Figma sections.
-- `src/features`: user interactions and use cases.
-- `src/entities`: task and user domain concerns.
-- `src/shared`: reusable UI primitives, utilities, configuration, and assets.
-- `src/test`: shared testing utilities and mocks.
-
-Folders are created when they receive an active responsibility; placeholder folders are intentionally avoided. Component styles are colocated CSS Modules, while reset rules and design tokens are global. The responsive implementation is mobile-first for browser use on desktop, iOS, and Android.
-
-For the complete route model, API constraints, delivery phases, and decision history, read the [implementation plan](docs/implementation-plan.md).
-
-## Quality and continuous integration
-
-The project uses strict TypeScript, ESLint, Prettier, Vitest, and React Testing Library. GitHub Actions runs formatting verification, type checking, linting, tests, and a production build for pull requests and pushes to `main`.
-
-Run the same checks locally before opening a pull request:
-
-```bash
-npm run format:check
-npm run typecheck
-npm run lint
-npm run test
-npm run build
-```
-
-## Security
-
-Environment files and credentials are ignored by Git. Never commit API tokens, secrets, or personal configuration. Use `.env.example` only as a template.
-
-## Visual evidence
-
-Screenshots and GIFs will be added as each user-interface phase is completed.
+Environment files and credentials are ignored by Git. Never commit `.env.local` or access tokens; use `.env.example` as the configuration template.
