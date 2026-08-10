@@ -7,13 +7,19 @@ import { getUserInitials, type User } from '@/entities/user/model/user'
 import { formatDueDateLabel } from '@/shared/lib/date/dueDate'
 import { Avatar } from '@/shared/ui/avatar/Avatar'
 import { DatePicker } from '@/shared/ui/date-picker/DatePicker'
-import { FieldDropdown } from '@/shared/ui/field-dropdown/FieldDropdown'
+import { FieldDropdown, type FieldVariant } from '@/shared/ui/field-dropdown/FieldDropdown'
 import dropdownStyles from '@/shared/ui/field-dropdown/FieldDropdown.module.css'
 import type { AssigneeFilter, TaskFilters } from '../model/taskFilters'
 
 type FilterFieldProps<TKey extends keyof TaskFilters> = {
   onChange: (value: TaskFilters[TKey]) => void
   value: TaskFilters[TKey]
+  /*
+   * The panel decides it, not each field: below the layout breakpoint every one
+   * of them becomes a full-width row whose options open centred over the screen,
+   * which is what 5.34 gave the task form for the same reason.
+   */
+  variant?: FieldVariant
 }
 
 /**
@@ -22,13 +28,14 @@ type FilterFieldProps<TKey extends keyof TaskFilters> = {
  * missing, while these only narrow a query, so every one of them offers an
  * `Any` option that a required field could never have.
  */
-export function StatusFilter({ onChange, value }: FilterFieldProps<'status'>) {
+export function StatusFilter({ onChange, value, variant }: FilterFieldProps<'status'>) {
   const selected = taskStatuses.find((status) => status.value === value)
 
   return (
     <FieldDropdown
       isFilled={Boolean(selected)}
       label="Status"
+      variant={variant}
       trigger={
         <>
           {/* Takes the colour of the chosen status, and stays an outline
@@ -63,11 +70,12 @@ export function StatusFilter({ onChange, value }: FilterFieldProps<'status'>) {
   )
 }
 
-export function EstimateFilter({ onChange, value }: FilterFieldProps<'pointEstimate'>) {
+export function EstimateFilter({ onChange, value, variant }: FilterFieldProps<'pointEstimate'>) {
   return (
     <FieldDropdown
       isFilled={value !== ''}
       label="Estimate"
+      variant={variant}
       trigger={
         <span className={dropdownStyles.triggerLabel}>
           {value === '' ? 'Estimate' : getPointEstimateLabel(value)}
@@ -103,13 +111,14 @@ export function EstimateFilter({ onChange, value }: FilterFieldProps<'pointEstim
  * after each choice would force the control open again for the next one, the
  * same reason the form's label control stays open (5.23).
  */
-export function TagsFilter({ onChange, value }: FilterFieldProps<'tags'>) {
+export function TagsFilter({ onChange, value, variant }: FilterFieldProps<'tags'>) {
   const selectedLabels = value.map((tag) => tagLabels[tag])
 
   return (
     <FieldDropdown
       isFilled={value.length > 0}
       label="Label"
+      variant={variant}
       trigger={
         <>
           <Tag aria-hidden="true" size={16} />
@@ -146,12 +155,13 @@ export function TagsFilter({ onChange, value }: FilterFieldProps<'tags'>) {
   )
 }
 
-export function DueDateFilter({ onChange, value }: FilterFieldProps<'dueDate'>) {
+export function DueDateFilter({ onChange, value, variant }: FilterFieldProps<'dueDate'>) {
   return (
     <FieldDropdown
       isFilled={value !== ''}
       label="Due date"
       panelClassName={dropdownStyles.panelFitsContent}
+      variant={variant}
       trigger={
         <>
           <CalendarClock aria-hidden="true" size={16} />
@@ -182,6 +192,7 @@ type AssigneeFilterProps = {
   assignees: User[]
   onChange: (value: AssigneeFilter) => void
   value: AssigneeFilter
+  variant?: FieldVariant
 }
 
 /**
@@ -189,7 +200,7 @@ type AssigneeFilterProps = {
  * `null` really does return the unassigned tasks, confirmed by creating one and
  * finding it alone.
  */
-export function AssigneeFilterField({ assignees, onChange, value }: AssigneeFilterProps) {
+export function AssigneeFilterField({ assignees, onChange, value, variant }: AssigneeFilterProps) {
   const selected = assignees.find((assignee) => assignee.id === value)
   const label = value === null ? 'Unassigned' : selected?.fullName
 
@@ -198,6 +209,7 @@ export function AssigneeFilterField({ assignees, onChange, value }: AssigneeFilt
       isFilled={value !== ''}
       label="Assignee"
       panelTitle="Assigned to..."
+      variant={variant}
       trigger={
         <>
           <UserRound aria-hidden="true" size={16} />

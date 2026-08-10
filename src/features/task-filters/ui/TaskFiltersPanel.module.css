@@ -73,6 +73,27 @@
   min-width: 14rem;
 }
 
+/*
+ * The narrow-viewport presentation. The shared modal already sizes itself to
+ * `min(100%, 28rem)`, so this only trims the padding a filter list does not need
+ * and lets the rows sit closer together than a form's fields do.
+ */
+.sheet {
+  display: grid;
+  gap: var(--space-3);
+  padding: var(--space-4);
+}
+
+/*
+ * No `min-width` here, unlike the anchored panel: these rows take the width the
+ * dialog gives them, and a minimum measured in `rem` is exactly what would
+ * reintroduce the overflow once a reader enlarges their text.
+ */
+.sheetFields {
+  display: grid;
+  gap: var(--space-2);
+}
+
 .clear {
   padding: var(--space-2);
   border: 0;

@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { SlidersHorizontal } from 'lucide-react'
 import { useUsers } from '@/entities/user/model/useUsers'
+import { useIsNarrowViewport } from '@/shared/lib/viewport/useIsNarrowViewport'
+import { Modal } from '@/shared/ui/modal/Modal'
 import { countActiveFilters } from '../model/taskFilters'
 import { useTaskFilters } from '../model/useTaskFilters'
 import {
@@ -28,11 +30,23 @@ export function TaskFiltersPanel({ hasAssigneeFilter = false }: TaskFiltersPanel
   // Teammates are only needed once the panel offers to filter by one.
   const { data } = useUsers({ skip: !hasAssigneeFilter || !isOpen })
   const activeCount = countActiveFilters(filters)
+  /*
+   * Below the layout breakpoint the toolbar hides its add-task control and gives
+   * the view toggle the full width, which leaves this trigger flush against the
+   * right edge. An anchored panel then opens into a screen edge rather than
+   * across the board, so the presentation changes rather than the anchor: the
+   * panel becomes a dialog and its fields the same full-width rows the task form
+   * uses, whose options open centred over the screen. Nothing here can outgrow
+   * the viewport, which flipping the anchor would only have deferred until a
+   * reader enlarged their text and every `rem` grew with it.
+   */
+  const isNarrowViewport = useIsNarrowViewport()
 
   const close = useCallback(() => setIsOpen(false), [])
 
   useEffect(() => {
-    if (!isOpen) {
+    /* The dialog dismisses through its own backdrop. */
+    if (!isOpen || isNarrowViewport) {
       return
     }
 
@@ -45,7 +59,59 @@ export function TaskFiltersPanel({ hasAssigneeFilter = false }: TaskFiltersPanel
     document.addEventListener('mousedown', handlePointerDown)
 
     return () => document.removeEventListener('mousedown', handlePointerDown)
-  }, [isOpen])
+  }, [isNarrowViewport, isOpen])
+
+  const fieldVariant = isNarrowViewport ? 'row' : 'compact'
+  const content = (
+    <>
+      <div className={isNarrowViewport ? styles.sheetFields : styles.fields}>
+        <StatusFilter
+          onChange={(value) => setFilter('status', value)}
+          value={filters.status}
+          variant={fieldVariant}
+        />
+        <EstimateFilter
+          onChange={(value) => setFilter('pointEstimate', value)}
+          value={filters.pointEstimate}
+          variant={fieldVariant}
+        />
+        <TagsFilter
+          onChange={(value) => setFilter('tags', value)}
+          value={filters.tags}
+          variant={fieldVariant}
+        />
+        <DueDateFilter
+          onChange={(value) => setFilter('dueDate', value)}
+          value={filters.dueDate}
+          variant={fieldVariant}
+        />
+        {hasAssigneeFilter ? (
+          <AssigneeFilterField
+            assignees={data?.users ?? []}
+            onChange={(value) => setFilter('assigneeId', value)}
+            value={filters.assigneeId}
+            variant={fieldVariant}
+          />
+        ) : null}
+      </div>
+      {/*
+       * Without this, a filter that returns nothing leaves no obvious way back:
+       * the board is empty, so there is nothing on screen to suggest what is
+       * hiding it.
+       */}
+      <button
+        className={styles.clear}
+        disabled={activeCount === 0 && filters.name === ''}
+        onClick={() => {
+          clearFilters()
+          close()
+        }}
+        type="button"
+      >
+        Clear all filters
+      </button>
+    </>
+  )
 
   return (
     <div className={styles.root} ref={containerRef}>
@@ -68,43 +134,15 @@ export function TaskFiltersPanel({ hasAssigneeFilter = false }: TaskFiltersPanel
       </button>
 
       {isOpen ? (
-        <div aria-label="Task filters" className={styles.panel} role="group">
-          <div className={styles.fields}>
-            <StatusFilter onChange={(value) => setFilter('status', value)} value={filters.status} />
-            <EstimateFilter
-              onChange={(value) => setFilter('pointEstimate', value)}
-              value={filters.pointEstimate}
-            />
-            <TagsFilter onChange={(value) => setFilter('tags', value)} value={filters.tags} />
-            <DueDateFilter
-              onChange={(value) => setFilter('dueDate', value)}
-              value={filters.dueDate}
-            />
-            {hasAssigneeFilter ? (
-              <AssigneeFilterField
-                assignees={data?.users ?? []}
-                onChange={(value) => setFilter('assigneeId', value)}
-                value={filters.assigneeId}
-              />
-            ) : null}
+        isNarrowViewport ? (
+          <Modal label="Task filters" onClose={close} panelClassName={styles.sheet}>
+            {content}
+          </Modal>
+        ) : (
+          <div aria-label="Task filters" className={styles.panel} role="group">
+            {content}
           </div>
-          {/*
-           * Without this, a filter that returns nothing leaves no obvious way
-           * back: the board is empty, so there is nothing on screen to suggest
-           * what is hiding it.
-           */}
-          <button
-            className={styles.clear}
-            disabled={activeCount === 0 && filters.name === ''}
-            onClick={() => {
-              clearFilters()
-              close()
-            }}
-            type="button"
-          >
-            Clear all filters
-          </button>
-        </div>
+        )
       ) : null}
     </div>
   )
