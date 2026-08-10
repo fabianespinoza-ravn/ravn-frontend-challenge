@@ -30,9 +30,8 @@ afterEach(() => {
 /**
  * jsdom computes no layout, so no assertion here can measure the overflow that
  * caused this. What it can hold is the decision that removed it: which of the
- * two presentations each side of the breakpoint renders. An anchored panel below
- * the breakpoint is the defect, because that is where the trigger sits flush
- * against the right edge of the screen with nothing to open into.
+ * two presentations each side of the breakpoint renders. On a narrow viewport,
+ * the filters stay in the toolbar flow rather than covering the task board.
  */
 describe('TaskFiltersPanel', () => {
   describe('below the layout breakpoint', () => {
@@ -40,25 +39,32 @@ describe('TaskFiltersPanel', () => {
       setViewportWidth(390)
     })
 
-    it('opens as a dialog rather than a panel anchored to the screen edge', async () => {
+    it('reveals an inline filters region rather than a dialog', async () => {
       const user = userEvent.setup()
       renderPanel()
 
       await user.click(screen.getByRole('button', { name: 'Filters' }))
 
-      expect(screen.getByRole('dialog', { name: 'Task filters' })).toBeInTheDocument()
-      expect(screen.queryByRole('group', { name: 'Task filters' })).not.toBeInTheDocument()
+      expect(screen.getByRole('group', { name: 'Task filters' })).toBeInTheDocument()
+      expect(screen.queryByRole('dialog', { name: 'Task filters' })).not.toBeInTheDocument()
     })
 
-    it('gives every field the row variant, whose options open centred over the screen', async () => {
+    it('uses direct chips for the three fixed option sets', async () => {
       const user = userEvent.setup()
       renderPanel()
 
       await user.click(screen.getByRole('button', { name: 'Filters' }))
 
-      for (const field of ['Status', 'Estimate', 'Label', 'Due date']) {
-        expect(screen.getByRole('button', { name: field })).toHaveClass(dropdownStyles.rowTrigger)
+      for (const group of ['Status', 'Estimate', 'Label']) {
+        expect(screen.getByRole('group', { name: group })).toBeInTheDocument()
       }
+      expect(screen.getByRole('button', { name: 'Backlog' })).toHaveAttribute(
+        'aria-pressed',
+        'false',
+      )
+      expect(screen.getByRole('button', { name: 'Due date' })).toHaveClass(
+        dropdownStyles.rowTrigger,
+      )
     })
   })
 
