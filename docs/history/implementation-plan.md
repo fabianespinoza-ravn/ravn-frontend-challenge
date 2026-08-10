@@ -1,7 +1,12 @@
-# Implementation Plan and Decision Log
+# Historical Implementation Plan and Decision Log
 
-> **Status:** Every product requirement is merged; a fix returns the mobile task filters to the viewport.
-> **Last updated:** 2026-08-07
+> **Document status:** Historical record. It preserves the delivery phases and contemporaneous technical rationale that led to the current implementation.
+>
+> **Current documentation:** Consult the [documentation index](../README.md) for the maintained architecture, data-flow, responsive-design and development guides. Current decisions are recorded in [`../decisions/`](../decisions/).
+>
+> **Historical snapshot:** The status, issue references and feature wording below reflect the point at which each entry was recorded; they are not a statement of the current repository state.
+>
+> **Last historical update:** 2026-08-07
 > **Phase closure:** Initial Setup was merged through [PR #3](https://github.com/fabianespinoza-ravn/ravn-frontend-challenge/pull/3); Issue #1 is closed.
 > **Phase closure:** Dashboard UI was merged through [PR #5](https://github.com/fabianespinoza-ravn/ravn-frontend-challenge/pull/5); Issue #4 is closed.
 > **Phase closure:** GraphQL Data and Creation was merged through [PR #7](https://github.com/fabianespinoza-ravn/ravn-frontend-challenge/pull/7); Issue #6 is closed.

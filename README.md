@@ -16,6 +16,18 @@ A responsive task-management application built with React, TypeScript and GraphQ
 - Due-date feedback: green for future dates, yellow for today/tomorrow, and red for overdue tasks in the list view; overdue dates are highlighted on board cards.
 - Accessible dialogs, menus, focus management and keyboard-friendly controls.
 
+## Documentation
+
+The maintained technical documentation is located in [`docs/`](docs/README.md):
+
+- [Architecture](docs/architecture.md)
+- [API and state](docs/api-and-state.md)
+- [Responsive design](docs/responsive-design.md)
+- [Development workflow](docs/development.md)
+- [Architecture Decision Records](docs/decisions/)
+
+The original phased plan is preserved as a [historical record](docs/history/implementation-plan.md).
+
 ## Screenshots
 
 ### Dashboard
