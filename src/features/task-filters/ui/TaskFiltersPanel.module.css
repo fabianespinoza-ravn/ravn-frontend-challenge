@@ -73,6 +73,46 @@
   min-width: 14rem;
 }
 
+/*
+ * Spike: the inline presentation dissolves this wrapper so the trigger and the
+ * region become siblings in the toolbar's own flex line. The region then claims
+ * a full basis and wraps onto a second row, under the controls rather than over
+ * the board. Nothing here is positioned, so the wrapper has nothing to anchor.
+ */
+.rootInline {
+  display: contents;
+}
+
+.region {
+  display: grid;
+  flex-basis: 100%;
+  gap: var(--space-3);
+  padding: var(--space-3);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-overlay);
+}
+
+/*
+ * The narrow-viewport presentation. The shared modal already sizes itself to
+ * `min(100%, 28rem)`, so this only trims the padding a filter list does not need
+ * and lets the rows sit closer together than a form's fields do.
+ */
+.sheet {
+  display: grid;
+  gap: var(--space-3);
+  padding: var(--space-4);
+}
+
+/*
+ * No `min-width` here, unlike the anchored panel: these rows take the width the
+ * dialog gives them, and a minimum measured in `rem` is exactly what would
+ * reintroduce the overflow once a reader enlarges their text.
+ */
+.sheetFields {
+  display: grid;
+  gap: var(--space-2);
+}
+
 .clear {
   padding: var(--space-2);
   border: 0;

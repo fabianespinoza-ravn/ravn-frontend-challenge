@@ -1,8 +1,10 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { SlidersHorizontal } from 'lucide-react'
 import { useUsers } from '@/entities/user/model/useUsers'
+import { useIsNarrowViewport } from '@/shared/lib/viewport/useIsNarrowViewport'
 import { countActiveFilters } from '../model/taskFilters'
 import { useTaskFilters } from '../model/useTaskFilters'
+import { EstimateChips, StatusChips, TagsChips } from './TaskFilterChips'
 import {
   AssigneeFilterField,
   DueDateFilter,
@@ -11,6 +13,9 @@ import {
   TagsFilter,
 } from './TaskFilterFields'
 import styles from './TaskFiltersPanel.module.css'
+
+/* Named rather than generated, since exactly one filters region exists at a time. */
+const filtersRegionId = 'task-filters-region'
 
 type TaskFiltersPanelProps = {
   /*
@@ -28,11 +33,23 @@ export function TaskFiltersPanel({ hasAssigneeFilter = false }: TaskFiltersPanel
   // Teammates are only needed once the panel offers to filter by one.
   const { data } = useUsers({ skip: !hasAssigneeFilter || !isOpen })
   const activeCount = countActiveFilters(filters)
+  /*
+   * Below the layout breakpoint the toolbar hides its add-task control and gives
+   * the view toggle the full width, which leaves this trigger flush against the
+   * right edge. An anchored panel then opens into a screen edge rather than
+   * across the board, so the presentation changes rather than the anchor: the
+   * panel becomes a dialog and its fields the same full-width rows the task form
+   * uses, whose options open centred over the screen. Nothing here can outgrow
+   * the viewport, which flipping the anchor would only have deferred until a
+   * reader enlarged their text and every `rem` grew with it.
+   */
+  const isNarrowViewport = useIsNarrowViewport()
 
   const close = useCallback(() => setIsOpen(false), [])
 
   useEffect(() => {
-    if (!isOpen) {
+    /* The dialog dismisses through its own backdrop. */
+    if (!isOpen || isNarrowViewport) {
       return
     }
 
@@ -45,13 +62,85 @@ export function TaskFiltersPanel({ hasAssigneeFilter = false }: TaskFiltersPanel
     document.addEventListener('mousedown', handlePointerDown)
 
     return () => document.removeEventListener('mousedown', handlePointerDown)
-  }, [isOpen])
+  }, [isNarrowViewport, isOpen])
+
+  const fieldVariant = isNarrowViewport ? 'row' : 'compact'
+  const content = (
+    <>
+      <div className={isNarrowViewport ? styles.sheetFields : styles.fields}>
+        {/*
+         * Spike variant 2: the three closed, short option sets narrow the board
+         * in place. Due date and Assignee still open, a calendar being too large
+         * to inline and a teammate list having no fixed length.
+         */}
+        {isNarrowViewport ? (
+          <>
+            <StatusChips onChange={(value) => setFilter('status', value)} value={filters.status} />
+            <EstimateChips
+              onChange={(value) => setFilter('pointEstimate', value)}
+              value={filters.pointEstimate}
+            />
+            <TagsChips onChange={(value) => setFilter('tags', value)} value={filters.tags} />
+          </>
+        ) : (
+          <>
+            <StatusFilter
+              onChange={(value) => setFilter('status', value)}
+              value={filters.status}
+              variant={fieldVariant}
+            />
+            <EstimateFilter
+              onChange={(value) => setFilter('pointEstimate', value)}
+              value={filters.pointEstimate}
+              variant={fieldVariant}
+            />
+            <TagsFilter
+              onChange={(value) => setFilter('tags', value)}
+              value={filters.tags}
+              variant={fieldVariant}
+            />
+          </>
+        )}
+        <DueDateFilter
+          onChange={(value) => setFilter('dueDate', value)}
+          value={filters.dueDate}
+          variant={fieldVariant}
+        />
+        {hasAssigneeFilter ? (
+          <AssigneeFilterField
+            assignees={data?.users ?? []}
+            onChange={(value) => setFilter('assigneeId', value)}
+            value={filters.assigneeId}
+            variant={fieldVariant}
+          />
+        ) : null}
+      </div>
+      {/*
+       * Without this, a filter that returns nothing leaves no obvious way back:
+       * the board is empty, so there is nothing on screen to suggest what is
+       * hiding it.
+       */}
+      <button
+        className={styles.clear}
+        disabled={activeCount === 0 && filters.name === ''}
+        onClick={() => {
+          clearFilters()
+          close()
+        }}
+        type="button"
+      >
+        Clear all filters
+      </button>
+    </>
+  )
 
   return (
-    <div className={styles.root} ref={containerRef}>
+    <div className={isNarrowViewport ? styles.rootInline : styles.root} ref={containerRef}>
       <button
+        aria-controls={isNarrowViewport ? filtersRegionId : undefined}
         aria-expanded={isOpen}
-        aria-haspopup="true"
+        /* A disclosure reveals a region in place; it does not pop anything up. */
+        aria-haspopup={isNarrowViewport ? undefined : true}
         /* The count is in the name, so it is announced and not only seen. */
         aria-label={activeCount > 0 ? `Filters, ${activeCount} active` : 'Filters'}
         className={activeCount > 0 ? `${styles.trigger} ${styles.isActive}` : styles.trigger}
@@ -68,43 +157,20 @@ export function TaskFiltersPanel({ hasAssigneeFilter = false }: TaskFiltersPanel
       </button>
 
       {isOpen ? (
-        <div aria-label="Task filters" className={styles.panel} role="group">
-          <div className={styles.fields}>
-            <StatusFilter onChange={(value) => setFilter('status', value)} value={filters.status} />
-            <EstimateFilter
-              onChange={(value) => setFilter('pointEstimate', value)}
-              value={filters.pointEstimate}
-            />
-            <TagsFilter onChange={(value) => setFilter('tags', value)} value={filters.tags} />
-            <DueDateFilter
-              onChange={(value) => setFilter('dueDate', value)}
-              value={filters.dueDate}
-            />
-            {hasAssigneeFilter ? (
-              <AssigneeFilterField
-                assignees={data?.users ?? []}
-                onChange={(value) => setFilter('assigneeId', value)}
-                value={filters.assigneeId}
-              />
-            ) : null}
-          </div>
-          {/*
-           * Without this, a filter that returns nothing leaves no obvious way
-           * back: the board is empty, so there is nothing on screen to suggest
-           * what is hiding it.
-           */}
-          <button
-            className={styles.clear}
-            disabled={activeCount === 0 && filters.name === ''}
-            onClick={() => {
-              clearFilters()
-              close()
-            }}
-            type="button"
+        isNarrowViewport ? (
+          <div
+            aria-label="Task filters"
+            className={styles.region}
+            id={filtersRegionId}
+            role="group"
           >
-            Clear all filters
-          </button>
-        </div>
+            {content}
+          </div>
+        ) : (
+          <div aria-label="Task filters" className={styles.panel} role="group">
+            {content}
+          </div>
+        )
       ) : null}
     </div>
   )

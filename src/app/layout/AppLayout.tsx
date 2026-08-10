@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import { Plus } from 'lucide-react'
 import { Outlet, useLocation } from 'react-router-dom'
 import { GET_TASKS } from '@/entities/task/api/taskOperations'
@@ -20,20 +20,13 @@ import { useUpdateTask } from '@/features/task-form/model/useUpdateTask'
 import { TaskFormModal } from '@/features/task-form/ui/TaskFormModal'
 import { useUsers } from '@/entities/user/model/useUsers'
 import { getMobilePlatform } from '@/shared/lib/platform/getMobilePlatform'
+import { useIsNarrowViewport } from '@/shared/lib/viewport/useIsNarrowViewport'
 import { useDebouncedValue } from '@/shared/lib/timing/useDebouncedValue'
 import { AddProjectPage } from '@/pages/add-project/AddProjectPage'
 import { IconButton } from '@/shared/ui/icon-button/IconButton'
 import { AppHeader } from '@/widgets/app-header/AppHeader'
 import { AppSidebar } from '@/widgets/app-sidebar/AppSidebar'
 import styles from './AppLayout.module.css'
-
-/**
- * The modal opens exactly where the toolbar add-task control becomes visible,
- * so that control always leads to the same container. Below this width the only
- * creation entry points are Add Project and the Android action button, which
- * both open the full-page composition.
- */
-const taskFormModalBreakpoint = 768
 
 /*
  * Named positively rather than as everything except Settings, so a route added
@@ -48,9 +41,13 @@ const searchDebounceDelay = 300
 export function AppLayout() {
   const [isNavigationOpen, setIsNavigationOpen] = useState(false)
   const [isTaskFormOpen, setIsTaskFormOpen] = useState(false)
-  const [supportsTaskFormModal, setSupportsTaskFormModal] = useState(
-    () => window.innerWidth >= taskFormModalBreakpoint,
-  )
+  /*
+   * The modal opens exactly where the toolbar add-task control becomes visible,
+   * so that control always leads to the same container. Below that width the
+   * only creation entry points are Add Project and the Android action button,
+   * which both open the full-page composition.
+   */
+  const supportsTaskFormModal = !useIsNarrowViewport()
   /*
    * The task being edited, or `null` while the draft is a new one. It decides
    * which mutation the same form submits to, and both containers read it to
@@ -85,16 +82,6 @@ export function AppLayout() {
    * because a trailing space is a search nobody meant to run.
    */
   const appliedName = useDebouncedValue(filters.name.trim(), searchDebounceDelay)
-
-  useEffect(() => {
-    function syncViewport() {
-      setSupportsTaskFormModal(window.innerWidth >= taskFormModalBreakpoint)
-    }
-
-    window.addEventListener('resize', syncViewport)
-
-    return () => window.removeEventListener('resize', syncViewport)
-  }, [])
 
   const closeTaskForm = useCallback(() => {
     setIsTaskFormOpen(false)
