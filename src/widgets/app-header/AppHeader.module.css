@@ -46,19 +46,12 @@
 
 /*
  * Takes the width the search would have taken on a route that has no tasks to
- * search, so the notification and profile controls stay at the right edge
+ * search, so the profile control stays at the right edge
  * instead of sliding across to meet the left one.
  */
 .searchSpacer {
   flex: 1;
   min-width: 0;
-}
-
-.actions {
-  display: flex;
-  flex: 0 0 auto;
-  align-items: center;
-  gap: var(--space-2);
 }
 
 .androidProfileLink {
@@ -69,21 +62,6 @@
 .androidProfileLink:focus-visible {
   outline: var(--focus-ring);
   outline-offset: var(--focus-offset);
-}
-
-.root :global(button) {
-  position: relative;
-}
-
-.notificationIndicator {
-  position: absolute;
-  top: 0.75rem;
-  right: 0.75rem;
-  width: 0.375rem;
-  height: 0.375rem;
-  border: 1px solid var(--color-surface);
-  border-radius: 50%;
-  background: var(--color-accent);
 }
 
 .profileLink {

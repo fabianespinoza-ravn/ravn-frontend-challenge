@@ -39,7 +39,7 @@ describe('Dashboard shell', () => {
     expect(screen.getByRole('button', { name: 'Add Project' })).toHaveClass(sidebarStyles.isActive)
   })
 
-  it('renders search, notification, and profile controls', () => {
+  it('renders search and profile controls', () => {
     render(
       <MockedProvider mocks={createGraphqlMocks()}>
         <MemoryRouter>
@@ -51,7 +51,6 @@ describe('Dashboard shell', () => {
     )
 
     expect(screen.getByRole('searchbox', { name: 'Search tasks' })).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'View notifications' })).toBeInTheDocument()
     expect(screen.getByRole('link', { name: 'Open settings' })).toHaveAttribute('href', '/settings')
     expect(screen.getByRole('img', { name: 'Profile' })).toHaveTextContent('FE')
   })
@@ -108,7 +107,6 @@ describe('Dashboard shell', () => {
 
     expect(screen.getByRole('link', { name: 'Open settings' })).toBeInTheDocument()
     expect(screen.getByRole('searchbox', { name: 'Search tasks' })).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'View notifications' })).toBeInTheDocument()
   })
 
   it('renders board view controls and requests task creation from the add-task action', () => {

@@ -1,7 +1,6 @@
-import { Bell, Search } from 'lucide-react'
+import { Search } from 'lucide-react'
 import { NavLink } from 'react-router-dom'
 import { Avatar } from '@/shared/ui/avatar/Avatar'
-import { IconButton } from '@/shared/ui/icon-button/IconButton'
 import { getUserInitials } from '@/entities/user/model/user'
 import { useProfile } from '@/entities/user/model/useProfile'
 import { useTaskFilters } from '@/features/task-filters/model/useTaskFilters'
@@ -43,20 +42,14 @@ export function AppHeader({ hasTaskSearch = true, isAndroid = false }: AppHeader
           />
         </div>
       ) : (
-        /* Holds the space the search left, so the actions stay at the edge. */
+        /* Holds the space the search left, so the profile control stays at the edge. */
         <span className={styles.searchSpacer} />
       )}
-      <div className={styles.actions}>
-        <IconButton aria-label="View notifications" title="View notifications">
-          <Bell aria-hidden="true" size={20} />
-          <span className={styles.notificationIndicator} aria-hidden="true" />
-        </IconButton>
-        {!isAndroid ? (
-          <NavLink aria-label="Open settings" className={styles.profileLink} to="/settings">
-            <Avatar alt="Profile" initials={initials} src={profile?.avatar} />
-          </NavLink>
-        ) : null}
-      </div>
+      {!isAndroid ? (
+        <NavLink aria-label="Open settings" className={styles.profileLink} to="/settings">
+          <Avatar alt="Profile" initials={initials} src={profile?.avatar} />
+        </NavLink>
+      ) : null}
     </header>
   )
 }

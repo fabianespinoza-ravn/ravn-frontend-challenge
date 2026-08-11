@@ -27,9 +27,6 @@ export type TaskAssignee = {
  */
 export type Task = {
   assignee?: TaskAssignee
-  attachmentCount: number
-  checklistCount: number
-  commentCount: number
   dueDate: string
   dueDateLabel: string
   dueDateTone: 'future' | 'past' | 'soon'

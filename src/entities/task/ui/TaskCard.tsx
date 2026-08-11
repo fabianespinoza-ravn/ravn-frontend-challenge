@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react'
-import { CalendarClock, CheckSquare2, MessageCircle, Paperclip } from 'lucide-react'
+import { CalendarClock } from 'lucide-react'
 import type { Task } from '@/entities/task/model/task'
 import { pointEstimateValues, tagLabels } from '@/entities/task/model/taskLabels'
 import { Avatar } from '@/shared/ui/avatar/Avatar'
@@ -58,20 +58,6 @@ export function TaskCard({ actions, task }: TaskCardProps) {
             —
           </span>
         )}
-        <div className={styles.statistics} aria-label="Task activity">
-          <span>
-            <Paperclip aria-hidden="true" size={14} />
-            {task.attachmentCount}
-          </span>
-          <span>
-            <CheckSquare2 aria-hidden="true" size={14} />
-            {task.checklistCount}
-          </span>
-          <span>
-            <MessageCircle aria-hidden="true" size={14} />
-            {task.commentCount}
-          </span>
-        </div>
       </footer>
     </article>
   )

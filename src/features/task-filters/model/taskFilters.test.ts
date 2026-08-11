@@ -13,9 +13,6 @@ import {
 
 function task(dueDate: string, id = 'task-1'): Task {
   return {
-    attachmentCount: 0,
-    checklistCount: 0,
-    commentCount: 0,
     dueDate,
     dueDateLabel: '',
     dueDateTone: 'future',

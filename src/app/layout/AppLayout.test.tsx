@@ -323,9 +323,6 @@ describe('AppLayout task creation', () => {
 
 const assignedTask: Task = {
   assignee: { id: 'user-2', initials: 'AL', name: 'Ada Lovelace' },
-  attachmentCount: 0,
-  checklistCount: 0,
-  commentCount: 0,
   dueDate: '2026-08-10T12:00:00.000Z',
   dueDateLabel: '10 Aug, 2026',
   dueDateTone: 'future',
