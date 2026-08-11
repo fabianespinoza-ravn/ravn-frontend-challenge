@@ -84,9 +84,6 @@ export function mapApiTaskToTask(apiTask: ApiTask): Task {
           },
         }
       : {}),
-    attachmentCount: 0,
-    checklistCount: 0,
-    commentCount: 0,
     dueDate: apiTask.dueDate,
     dueDateLabel: getDueDateLabel(dueDate, dayOffset),
     dueDateTone,

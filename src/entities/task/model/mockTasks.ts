@@ -3,9 +3,6 @@ import type { Task } from './task'
 export const mockTasks: Task[] = [
   {
     assignee: { id: 'user-lena-evans', initials: 'LE', name: 'Lena Evans' },
-    attachmentCount: 2,
-    checklistCount: 5,
-    commentCount: 3,
     dueDate: '2026-08-04',
     dueDateLabel: 'Today',
     dueDateTone: 'soon',
@@ -16,9 +13,6 @@ export const mockTasks: Task[] = [
     title: 'Slack workspace',
   },
   {
-    attachmentCount: 1,
-    checklistCount: 2,
-    commentCount: 1,
     dueDate: '2026-08-10',
     dueDateLabel: '10 Aug, 2026',
     dueDateTone: 'future',
@@ -30,9 +24,6 @@ export const mockTasks: Task[] = [
   },
   {
     assignee: { id: 'mock-authenticated-user', initials: 'FE', name: 'Fabian Espinoza' },
-    attachmentCount: 3,
-    checklistCount: 4,
-    commentCount: 2,
     dueDate: '2026-08-05',
     dueDateLabel: 'Tomorrow',
     dueDateTone: 'soon',
@@ -44,9 +35,6 @@ export const mockTasks: Task[] = [
   },
   {
     assignee: { id: 'mock-authenticated-user', initials: 'FE', name: 'Fabian Espinoza' },
-    attachmentCount: 2,
-    checklistCount: 5,
-    commentCount: 3,
     dueDate: '2026-08-03',
     dueDateLabel: 'Yesterday',
     dueDateTone: 'past',
@@ -58,9 +46,6 @@ export const mockTasks: Task[] = [
   },
   {
     assignee: { id: 'user-alex-lee', initials: 'AL', name: 'Alex Lee' },
-    attachmentCount: 1,
-    checklistCount: 3,
-    commentCount: 2,
     dueDate: '2026-08-06',
     dueDateLabel: '6 Aug, 2026',
     dueDateTone: 'future',
@@ -72,9 +57,6 @@ export const mockTasks: Task[] = [
   },
   {
     assignee: { id: 'mock-authenticated-user', initials: 'FE', name: 'Fabian Espinoza' },
-    attachmentCount: 4,
-    checklistCount: 6,
-    commentCount: 2,
     dueDate: '2026-08-12',
     dueDateLabel: '12 Aug, 2026',
     dueDateTone: 'future',
@@ -86,9 +68,6 @@ export const mockTasks: Task[] = [
   },
   {
     assignee: { id: 'mock-authenticated-user', initials: 'FE', name: 'Fabian Espinoza' },
-    attachmentCount: 2,
-    checklistCount: 5,
-    commentCount: 3,
     dueDate: '2026-08-04',
     dueDateLabel: 'Today',
     dueDateTone: 'soon',
@@ -100,9 +79,6 @@ export const mockTasks: Task[] = [
   },
   {
     assignee: { id: 'user-jordan-rivera', initials: 'JR', name: 'Jordan Rivera' },
-    attachmentCount: 1,
-    checklistCount: 1,
-    commentCount: 0,
     dueDate: '2026-08-02',
     dueDateLabel: '2 Aug, 2026',
     dueDateTone: 'past',

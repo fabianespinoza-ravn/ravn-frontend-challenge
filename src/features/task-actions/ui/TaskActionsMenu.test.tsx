@@ -6,9 +6,6 @@ import { TaskActionsTestProvider } from '@/test/taskActions'
 import { TaskActionsMenu } from './TaskActionsMenu'
 
 const task: Task = {
-  attachmentCount: 0,
-  checklistCount: 0,
-  commentCount: 0,
   dueDate: '2026-08-12T12:00:00.000Z',
   dueDateLabel: '12 Aug, 2026',
   dueDateTone: 'future',
