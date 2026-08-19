@@ -1,0 +1,13 @@
+/*
+ * Hidden from sight but not from the accessibility tree, since what it says is
+ * already on screen for anyone who can see it.
+ */
+.root {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}

@@ -4,6 +4,7 @@ import { TaskList } from '@/widgets/task-list/TaskList'
 import { TaskToolbar, type TaskView } from '@/widgets/task-toolbar/TaskToolbar'
 import { TaskBoard } from '@/widgets/task-board/TaskBoard'
 import { emptyResultsHint } from '@/features/task-filters/model/taskFilters'
+import { LiveAnnouncement } from '@/shared/ui/live-announcement/LiveAnnouncement'
 import { useTaskFilters } from '@/features/task-filters/model/useTaskFilters'
 import { useDashboardTasks } from './model/useDashboardTasks'
 import styles from './DashboardPage.module.css'
@@ -16,9 +17,22 @@ export function DashboardPage() {
    * own choice, so switching one does not rearrange the other behind you.
    */
   const [view, setView] = useState<TaskView>('board')
+  const hasNoTasks = !isLoading && !error && tasks.length === 0
+  /*
+   * Loading announces itself and so does a failure, but a filter that empties
+   * the board replaces it in silence. Only the emptiness is announced: coming
+   * back to results is a board the reader is already watching, while an empty
+   * one is the answer that needs saying.
+   */
+  const announcement = hasNoTasks
+    ? isFiltered
+      ? 'No tasks match your filters.'
+      : 'No tasks are available.'
+    : ''
 
   return (
     <section className={styles.root}>
+      <LiveAnnouncement message={announcement} />
       <h1 className={styles.heading}>Dashboard</h1>
       <TaskToolbar activeView={view} hasAssigneeFilter onSelectView={setView} />
       {isLoading ? (
@@ -36,7 +50,7 @@ export function DashboardPage() {
           </Button>
         </section>
       ) : null}
-      {!isLoading && !error && tasks.length === 0 ? (
+      {hasNoTasks ? (
         <section className={styles.state}>
           {/*
            * A search that found nothing and an account with nothing in it are
