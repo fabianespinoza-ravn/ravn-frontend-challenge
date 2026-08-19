@@ -13,18 +13,19 @@ main.tsx
       → AppLayout
         → AppSidebar + AppHeader + route Outlet
         → task form and delete-dialog overlays
+        → StatusToast, the standing region all three mutations announce into
 ```
 
 ## Layers
 
-| Layer      | Responsibility                                                        | Examples                                   |
-| ---------- | --------------------------------------------------------------------- | ------------------------------------------ |
-| `app`      | Application composition, providers, router, layout and global styles. | `AppLayout`, Apollo provider, router.      |
-| `pages`    | Route-level screen state and rendering.                               | Dashboard, My Tasks, Settings.             |
-| `widgets`  | Composed interface regions.                                           | Header, sidebar, toolbar, board, list.     |
-| `features` | User workflows and interaction-specific state.                        | Task form, task actions, filters.          |
-| `entities` | Task and user domain models, operations and entity UI.                | `Task`, `ApiTask`, mapper, `TaskCard`.     |
-| `shared`   | Generic UI, configuration, API infrastructure and helpers.            | Modal, buttons, dates, viewport, platform. |
+| Layer      | Responsibility                                                        | Examples                                                                                       |
+| ---------- | --------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
+| `app`      | Application composition, providers, router, layout and global styles. | `AppLayout`, Apollo provider, router.                                                          |
+| `pages`    | Route-level screen state and rendering.                               | Dashboard, My Tasks, Settings.                                                                 |
+| `widgets`  | Composed interface regions.                                           | Header, sidebar, toolbar, board, list.                                                         |
+| `features` | User workflows and interaction-specific state.                        | `useTaskFormWorkflow`, `useTaskDeletionWorkflow`, `useTaskFiltersState`.                       |
+| `entities` | Task and user domain models, operations and entity UI.                | `Task`, `ApiTask`, mapper, `TaskCard`, `TaskTags`.                                             |
+| `shared`   | Generic UI, configuration, API infrastructure and helpers.            | Modal, buttons, dates, viewport, platform, `useDisclosure`, `StatusToast`, `LiveAnnouncement`. |
 
 Dependencies point downward: pages compose widgets and features; features use entities and shared code; entities use shared code. Entity UI does not import a feature. For example, `TaskCard` receives its action menu as a prop instead of importing task actions directly.
 
@@ -42,12 +43,20 @@ Dependencies point downward: pages compose widgets and features; features use en
 
 ## Shared layout state
 
-`AppLayout` owns state that must outlive a page, card or responsive container:
+State that must outlive a page, card or responsive container is held above the routes, but it
+belongs to the feature that owns it rather than to the shell. `AppLayout` composes three
+workflow hooks and keeps only what a shell is for:
 
-- Navigation drawer visibility.
-- Task form visibility and draft state.
-- The task currently being edited.
-- The task awaiting delete confirmation.
-- Shared filters and debounced search value.
+| Owner                                               | State                                                                                                 |
+| --------------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
+| `AppLayout`                                         | Navigation drawer visibility, and the transient region the three mutations announce into.             |
+| `useTaskFormWorkflow` (`features/task-form`)        | Whether the form is open, which task it is editing, which container renders it, and the draft itself. |
+| `useTaskDeletionWorkflow` (`features/task-actions`) | The task awaiting a delete confirmation.                                                              |
+| `useTaskFiltersState` (`features/task-filters`)     | The active filters and the debounced search value.                                                    |
 
-It exposes focused contexts for opening the form, editing/deleting tasks and changing filters. This prevents prop drilling while avoiding a broad global client-state store.
+The layout exposes focused contexts for opening the form, editing and deleting tasks, and
+changing filters. This prevents prop drilling while avoiding a broad global client-state store.
+
+The announcement region stays with the layout because all three workflows report into one region
+and a deletion succeeds when no form is mounted, so no single feature can own it. Each workflow
+receives an `announce` function, which keeps the dependency visible at the call site.

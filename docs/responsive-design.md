@@ -25,7 +25,7 @@ Platform detection affects interaction conventions; it does not change routes or
 
 ## Shared draft across layouts
 
-The task-form draft belongs to `AppLayout`, not to the modal or full-page form. When viewport width crosses `768px`, the container can change while entered values, validation state and edit/create mode remain intact.
+The task-form draft belongs to `useTaskFormWorkflow`, which the layout calls, rather than to the modal or the full-page form. That hook also decides which of the two containers renders it. When viewport width crosses `768px`, the container can change while entered values, validation state and edit/create mode remain intact.
 
 ## Deadline feedback
 
