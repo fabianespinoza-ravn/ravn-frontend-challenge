@@ -53,10 +53,44 @@ function renderDashboard(
 afterEach(cleanup)
 
 describe('DashboardPage', () => {
+  /*
+   * A filter that empties the board replaces what is on screen without moving
+   * focus, so the standing region is what tells a reader the search answered.
+   */
+  it('announces a filter that matched nothing', async () => {
+    renderDashboard(
+      [
+        {
+          request: { query: GET_TASKS, variables: { input: { name: 'nothing' } } },
+          result: { data: { tasks: [] } },
+        },
+      ],
+      'nothing',
+    )
+
+    expect(
+      await screen.findByRole('heading', { name: 'No tasks match your filters' }),
+    ).toBeInTheDocument()
+    expect(screen.getByRole('status')).toHaveTextContent('No tasks match your filters.')
+  })
+
+  it('leaves the announcement empty while the board has tasks', async () => {
+    renderDashboard([
+      {
+        request: { query: GET_TASKS, variables: { input: {} } },
+        result: { data: { tasks: [laterTask] } },
+      },
+    ])
+
+    await screen.findByRole('article', { name: 'Later task' })
+
+    expect(screen.getByRole('status')).toBeEmptyDOMElement()
+  })
+
   it('shows a loading state before task data is available', () => {
     renderDashboard([])
 
-    expect(screen.getByRole('status')).toHaveTextContent('Loading tasks')
+    expect(screen.getByRole('heading', { name: 'Loading tasks' })).toBeInTheDocument()
   })
 
   it('maps API tasks and keeps chronological order within a status column', async () => {

@@ -60,10 +60,31 @@ function renderMyTasks(mocks: MockedResponse[], name = '') {
 afterEach(cleanup)
 
 describe('MyTasksPage', () => {
+  it('announces a filter that matched nothing', async () => {
+    renderMyTasks(
+      [
+        profileMock(),
+        {
+          request: {
+            query: GET_TASKS,
+            variables: { input: { name: 'nothing', assigneeId: mockProfile.id } },
+          },
+          result: { data: { tasks: [] } },
+        },
+      ],
+      'nothing',
+    )
+
+    expect(
+      await screen.findByRole('heading', { name: 'No assigned tasks match your filters' }),
+    ).toBeInTheDocument()
+    expect(screen.getByRole('status')).toHaveTextContent('No assigned tasks match your filters.')
+  })
+
   it('loads the authenticated profile and renders its assigned API tasks in list view', async () => {
     renderMyTasks([profileMock(), tasksMock([assignedTask])])
 
-    expect(screen.getByRole('status')).toHaveTextContent('Loading assigned tasks')
+    expect(screen.getByRole('heading', { name: 'Loading assigned tasks' })).toBeInTheDocument()
     expect(await screen.findByRole('article', { name: 'Assigned API task' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Task view' })).toHaveAttribute(
       'aria-pressed',

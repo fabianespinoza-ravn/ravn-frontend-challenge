@@ -800,11 +800,12 @@ describe('AppLayout filtering and the board', () => {
     await user.click(screen.getByRole('button', { name: 'Done' }))
 
     /*
-     * Mid-flight: the answer has not arrived, and the board has not left.
-     * Scoped to the route's own content, since the layout now keeps a standing
-     * announcement region of the same role outside it.
+     * Mid-flight: the answer has not arrived, and the board has not left. The
+     * loading panel is named rather than looked for by role, since two standing
+     * announcement regions now carry that role whether or not anything is
+     * loading.
      */
-    expect(within(screen.getByRole('main')).queryByRole('status')).not.toBeInTheDocument()
+    expect(screen.queryByRole('heading', { name: 'Loading tasks' })).not.toBeInTheDocument()
     expect(screen.getByRole('article', { name: mockCreatedTask.name })).toBeInTheDocument()
   })
 })
