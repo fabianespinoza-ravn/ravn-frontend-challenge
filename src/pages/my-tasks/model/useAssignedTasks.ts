@@ -1,83 +1,39 @@
-import { useQuery } from '@apollo/client/react'
-import { useCallback, useMemo } from 'react'
-import { GET_TASKS } from '@/entities/task/api/taskOperations'
-import type { ApiTask, TaskFilterInput } from '@/entities/task/model/apiTask'
-import { mapApiTaskToTask } from '@/entities/task/model/taskMapper'
+import { useCallback } from 'react'
 import { useProfile } from '@/entities/user/model/useProfile'
-import {
-  applyClientFilters,
-  hasActiveFilters,
-  toTaskFilterInput,
-} from '@/features/task-filters/model/taskFilters'
-import { useTaskFilters } from '@/features/task-filters/model/useTaskFilters'
+import { useFilteredTasks } from '@/features/task-filters/model/useFilteredTasks'
 
-type TasksQueryData = {
-  tasks: ApiTask[]
-}
-
-type TasksQueryVariables = {
-  input: TaskFilterInput
-}
-
-function sortTasksByDueDate(firstTask: ApiTask, secondTask: ApiTask) {
-  return new Date(firstTask.dueDate).getTime() - new Date(secondTask.dueDate).getTime()
-}
-
+/**
+ * The authenticated user's tasks, filtered.
+ *
+ * All this route adds to the board's own request is its assignee and the profile
+ * that answers who that is.
+ */
 export function useAssignedTasks() {
   const profileQuery = useProfile()
   const profileId = profileQuery.data?.profile.id
-  const { appliedFilters } = useTaskFilters()
-  /*
-   * Both fields in one input. Contract 5.10 confirmed that different filter
-   * fields combine with AND, so searching here stays inside what is assigned to
-   * the authenticated user rather than escaping into everyone's tasks.
-   */
   /*
    * The route's own assignee wins over the panel's, which is why the panel does
    * not offer that control here: My Tasks is the assignee filter, and a second
    * one would either contradict it or do nothing.
    */
-  const taskVariables = useMemo(
-    () => ({
-      input: {
-        ...toTaskFilterInput(appliedFilters),
-        ...(profileId ? { assigneeId: profileId } : {}),
-      },
-    }),
-    [appliedFilters, profileId],
-  )
-  const tasksQuery = useQuery<TasksQueryData, TasksQueryVariables>(GET_TASKS, {
-    skip: !profileId,
-    variables: taskVariables,
-  })
-
-  // Keeps the list mounted while a narrowed filter is answered; see 7.x.
-  const apiTasks = tasksQuery.data?.tasks ?? tasksQuery.previousData?.tasks
-
-  const tasks = useMemo(
-    () =>
-      applyClientFilters(
-        [...(apiTasks ?? [])].sort(sortTasksByDueDate).map(mapApiTaskToTask),
-        appliedFilters,
-      ),
-    [apiTasks, appliedFilters],
-  )
+  const filtered = useFilteredTasks({ assigneeId: profileId, skip: !profileId })
+  const retryTasks = filtered.retry
 
   const retry = useCallback(() => {
     void profileQuery.refetch()
 
     if (profileId) {
-      void tasksQuery.refetch(taskVariables)
+      retryTasks()
     }
-  }, [profileId, profileQuery, taskVariables, tasksQuery])
+  }, [profileId, profileQuery, retryTasks])
 
   return {
-    error: profileQuery.error ?? tasksQuery.error,
-    /* Lets the view say "nothing matches" rather than "nothing is assigned". */
-    isFiltered: hasActiveFilters(appliedFilters),
-    isLoading: (profileQuery.loading || tasksQuery.loading) && !tasksQuery.previousData,
-    isRefreshing: tasksQuery.loading && Boolean(tasksQuery.previousData),
+    error: profileQuery.error ?? filtered.error,
+    isFiltered: filtered.isFiltered,
+    /* The list waits on the profile too, since the request cannot go without it. */
+    isLoading: (profileQuery.loading || filtered.loading) && !filtered.hasPreviousData,
+    isRefreshing: filtered.isRefreshing,
     retry,
-    tasks,
+    tasks: filtered.tasks,
   }
 }
