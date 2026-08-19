@@ -97,9 +97,14 @@ export function hasActiveFilters(filters: TaskFilters) {
  * start folding case, advice that had become unnecessary would be a smaller
  * failure than copy that had become untrue. Without a name there is nothing
  * surprising to explain, so it points at the way out instead.
+ *
+ * One job per branch. The typed-name branch names the surprise and stops; the
+ * other offers the way out. Saying both in one sentence made the first branch
+ * repeat what the second exists to say, and named a `task title` the reader
+ * cannot see rather than the term they typed.
  */
 export function emptyResultsHint(filters: TaskFilters) {
   return filters.name
-    ? 'Try matching the capitals in the task title, or clear one of the filters.'
+    ? 'Try matching the capitals in the name you typed.'
     : 'Try clearing one of them.'
 }
