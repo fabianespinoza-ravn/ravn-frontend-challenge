@@ -15,6 +15,7 @@ A responsive task-management application built with React, TypeScript and GraphQ
 - Responsive desktop, Android and iOS-oriented UI compositions.
 - Due-date feedback: green for future dates, yellow for today/tomorrow, and red for overdue tasks in the list view; overdue dates are highlighted on board cards.
 - Accessible dialogs, menus, focus management and keyboard-friendly controls.
+- Announced feedback for every mutation: an assertive message when one fails, naming the operation, and a polite confirmation when one succeeds.
 
 ## Documentation
 
@@ -148,13 +149,13 @@ The repository follows a lightweight feature-sliced structure:
 | `src/shared`   | Reusable UI primitives, configuration, API client and utilities.              |
 | `src/test`     | Shared testing utilities and GraphQL mocks.                                   |
 
-`AppLayout` coordinates shared UI state: navigation, filters, task creation/editing, delete confirmation and the responsive form container. Apollo owns remote data and its normalized cache.
+`AppLayout` is the shell: it owns the navigation and the region that announces finished mutations, and it composes three workflow hooks that own the rest — the task form and its draft, the delete confirmation, and the filters. Each lives with the feature it belongs to. Apollo owns remote data and its normalized cache.
 
 ## Data flow
 
 ```text
 Dashboard / My Tasks
-  → page data hook
+  → useFilteredTasks (My Tasks wraps it to supply its assignee)
   → Apollo useQuery(GET_TASKS)
   → GraphQL API
   → InMemoryCache
@@ -166,7 +167,7 @@ Task mutations are handled as follows:
 
 - Create: runs `CREATE_TASK` and refetches active `GET_TASKS` queries so server-side filters remain authoritative.
 - Update: `UPDATE_TASK` returns the full task; Apollo updates the normalized entity automatically. A reassignment also refetches task lists because it can change My Tasks membership.
-- Delete: `DELETE_TASK` evicts the task entity from Apollo cache and runs garbage collection, removing it from cached lists without a full refetch.
+- Delete: `DELETE_TASK` evicts the task entity from Apollo cache and runs garbage collection, removing it from cached lists without a full refetch. Measured rather than assumed: a deletion emits exactly one request, and every cached task list releases the task without network activity.
 
 ## Responsive behavior
 
@@ -176,7 +177,7 @@ The shared layout breakpoint is `768px`.
 - Android narrow viewport: drawer navigation, compact header, floating create button and Material-style date picker.
 - iOS/other narrow viewport: bottom navigation, full-page task form and wheel-style date picker.
 
-The form draft is owned by `AppLayout`, so entered values survive a switch between desktop modal and mobile full-page containers.
+The form draft is owned by `useTaskFormWorkflow` above both containers, so entered values survive a switch between the desktop modal and the mobile full-page composition.
 
 ## Prerequisites
 
