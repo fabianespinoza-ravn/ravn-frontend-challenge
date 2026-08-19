@@ -60,7 +60,7 @@ export function SettingsPage() {
               <dd>{profile.email}</dd>
             </div>
             <div className={styles.detail}>
-              <dt>Position</dt>
+              <dt>Type</dt>
               <dd>{userTypeLabels[profile.type]}</dd>
             </div>
             {/* Only when the stored value is a date we can actually name. */}

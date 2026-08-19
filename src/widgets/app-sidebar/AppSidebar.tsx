@@ -72,7 +72,7 @@ export function AppSidebar({
         onTouchEnd={isAndroid ? handleDrawerTouchEnd : undefined}
         onTouchStart={isAndroid ? handleTouchStart : undefined}
       >
-        <div className={styles.brand} aria-label="Ravn">
+        <div className={styles.brand}>
           <BrandLogo />
         </div>
         <nav className={styles.navigation} aria-label="Primary navigation">

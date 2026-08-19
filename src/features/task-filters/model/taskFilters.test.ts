@@ -109,7 +109,7 @@ describe('counting', () => {
 })
 
 describe('emptyResultsHint', () => {
-  it('explains the case-sensitive name when one was typed', () => {
+  it('offers the capitals as something to try when a name was typed', () => {
     expect(emptyResultsHint({ ...emptyTaskFilters, name: 'ticket' })).toContain('capitals')
   })
 

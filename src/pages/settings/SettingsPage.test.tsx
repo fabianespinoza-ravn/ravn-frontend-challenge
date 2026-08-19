@@ -28,12 +28,12 @@ describe('SettingsPage', () => {
     expect(screen.getByRole('status')).toHaveTextContent('Loading profile')
   })
 
-  it('shows the authenticated name, email and position', async () => {
+  it('shows the authenticated name, email and account type', async () => {
     renderSettings([profileMock()])
 
     expect(await screen.findByRole('heading', { name: mockProfile.fullName })).toBeInTheDocument()
     expect(screen.getByText(mockProfile.email)).toBeInTheDocument()
-    expect(screen.getByText('Position')).toBeInTheDocument()
+    expect(screen.getByText('Type')).toBeInTheDocument()
   })
 
   /*
@@ -52,7 +52,7 @@ describe('SettingsPage', () => {
   it('leaves out the joining month when the stored value is not a date', async () => {
     renderSettings([profileMock({ ...mockProfile, createdAt: 'not-a-date' })])
 
-    expect(await screen.findByText('Position')).toBeInTheDocument()
+    expect(await screen.findByText('Type')).toBeInTheDocument()
     expect(screen.queryByText('Member since')).not.toBeInTheDocument()
   })
 

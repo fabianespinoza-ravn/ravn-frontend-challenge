@@ -3,9 +3,14 @@ export const userTypes = ['ADMIN', 'CANDIDATE'] as const
 export type UserType = (typeof userTypes)[number]
 
 /**
- * The challenge calls this the user's Position, and the API answers it as an
- * enum. The wording lives beside the type for the same reason the task labels
- * do (5.20): one source, so no view spells it its own way.
+ * The account's role, which the API answers as an enum of two values.
+ *
+ * The challenge lists a Position among the profile fields, and this was once
+ * labelled as one. The API has no such field: `position` exists on `Task` and
+ * nowhere else in the schema, so the label named a role after something the
+ * user record cannot answer. The wording lives beside the type for the same
+ * reason the task labels do (5.20): one source, so no view spells it its own
+ * way.
  */
 export const userTypeLabels: Record<UserType, string> = {
   ADMIN: 'Admin',
@@ -19,7 +24,6 @@ export type User = {
   fullName: string
   id: string
   type: UserType
-  updatedAt: string
 }
 
 const memberSinceParts = new Intl.DateTimeFormat('en-US', {
