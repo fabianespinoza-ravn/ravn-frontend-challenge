@@ -1,6 +1,6 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
 import { MoreHorizontal, Pencil, Trash2 } from 'lucide-react'
 import type { Task } from '@/entities/task/model/task'
+import { useDisclosure } from '@/shared/lib/disclosure/useDisclosure'
 import { IconButton } from '@/shared/ui/icon-button/IconButton'
 import { useTaskActions } from '../model/useTaskActions'
 import styles from './TaskActionsMenu.module.css'
@@ -19,48 +19,8 @@ type TaskActionsMenuProps = {
  * lands back on the card it came from rather than at the top of the document.
  */
 export function TaskActionsMenu({ task }: TaskActionsMenuProps) {
-  const [isOpen, setIsOpen] = useState(false)
   const { deleteTask, editTask } = useTaskActions()
-  const containerRef = useRef<HTMLDivElement>(null)
-  const triggerRef = useRef<HTMLButtonElement>(null)
-  const wasOpenRef = useRef(false)
-
-  const close = useCallback(() => setIsOpen(false), [])
-
-  useEffect(() => {
-    if (wasOpenRef.current && !isOpen) {
-      triggerRef.current?.focus()
-    }
-
-    wasOpenRef.current = isOpen
-  }, [isOpen])
-
-  useEffect(() => {
-    if (!isOpen) {
-      return
-    }
-
-    function handlePointerDown(event: MouseEvent) {
-      if (event.target instanceof Node && !containerRef.current?.contains(event.target)) {
-        setIsOpen(false)
-      }
-    }
-
-    function handleKeyDown(event: KeyboardEvent) {
-      if (event.key === 'Escape') {
-        event.stopPropagation()
-        close()
-      }
-    }
-
-    document.addEventListener('mousedown', handlePointerDown)
-    document.addEventListener('keydown', handleKeyDown, true)
-
-    return () => {
-      document.removeEventListener('mousedown', handlePointerDown)
-      document.removeEventListener('keydown', handleKeyDown, true)
-    }
-  }, [close, isOpen])
+  const { close, containerRef, isOpen, toggle, triggerRef } = useDisclosure()
 
   return (
     <div className={styles.root} ref={containerRef}>
@@ -68,7 +28,7 @@ export function TaskActionsMenu({ task }: TaskActionsMenuProps) {
         aria-expanded={isOpen}
         aria-haspopup="menu"
         aria-label={`More options for ${task.title}`}
-        onClick={() => setIsOpen((currentIsOpen) => !currentIsOpen)}
+        onClick={toggle}
         ref={triggerRef}
         size="small"
       >
