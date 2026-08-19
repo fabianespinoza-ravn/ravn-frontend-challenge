@@ -11,7 +11,7 @@ A responsive task-management application built with React, TypeScript and GraphQ
 - Create, edit and delete tasks against the GraphQL API.
 - Apollo Client normalized cache with intentional update strategies for create, update and delete.
 - My Tasks view, scoped to the authenticated user.
-- Settings page with authenticated-user information.
+- Settings page with the authenticated user's name, email, account type and joining month. The challenge also lists a Position, which the API has no field for: `position` exists on `Task` and nowhere else in the schema, and asking for it on a user returns `Cannot query field "position" on type "User"`. The remaining field, `updatedAt`, is not rendered because it cannot change: no mutation writes to a user, and every account in the verified data carries it equal to `createdAt`.
 - Responsive desktop, Android and iOS-oriented UI compositions.
 - Due-date feedback: green for future dates, yellow for today/tomorrow, and red for overdue tasks in the list view; overdue dates are highlighted on board cards.
 - Accessible dialogs, menus, focus management and keyboard-friendly controls.

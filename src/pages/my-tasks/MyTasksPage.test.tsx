@@ -16,19 +16,15 @@ import { MyTasksPage } from './MyTasksPage'
 type ApolloApiTask = ApiTask & {
   __typename: 'Task'
   assignee: NonNullable<ApiTask['assignee']> & { __typename: 'User' }
-  creator: ApiTask['creator'] & { __typename: 'User' }
 }
 
 const assignedTask: ApolloApiTask = {
   __typename: 'Task',
   assignee: mockProfile,
-  createdAt: '2026-08-04T00:00:00.000Z',
-  creator: mockProfile,
   dueDate: '2099-08-12T12:00:00.000Z',
   id: 'assigned-task-1',
   name: 'Assigned API task',
   pointEstimate: 'TWO',
-  position: 1,
   status: 'TODO',
   tags: ['REACT'],
 }

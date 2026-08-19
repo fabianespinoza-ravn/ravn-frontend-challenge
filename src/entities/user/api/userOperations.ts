@@ -9,7 +9,6 @@ export const GET_PROFILE = gql`
       avatar
       type
       createdAt
-      updatedAt
     }
   }
 `
@@ -23,7 +22,6 @@ export const GET_USERS = gql`
       avatar
       type
       createdAt
-      updatedAt
     }
   }
 `

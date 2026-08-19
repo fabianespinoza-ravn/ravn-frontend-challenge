@@ -6,23 +6,11 @@ export const TASK_FIELDS = gql`
     name
     dueDate
     pointEstimate
-    position
     status
     tags
-    createdAt
     assignee {
       id
       fullName
-      email
-      avatar
-      type
-    }
-    creator {
-      id
-      fullName
-      email
-      avatar
-      type
     }
   }
 `

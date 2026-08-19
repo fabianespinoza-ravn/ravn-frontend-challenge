@@ -7,15 +7,15 @@ export const taskTags = ['ANDROID', 'IOS', 'NODE_JS', 'RAILS', 'REACT'] as const
 export type PointEstimate = (typeof pointEstimates)[number]
 export type TaskTag = (typeof taskTags)[number]
 
+/** Only what the mapper reads: the fragment asks for exactly these. */
+export type ApiTaskAssignee = Pick<User, 'fullName' | 'id'>
+
 export type ApiTask = {
-  assignee: User | null
-  createdAt: string
-  creator: User
+  assignee: ApiTaskAssignee | null
   dueDate: string
   id: string
   name: string
   pointEstimate: PointEstimate
-  position: number
   status: TaskStatus
   tags: TaskTag[]
 }

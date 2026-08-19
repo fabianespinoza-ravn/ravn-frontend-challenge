@@ -4,7 +4,7 @@ import userEvent from '@testing-library/user-event'
 import { afterEach, describe, expect, it } from 'vitest'
 import { GET_TASKS } from '@/entities/task/api/taskOperations'
 import type { ApiTask } from '@/entities/task/model/apiTask'
-import { mockProfile, mockTeammate } from '@/test/mocks/graphql'
+import { mockTeammate } from '@/test/mocks/graphql'
 import { TaskActionsTestProvider } from '@/test/taskActions'
 import { emptyTaskFilters } from '@/features/task-filters/model/taskFilters'
 import { TaskFiltersTestProvider } from '@/test/taskFilters'
@@ -13,19 +13,15 @@ import { DashboardPage } from './DashboardPage'
 
 type ApolloApiTask = ApiTask & {
   __typename: 'Task'
-  creator: ApiTask['creator'] & { __typename: 'User' }
 }
 
 const laterTask: ApolloApiTask = {
   __typename: 'Task',
   assignee: null,
-  createdAt: '2026-08-04T00:00:00.000Z',
-  creator: { ...mockProfile, __typename: 'User' },
   dueDate: '2099-08-12T12:00:00.000Z',
   id: 'task-later',
   name: 'Later task',
   pointEstimate: 'FOUR',
-  position: 2,
   status: 'BACKLOG',
   tags: ['REACT'],
 }
@@ -35,7 +31,6 @@ const earlierTask: ApiTask = {
   dueDate: '2099-08-01T12:00:00.000Z',
   id: 'task-earlier',
   name: 'Earlier task',
-  position: 1,
 }
 
 function renderDashboard(

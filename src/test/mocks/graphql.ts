@@ -12,7 +12,6 @@ export const mockProfile: User & { __typename: 'User' } = {
   fullName: 'Fabian Espinoza',
   id: 'profile-1',
   type: 'CANDIDATE',
-  updatedAt: '2026-08-04T00:00:00.000Z',
 }
 
 /** A teammate who is not the authenticated profile, so assignment is observable. */
@@ -24,7 +23,6 @@ export const mockTeammate: User & { __typename: 'User' } = {
   fullName: 'Ada Lovelace',
   id: 'user-2',
   type: 'ADMIN',
-  updatedAt: '2026-08-04T00:00:00.000Z',
 }
 
 export const mockUsers: User[] = [mockProfile, mockTeammate]
@@ -35,13 +33,10 @@ export const mockApiTasks: ApiTask[] = []
 export const mockCreatedTask: ApiTask & { __typename: 'Task' } = {
   __typename: 'Task',
   assignee: null,
-  createdAt: '2026-08-06T00:00:00.000Z',
-  creator: mockProfile,
   dueDate: '2026-08-10T12:00:00.000Z',
   id: 'task-created',
   name: 'Ship the mutation',
   pointEstimate: 'FOUR',
-  position: 1,
   status: 'TODO',
   tags: ['REACT'],
 }
