@@ -23,7 +23,7 @@ import { getMobilePlatform } from '@/shared/lib/platform/getMobilePlatform'
 import { useIsNarrowViewport } from '@/shared/lib/viewport/useIsNarrowViewport'
 import { useTransientStatus } from '@/shared/lib/feedback/useTransientStatus'
 import { useDebouncedValue } from '@/shared/lib/timing/useDebouncedValue'
-import { AddProjectPage } from '@/pages/add-project/AddProjectPage'
+import { TaskFormPage } from '@/pages/task-form/TaskFormPage'
 import { IconButton } from '@/shared/ui/icon-button/IconButton'
 import { StatusToast } from '@/shared/ui/status-toast/StatusToast'
 import { AppHeader } from '@/widgets/app-header/AppHeader'
@@ -251,9 +251,11 @@ export function AppLayout() {
               {isFullPageTaskFormOpen ? null : (
                 <AppHeader hasTaskSearch={hasTaskSearch} isAndroid={isAndroid} />
               )}
-              <main className={isFullPageTaskFormOpen ? styles.addProjectContent : styles.content}>
+              <main
+                className={isFullPageTaskFormOpen ? styles.taskFormPageContent : styles.content}
+              >
                 {isFullPageTaskFormOpen ? (
-                  <AddProjectPage
+                  <TaskFormPage
                     assignees={usersData?.users}
                     form={taskForm}
                     hasFailed={Boolean(creationError ?? updateError)}
@@ -268,7 +270,7 @@ export function AppLayout() {
               </main>
               {isAndroid && !isFullPageTaskFormOpen ? (
                 <IconButton
-                  aria-label="Add Project"
+                  aria-label="Add task"
                   className={styles.androidAddTaskButton}
                   onClick={taskFormContext.openTaskForm}
                 >

@@ -29,7 +29,7 @@
     max(var(--space-4), env(safe-area-inset-left));
 }
 
-.addProjectContent {
+.taskFormPageContent {
   width: min(100%, var(--content-max-width));
   margin: 0 auto;
   padding: var(--space-4) max(var(--space-4), env(safe-area-inset-right))
@@ -80,7 +80,7 @@
     padding: var(--space-3) var(--space-6) var(--space-8);
   }
 
-  .addProjectContent {
+  .taskFormPageContent {
     padding: var(--space-3) var(--space-6) var(--space-8);
   }
 }

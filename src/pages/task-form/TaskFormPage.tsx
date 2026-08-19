@@ -5,9 +5,9 @@ import type { TaskFormState } from '@/features/task-form/model/useTaskFormState'
 import { TaskFormStatus } from '@/features/task-form/ui/TaskFormStatus'
 import { TaskForm } from '@/features/task-form/ui/TaskForm'
 import { IconButton } from '@/shared/ui/icon-button/IconButton'
-import styles from './AddProjectPage.module.css'
+import styles from './TaskFormPage.module.css'
 
-type AddProjectPageProps = {
+type TaskFormPageProps = {
   assignees?: User[]
   form: TaskFormState
   hasFailed?: boolean
@@ -18,7 +18,7 @@ type AddProjectPageProps = {
   onSubmit?: () => void
 }
 
-export function AddProjectPage({
+export function TaskFormPage({
   assignees,
   form,
   hasFailed = false,
@@ -26,7 +26,7 @@ export function AddProjectPage({
   isSubmitting = false,
   onClose,
   onSubmit,
-}: AddProjectPageProps) {
+}: TaskFormPageProps) {
   /*
    * Completeness is the same question for either mutation, since both refuse
    * the same missing fields, so the creation input is what answers it.
