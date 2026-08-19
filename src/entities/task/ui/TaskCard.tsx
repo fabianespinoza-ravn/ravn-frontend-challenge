@@ -1,7 +1,8 @@
 import type { ReactNode } from 'react'
 import { CalendarClock } from 'lucide-react'
 import type { Task } from '@/entities/task/model/task'
-import { pointEstimateValues, tagLabels } from '@/entities/task/model/taskLabels'
+import { pointEstimateValues } from '@/entities/task/model/taskLabels'
+import { TaskTags } from '@/entities/task/ui/TaskTags'
 import { Avatar } from '@/shared/ui/avatar/Avatar'
 import styles from './TaskCard.module.css'
 
@@ -35,16 +36,7 @@ export function TaskCard({ actions, task }: TaskCardProps) {
         </span>
       </div>
 
-      <div className={styles.tags}>
-        {task.tags.map((tag) => (
-          <span
-            className={tag === 'ANDROID' ? `${styles.tag} ${styles.isAndroid}` : styles.tag}
-            key={tag}
-          >
-            {tagLabels[tag]}
-          </span>
-        ))}
-      </div>
+      <TaskTags className={styles.tags} tags={task.tags} />
 
       <footer className={styles.footer}>
         {task.assignee ? (

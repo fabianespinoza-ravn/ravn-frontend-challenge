@@ -1,7 +1,8 @@
 import { ChevronDown } from 'lucide-react'
 import type { Task } from '@/entities/task/model/task'
 import { taskStatuses } from '@/entities/task/model/task'
-import { pointEstimateValues, tagLabels } from '@/entities/task/model/taskLabels'
+import { pointEstimateValues } from '@/entities/task/model/taskLabels'
+import { TaskTags } from '@/entities/task/ui/TaskTags'
 import { TaskActionsMenu } from '@/features/task-actions/ui/TaskActionsMenu'
 import { Avatar } from '@/shared/ui/avatar/Avatar'
 import styles from './TaskList.module.css'
@@ -75,20 +76,7 @@ export function TaskList({ hasAssigneeColumn = false, tasks, title = 'My Tasks' 
                               {String(index + 1).padStart(2, '0')}
                             </span>
                             <h2>{task.title}</h2>
-                            <div className={styles.tags}>
-                              {task.tags.map((tag) => (
-                                <span
-                                  className={
-                                    tag === 'ANDROID'
-                                      ? `${styles.tag} ${styles.isAndroid}`
-                                      : styles.tag
-                                  }
-                                  key={tag}
-                                >
-                                  {tagLabels[tag]}
-                                </span>
-                              ))}
-                            </div>
+                            <TaskTags tags={task.tags} />
                             <span className={styles.points}>
                               {pointEstimateValues[task.pointEstimate]} points
                             </span>

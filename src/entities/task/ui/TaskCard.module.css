@@ -57,26 +57,7 @@
 }
 
 .tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-2);
   margin-top: var(--space-3);
-}
-
-.tag {
-  padding: var(--space-1) var(--space-2);
-  border-radius: var(--radius-sm);
-  background: rgb(101 185 139 / 14%);
-  color: #8fcf91;
-  font-size: 0.6875rem;
-  font-weight: var(--font-weight-semibold);
-  letter-spacing: 0.03em;
-  text-transform: uppercase;
-}
-
-.isAndroid {
-  background: rgb(227 189 87 / 13%);
-  color: #e3bd57;
 }
 
 .footer {
