@@ -3,9 +3,10 @@ import styles from './BrandLogo.module.css'
 export function BrandLogo() {
   return (
     <svg
-      aria-hidden="true"
+      aria-label="Ravn"
       className={styles.root}
       fill="none"
+      role="img"
       viewBox="0 0 80 72"
       xmlns="http://www.w3.org/2000/svg"
     >
