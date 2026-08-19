@@ -3,20 +3,20 @@ import userEvent from '@testing-library/user-event'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { taskFormId } from '@/features/task-form/model/taskForm'
 import { useTaskFormState } from '@/features/task-form/model/useTaskFormState'
-import { AddProjectPage } from './AddProjectPage'
-import styles from './AddProjectPage.module.css'
+import { TaskFormPage } from './TaskFormPage'
+import styles from './TaskFormPage.module.css'
 
-function AddProjectHarness({ onClose }: { onClose: () => void }) {
+function TaskFormPageHarness({ onClose }: { onClose: () => void }) {
   const form = useTaskFormState()
 
-  return <AddProjectPage form={form} onClose={onClose} />
+  return <TaskFormPage form={form} onClose={onClose} />
 }
 
 afterEach(cleanup)
 
-describe('AddProjectPage', () => {
+describe('TaskFormPage', () => {
   it('renders the task form inside the mobile full-page composition', () => {
-    render(<AddProjectHarness onClose={vi.fn()} />)
+    render(<TaskFormPageHarness onClose={vi.fn()} />)
 
     expect(screen.getByRole('button', { name: 'Close task creation' })).toBeInTheDocument()
     expect(screen.getByRole('heading', { name: 'Create Task' })).toBeInTheDocument()
@@ -28,7 +28,7 @@ describe('AddProjectPage', () => {
   })
 
   it('submits through the form even though its Create control sits outside it', () => {
-    render(<AddProjectHarness onClose={vi.fn()} />)
+    render(<TaskFormPageHarness onClose={vi.fn()} />)
 
     expect(screen.getByRole('button', { name: 'Create' })).toHaveAttribute('form', taskFormId)
   })
@@ -36,7 +36,7 @@ describe('AddProjectPage', () => {
   it('highlights Create only once every required field carries a value', async () => {
     const user = userEvent.setup()
 
-    render(<AddProjectHarness onClose={vi.fn()} />)
+    render(<TaskFormPageHarness onClose={vi.fn()} />)
 
     const createButton = screen.getByRole('button', { name: 'Create' })
 

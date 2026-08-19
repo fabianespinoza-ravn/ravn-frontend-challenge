@@ -102,7 +102,7 @@ describe('AppLayout task creation', () => {
 
     renderLayout()
 
-    fireEvent.click(screen.getByRole('button', { name: 'Add Project' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Add task' }))
 
     expect(screen.getByRole('heading', { name: 'Create Task' })).toBeInTheDocument()
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
