@@ -533,6 +533,88 @@ describe('AppLayout task deletion', () => {
   })
 })
 
+/*
+ * One invariant, three mutations: a mutation that succeeds closes its surface
+ * and announces it. The announcement is a region of its own rather than the
+ * draft's `role="alert"`, because a confirmation is not an interruption, and
+ * because a deletion succeeds when no draft is open to carry the message.
+ */
+describe('AppLayout mutation feedback', () => {
+  /*
+   * A live region inserted together with its first message is announced by
+   * almost nothing, so the empty region has to be there from the start.
+   */
+  it('keeps the announcement region mounted before anything has happened', () => {
+    renderLayout()
+
+    expect(screen.getByRole('status')).toBeEmptyDOMElement()
+  })
+
+  it('announces a created task', async () => {
+    platformMock.value = 'other'
+    setViewportWidth(1024)
+    const user = userEvent.setup()
+
+    renderLayout(<TaskToolbar />, [
+      {
+        request: { query: CREATE_TASK, variables: { input: expectedCreateInput() } },
+        result: { data: { createTask: mockCreatedTask } },
+      },
+    ])
+
+    await user.click(screen.getByRole('button', { name: 'Add task' }))
+    await fillDraft(user)
+    await user.click(screen.getByRole('button', { name: 'Create' }))
+
+    expect(
+      await within(screen.getByRole('status')).findByText('Task created successfully.'),
+    ).toBeInTheDocument()
+  })
+
+  it('announces an updated task', async () => {
+    const user = userEvent.setup()
+
+    renderLayout(<TaskActionsMenu task={assignedTask} />, [
+      {
+        request: {
+          query: UPDATE_TASK,
+          variables: { input: expectedUpdateInput(assignedTask.assignee?.id ?? null) },
+        },
+        result: { data: { updateTask: mockCreatedTask } },
+      },
+    ])
+
+    await user.click(screen.getByRole('button', { name: `More options for ${draftTitle}` }))
+    await user.click(screen.getByRole('menuitem', { name: 'Edit' }))
+    await user.click(screen.getByRole('button', { name: 'Save' }))
+
+    expect(
+      await within(screen.getByRole('status')).findByText('Task updated successfully.'),
+    ).toBeInTheDocument()
+  })
+
+  it('announces a deleted task without naming it', async () => {
+    const user = userEvent.setup()
+
+    renderLayout(<TaskActionsMenu task={assignedTask} />, [
+      {
+        request: { query: DELETE_TASK, variables: { input: { id: assignedTask.id } } },
+        result: { data: { deleteTask: mockCreatedTask } },
+      },
+    ])
+
+    await user.click(screen.getByRole('button', { name: `More options for ${draftTitle}` }))
+    await user.click(screen.getByRole('menuitem', { name: 'Delete' }))
+    await user.click(screen.getByRole('button', { name: 'Delete' }))
+
+    const region = screen.getByRole('status')
+
+    expect(await within(region).findByText('Task deleted successfully.')).toBeInTheDocument()
+    // Generic on purpose: the dialog named the task before the action ran.
+    expect(within(region).queryByText(new RegExp(draftTitle))).not.toBeInTheDocument()
+  })
+})
+
 describe('AppLayout task deletion and the cache', () => {
   /*
    * Exactly one GET_TASKS mock is supplied. A refetch would find nothing to
@@ -717,8 +799,12 @@ describe('AppLayout filtering and the board', () => {
     await user.click(screen.getByRole('button', { name: 'Status' }))
     await user.click(screen.getByRole('button', { name: 'Done' }))
 
-    // Mid-flight: the answer has not arrived, and the board has not left.
-    expect(screen.queryByRole('status')).not.toBeInTheDocument()
+    /*
+     * Mid-flight: the answer has not arrived, and the board has not left.
+     * Scoped to the route's own content, since the layout now keeps a standing
+     * announcement region of the same role outside it.
+     */
+    expect(within(screen.getByRole('main')).queryByRole('status')).not.toBeInTheDocument()
     expect(screen.getByRole('article', { name: mockCreatedTask.name })).toBeInTheDocument()
   })
 })

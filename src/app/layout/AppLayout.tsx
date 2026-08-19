@@ -21,9 +21,11 @@ import { TaskFormModal } from '@/features/task-form/ui/TaskFormModal'
 import { useUsers } from '@/entities/user/model/useUsers'
 import { getMobilePlatform } from '@/shared/lib/platform/getMobilePlatform'
 import { useIsNarrowViewport } from '@/shared/lib/viewport/useIsNarrowViewport'
+import { useTransientStatus } from '@/shared/lib/feedback/useTransientStatus'
 import { useDebouncedValue } from '@/shared/lib/timing/useDebouncedValue'
 import { AddProjectPage } from '@/pages/add-project/AddProjectPage'
 import { IconButton } from '@/shared/ui/icon-button/IconButton'
+import { StatusToast } from '@/shared/ui/status-toast/StatusToast'
 import { AppHeader } from '@/widgets/app-header/AppHeader'
 import { AppSidebar } from '@/widgets/app-sidebar/AppSidebar'
 import styles from './AppLayout.module.css'
@@ -72,6 +74,11 @@ export function AppLayout() {
     useUpdateTask()
   const [runDeleteTask, { error: deletionError, loading: isDeletingTask, reset: resetDeletion }] =
     useDeleteTask()
+  /*
+   * One region for all three mutations, held here because a deletion succeeds
+   * when no draft is open to carry the message.
+   */
+  const { announce: announceTaskStatus, status: taskStatus } = useTransientStatus()
   const mobilePlatform = getMobilePlatform()
   const isAndroid = mobilePlatform === 'android'
   const hasTaskSearch = taskRoutes.includes(useLocation().pathname)
@@ -146,10 +153,18 @@ export function AppLayout() {
       }
 
       closeTaskForm()
+      /*
+       * One success path serves both mutations, so the sentence is what says
+       * which one finished. Create is included even though the review named
+       * update and delete: staying silent here would take an extra condition,
+       * and would leave one CRUD operation as the exception on a surface the
+       * other two share.
+       */
+      announceTaskStatus(editingTask ? 'Task updated successfully.' : 'Task created successfully.')
     } catch {
       // Reported through the mutation's own error; the draft stays as it was.
     }
-  }, [closeTaskForm, createTask, editingTask, taskForm.values, updateTask])
+  }, [announceTaskStatus, closeTaskForm, createTask, editingTask, taskForm.values, updateTask])
 
   const taskFormContext = useMemo(
     () => ({
@@ -176,10 +191,12 @@ export function AppLayout() {
     try {
       await runDeleteTask({ variables: { input: { id: deletingTask.id } } })
       setDeletingTask(null)
+      /* Generic on purpose: the dialog named the task before the action ran. */
+      announceTaskStatus('Task deleted successfully.')
     } catch {
       // Reported in the dialog, which stays open so it can be tried again.
     }
-  }, [deletingTask, runDeleteTask])
+  }, [announceTaskStatus, deletingTask, runDeleteTask])
 
   const taskActionsContext = useMemo(() => ({ deleteTask: setDeletingTask, editTask }), [editTask])
 
@@ -279,6 +296,10 @@ export function AppLayout() {
                 taskTitle={deletingTask.title}
               />
             ) : null}
+            <StatusToast
+              announcementKey={taskStatus.announcementKey}
+              message={taskStatus.message}
+            />
           </div>
         </TaskFiltersContext>
       </TaskActionsContext>
