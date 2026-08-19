@@ -6,11 +6,11 @@ import { TaskBoard } from '@/widgets/task-board/TaskBoard'
 import { emptyResultsHint } from '@/features/task-filters/model/taskFilters'
 import { LiveAnnouncement } from '@/shared/ui/live-announcement/LiveAnnouncement'
 import { useTaskFilters } from '@/features/task-filters/model/useTaskFilters'
-import { useDashboardTasks } from './model/useDashboardTasks'
+import { useFilteredTasks } from '@/features/task-filters/model/useFilteredTasks'
 import styles from './DashboardPage.module.css'
 
 export function DashboardPage() {
-  const { error, isFiltered, isLoading, isRefreshing, retry, tasks } = useDashboardTasks()
+  const { error, isFiltered, isLoading, isRefreshing, retry, tasks } = useFilteredTasks()
   const { appliedFilters } = useTaskFilters()
   /*
    * Each route keeps the presentation it was designed around and remembers its

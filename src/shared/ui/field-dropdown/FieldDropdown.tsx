@@ -1,4 +1,5 @@
-import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react'
+import type { ReactNode } from 'react'
+import { useDisclosure } from '@/shared/lib/disclosure/useDisclosure'
 import styles from './FieldDropdown.module.css'
 
 /**
@@ -78,48 +79,7 @@ export function FieldDropdown({
   value,
   variant = 'compact',
 }: FieldDropdownProps) {
-  const [isOpen, setIsOpen] = useState(false)
-  const containerRef = useRef<HTMLDivElement>(null)
-  const triggerRef = useRef<HTMLButtonElement>(null)
-  const wasOpenRef = useRef(false)
-
-  const close = useCallback(() => setIsOpen(false), [])
-
-  useEffect(() => {
-    if (wasOpenRef.current && !isOpen) {
-      triggerRef.current?.focus()
-    }
-
-    wasOpenRef.current = isOpen
-  }, [isOpen])
-
-  useEffect(() => {
-    if (!isOpen) {
-      return
-    }
-
-    function handlePointerDown(event: MouseEvent) {
-      if (event.target instanceof Node && !containerRef.current?.contains(event.target)) {
-        setIsOpen(false)
-      }
-    }
-
-    function handleKeyDown(event: KeyboardEvent) {
-      if (event.key === 'Escape') {
-        event.stopPropagation()
-        close()
-      }
-    }
-
-    document.addEventListener('mousedown', handlePointerDown)
-    document.addEventListener('keydown', handleKeyDown, true)
-
-    return () => {
-      document.removeEventListener('mousedown', handlePointerDown)
-      document.removeEventListener('keydown', handleKeyDown, true)
-    }
-  }, [close, isOpen])
-
+  const { close, containerRef, isOpen, toggle, triggerRef } = useDisclosure()
   const isRow = variant === 'row'
 
   return (
@@ -138,7 +98,7 @@ export function FieldDropdown({
           .filter(Boolean)
           .join(' ')}
         disabled={disabled}
-        onClick={() => setIsOpen((currentIsOpen) => !currentIsOpen)}
+        onClick={toggle}
         ref={triggerRef}
         type="button"
       >
