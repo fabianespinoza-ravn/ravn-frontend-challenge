@@ -399,6 +399,58 @@ describe('AppLayout task editing', () => {
 
     await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument())
   })
+
+  /*
+   * The composition is shared, so a failed edit reporting a failed creation is
+   * the same bug wearing the other operation's sentence. The verb is what
+   * proves the mode reached the message.
+   */
+  it('keeps the draft and reports an edit that failed', async () => {
+    const user = userEvent.setup()
+
+    renderLayout(<TaskActionsMenu task={assignedTask} />, [
+      {
+        request: {
+          query: UPDATE_TASK,
+          variables: { input: expectedUpdateInput(assignedTask.assignee?.id ?? null) },
+        },
+        error: new Error('Update failed'),
+      },
+    ])
+
+    await user.click(screen.getByRole('button', { name: `More options for ${draftTitle}` }))
+    await user.click(screen.getByRole('menuitem', { name: 'Edit' }))
+    await user.click(screen.getByRole('button', { name: 'Save' }))
+
+    expect(await screen.findByRole('alert')).toHaveTextContent('The task could not be updated')
+    expect(screen.getByRole('dialog', { name: 'Edit Task' })).toBeInTheDocument()
+    expect(screen.getByLabelText('Task Title')).toHaveValue(draftTitle)
+  })
+
+  /*
+   * Title and Label are the only required fields an edit can empty: the others
+   * are chosen through controls that offer no way back to unset.
+   */
+  it('names the missing fields against the edit in progress', async () => {
+    const user = userEvent.setup()
+
+    renderLayout(<TaskActionsMenu task={assignedTask} />)
+
+    await user.click(screen.getByRole('button', { name: `More options for ${draftTitle}` }))
+    await user.click(screen.getByRole('menuitem', { name: 'Edit' }))
+
+    await user.clear(screen.getByLabelText('Task Title'))
+    await user.click(screen.getByRole('button', { name: 'Label: React' }))
+    await user.click(screen.getByRole('button', { name: 'React' }))
+    // Tags are a multiple selection, so the panel waits to be dismissed.
+    await user.keyboard('{Escape}')
+
+    await user.click(screen.getByRole('button', { name: 'Save' }))
+
+    expect(screen.getByRole('alert')).toHaveTextContent(
+      'Add Task title and Label before updating this task.',
+    )
+  })
 })
 
 describe('AppLayout task deletion', () => {

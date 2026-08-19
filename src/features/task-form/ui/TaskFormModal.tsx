@@ -38,6 +38,7 @@ export function TaskFormModal({
         <TaskFormStatus
           className={styles.status}
           hasFailed={hasFailed}
+          isEditing={isEditing}
           missingFields={form.missingFields}
         />
         <button

@@ -63,6 +63,7 @@ export function AddProjectPage({
       <TaskFormStatus
         className={styles.status}
         hasFailed={hasFailed}
+        isEditing={isEditing}
         missingFields={form.missingFields}
       />
       <TaskForm assignees={assignees} form={form} id={taskFormId} onSubmit={onSubmit} />
