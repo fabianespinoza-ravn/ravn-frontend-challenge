@@ -90,13 +90,16 @@ export function hasActiveFilters(filters: TaskFilters) {
 /**
  * What to say when a combination returns nothing.
  *
- * A typed name gets the one surprise in how this behaves: the API matches it
- * case-sensitively (5.10), so a lowercase term will not find a capitalised
- * task. Without a name there is nothing surprising to explain, so it points at
- * the way out instead.
+ * A typed name gets the one surprise in how this behaves: contract 5.10 found
+ * the API matching it case-sensitively, so a lowercase term will not find a
+ * capitalised task. The sentence offers that as something to try rather than
+ * stating it as a rule, because the rule belongs to the API: were the API to
+ * start folding case, advice that had become unnecessary would be a smaller
+ * failure than copy that had become untrue. Without a name there is nothing
+ * surprising to explain, so it points at the way out instead.
  */
 export function emptyResultsHint(filters: TaskFilters) {
   return filters.name
-    ? 'The name is matched exactly as typed, including its capitals.'
+    ? 'Try matching the capitals in the task title, or clear one of the filters.'
     : 'Try clearing one of them.'
 }
